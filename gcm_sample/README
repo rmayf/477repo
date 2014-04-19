@@ -1,0 +1,11 @@
+This README describes how to build and run the Android client and GCM server applet.
+
+PreReqs:
+1. Apache Ant
+2. JDK 1.7 (may work with other versions)
+3. Follow directions in README files of the two subfolders of this directory
+
+Troubleshooting:
+JAVA_HOME environment variable may need to be set to point to your JDK directory
+	  export JAVA_HOME='<path_to_jdk>/jdkxxx'
+
