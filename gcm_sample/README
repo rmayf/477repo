@@ -1,0 +1,16 @@
+This README describes how to build and run the Android client and GCM server applet.
+
+See this link for instructions:
+http://lalit3686.blogspot.com/2012/07/android-steps-to-run-gcm-demo.html
+
+PreReqs:
+1. Apache Ant
+2. JDK 1.7 (may work with other versions)
+3. in gcm-demo-client/src/.../app/CommonUtilities.java, edit SENDER_ID to Project Number
+   Also change SERVER_URL to point to correct IP:port/gcm-demo
+4. Follow directions in README files of the two subfolders of this directory to build
+
+Troubleshooting:
+JAVA_HOME environment variable may need to be set to point to your JDK directory
+	  export JAVA_HOME='<path_to_jdk>/jdkxxx'
+
