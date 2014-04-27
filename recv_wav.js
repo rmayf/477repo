@@ -1,3 +1,8 @@
+/*
+ * Reid Mayfield, CSE 477 Spring 2014, rmayf@cs.washington.edu
+ *
+ */
+
 // TCP Server
 var net = require('net');
 // Binary Data Parser
@@ -17,6 +22,7 @@ var https = require('https');
 const tcp_timeout = 10000;
 const sample_dir = "./samples/";
 const parse_hostname = 'api.parse.com';
+const parse_path = '/1/users/GyqucAeYa3';
 const tcp_port = 6969;
 const http_port = 4774;
 const server_name = 'Klement';
@@ -34,7 +40,8 @@ var tcp_server = net.createServer(function(sock) {
 	    // Get list of files from the server
 		https.get({
 	        hostname: parse_hostname,
-		    path: '/1/users/GyqucAeYa3',
+		    path: parse_path,
+                    // TODO put these keys in an obj with get functions
                     headers: { 'X-Parse-Application-Id': '0JBJLFotV9xF1MvdmihvrH8Ozx8EG9CPNlHX2WFM',
                                'X-Parse-REST-API-Key': 'OPzuRnFuJDcbOmVwZbfUdWEtgnphyKwqoh5RT4NR' }
 		  }, function(res) {
@@ -121,31 +128,39 @@ http.createServer(function(req, res) {
     }
   }
   else if (header.pathname === "/upload") {
-    if(('filename' in header.query)) {
-      fs.createWriteStream(sample_dir + header.query.filename, function(e) {
-        if(e) {
-          res.writeHeader(418);
-          res.end('error ' + e.message);
-        } else {
-          req.pipe(this)
-          .on('error', function(e) {
-            res.writeHeader(418);
-            res.end('error ' + e.message);
-          })
-          .on('finish', function() {
-            res.writeHeader(200);
-            res.end('success!');
-          });
-          req.on('close', function() {
-            this.end();
-          });
-        }
-      });
-    }
-    else {
+    req.on('dir_exists', function() {
+      if(('filename' in header.query)) {
+        var file = fs.createWriteStream(sample_dir + header.query.filename, {flags: 'w'});
+        file.on('error', function(e) {
+          req.emit('error', e);
+        });
+        req.pipe(file);
+        req.on('end', function() {
+          res.writeHeader(200);
+          res.end('success!');
+        });
+      }
+      else {
+        res.writeHeader(418);
+        res.end('no filename specified');
+      }  
+    });
+    req.on('error', function(e) {
       res.writeHeader(418);
-      res.end('no filename specified');
-    }  
+      res.end('error ' + e.message);
+    });
+    fs.exists(sample_dir, function(yes) {
+      if (!yes) {
+        fs.mkdir(sample_dir, function(e) {
+          if(e) {
+            req.emit('error', e);
+          } 
+          req.emit('dir_exists');
+        });
+      } else {
+        req.emit('dir_exists');
+      }
+    });
   }
   else if (header.pathname === "/return") {
     // if file exists pipe it to res
