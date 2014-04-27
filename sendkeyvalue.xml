@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText android:id="@+id/key_text"
+        android:layout_height="wrap_content"
+        android:hint="@string/value_hint"
+        android:layout_width="match_parent"/>
+    <EditText android:id="@+id/value_text"
+        android:layout_height="wrap_content"
+        android:hint="@string/value_hint"
+        android:layout_width="match_parent"/>
+
+	<Button
+	    android:id="@+id/sendToParseButton"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:onClick="sendMessage"
+	    android:text="@string/sendToParseButtonText" />
+
+</LinearLayout>
