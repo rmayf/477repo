@@ -6,16 +6,17 @@ var binary = require('binary');
 var wav = require('wav');
 // Time Formatter
 var moment = require('moment');
-// HTTP Server and Client
+// HTTP Server
 var http = require('http');
 var url = require('url');
 // fs
 var fs = require('fs');
+// HTTPS Client
+var https = require('https');
 
 const tcp_timeout = 10000;
 const sample_dir = "./samples/";
-const parse_hostname = '';
-const parse_port = '';
+const parse_hostname = 'api.parse.com';
 const tcp_port = 6969;
 const http_port = 4774;
 const server_name = 'Klement';
@@ -31,10 +32,11 @@ var tcp_server = net.createServer(function(sock) {
 	    var filenames = {};
 		
 	    // Get list of files from the server
-		http.get({
+		https.get({
 	        hostname: parse_hostname,
-		    port: parse_port,
-		    path: '/getSamples?id=' + vars.id,
+		    path: '/1/users/GyqucAeYa3',
+                    headers: { 'X-Parse-Application-Id': '0JBJLFotV9xF1MvdmihvrH8Ozx8EG9CPNlHX2WFM',
+                               'X-Parse-REST-API-Key': 'OPzuRnFuJDcbOmVwZbfUdWEtgnphyKwqoh5RT4NR' }
 		  }, function(res) {
 		    var body = '';
             if (res.statusCode != 200) {
@@ -86,8 +88,6 @@ var tcp_server = net.createServer(function(sock) {
   });
   sock.on('file', function(sample) {
     console.log(sample);
-	
-	//console.log("filenames: " + filenames);
   });
 });
 
@@ -126,16 +126,20 @@ http.createServer(function(req, res) {
         if(e) {
           res.writeHeader(418);
           res.end('error ' + e.message);
+        } else {
+          req.pipe(this)
+          .on('error', function(e) {
+            res.writeHeader(418);
+            res.end('error ' + e.message);
+          })
+          .on('finish', function() {
+            res.writeHeader(200);
+            res.end('success!');
+          });
+          req.on('close', function() {
+            this.end();
+          });
         }
-        req.pipe(this)
-        .on('error', function(e) {
-          res.writeHeader(418);
-          res.end('error ' + e.message);
-        })
-        .on('finish', function() {
-          res.writeHeader(200);
-          res.end('success!');
-        });
       });
     }
     else {
