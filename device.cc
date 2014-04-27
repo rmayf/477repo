@@ -15,15 +15,16 @@
 #include <arpa/inet.h>
 
 #define DEVICE_ID 0xdeadbabe
-#define HEADER_SIZE 10
-#define SAMPLE_RATE_OFF 4
-#define BIT_DEPTH_OFF 8
-#define CHANNELS_OFF 9
+#define HEADER_SIZE 11
+#define SAMPLE_RATE_OFF 5
+#define TYPE_OFF 4
+#define BIT_DEPTH_OFF 9
+#define CHANNELS_OFF 10
 
 /*
 Header Format (Network Order)
 +----------------+------------------+---------------+--------------+
-| device_id (32) | sample_rate (32) | bit_depth (8) | channels (8) |
+| device_id (32) | type (8) | sample_rate (32) | bit_depth (8) | channels (8) |
 +----------------+------------------+---------------+--------------+
 */
 
@@ -69,6 +70,7 @@ int main(int argc, char **argv) {
   // Reads the metadata using Aquila
   Aquila::WaveFile wav(argv[3]);
   uint32_t sample_rate = htonl(wav.getSampleFrequency());
+  uint32_t sample_number = htonl(wav.getSamplesCount());
   uint8_t bit_depth = wav.getBitsPerSample();
   assert(bit_depth == 16 || bit_depth == 8);
   uint8_t channels = wav.getChannelsNum();
@@ -79,6 +81,7 @@ int main(int argc, char **argv) {
   uint32_t id = htonl(DEVICE_ID);
   memcpy(header, &id, sizeof(id));
   memcpy(&header[SAMPLE_RATE_OFF], &sample_rate, sizeof(sample_rate));
+  header[TYPE_OFF] = 1;
   header[BIT_DEPTH_OFF] = 16;
   header[CHANNELS_OFF] = 1;
 
@@ -99,7 +102,7 @@ int main(int argc, char **argv) {
       if (bit_depth == 8) {
         samples[i] = static_cast<uint16_t>(wav.sample(i) * 127.0);
       } else {
-	samples[i] = htole16(static_cast<uint16_t>(wav.sample(i) * 32767.0));
+	samples[i] = htons(static_cast<uint16_t>(wav.sample(i) * 32767.0));
       }
     }
 
