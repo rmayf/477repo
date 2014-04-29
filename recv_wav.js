@@ -18,11 +18,12 @@ var url = require('url');
 var fs = require('fs');
 // HTTPS Client
 var https = require('https');
-// Used for multiple event trigger
-var async = require('async');
+// Matlab stuff
+var worker = require('child_process');
 
 const tcp_timeout = 10000;
 const sample_dir = "./samples/";
+const catal_dir = "./catalogs/";
 const parse_hostname = 'api.parse.com';
 const parse_path = '/1/users/GyqucAeYa3';
 const tcp_port = 6969;
@@ -53,65 +54,22 @@ var tcp_server = net.createServer(function(sock) {
 	.word8bu('type')
 	.tap(function(vars) {
 	  if (vars.type == 1) {
-            var extractor = this;
-            async.parallel({
-              catalog: function(callback) {		
-	      // Get list of files from the server
-		https.get({
-	        hostname: parse_hostname,
-		    path: parse_path,
-                    headers: { 'X-Parse-Application-Id': '0JBJLFotV9xF1MvdmihvrH8Ozx8EG9CPNlHX2WFM',
-                               'X-Parse-REST-API-Key': 'OPzuRnFuJDcbOmVwZbfUdWEtgnphyKwqoh5RT4NR' }
-		  }, function(res) {
-		    var body = '';
-                    if (res.statusCode != 200) {
-                       callback (new Error("HTTP Response: " + res.statusCode), null);
-                    }
-		    res.on('data', function(stuff) {
-		      body += stuff;
-	            })
-		    res.on('end', function() {
-		      callback (null, JSON.parse(body));
-		    });
-		})
-		.on('error', function(e) {
-	          callback (e, null);
-	        });
-              },
-              sample: function(callback) {
-		extractor.word32bu('sample_rate')
-		    .word8bu('bit_depth')
-		    .word8bu('channels')
-		    .tap(function(vars) {
-		      sock.unpipe();
-		      var sample = sample_dir + 'd'+vars.id + "_" + moment().format('MMDDYY_hhmmss') + ".wav";
-		      sock.pipe(wav.FileWriter(sample, {
-	                format: 1,
-		        channels: vars.channels,
-		        sampleRate: vars.sample_rate,
-		        bitDepth: vars.bit_depth
-	              }));
-                      sock.on('end', function() {
-                        callback(null, sample);
-                      });
-		    });
-             }
-           },
-           function(err, res) {
-             if(err) {
-               sock.emit('error', err);
-             }
-             // res {catalog: ["file1", "file2", ...], sample: "filename"}
-             var comparer = require('child_process').exec('./compare ' + res.sample, 
-                                                                        function(err, out, stderr) {
-               if(err) {
-                 console.log('error ' + err);
-               }
-               console.log('answer: ' + out);
-               // Send match alert to parse
-               // https.get(
-             });
-           });
+            this.word32bu('sample_rate')
+ 	    .word8bu('bit_depth')
+	    .word8bu('channels')
+	    .tap(function(vars) {
+	      sock.unpipe();
+	      var sample = sample_dir + 'd'+vars.id + "_" + moment().format('MMDDYY_hhmmss') + ".wav";
+	      sock.pipe(wav.FileWriter(sample, {
+                format: 1,
+	        channels: vars.channels,
+	        sampleRate: vars.sample_rate,
+	        bitDepth: vars.bit_depth
+              }));
+              sock.on('end', function() {
+                sock.emit('file_written', vars.id, sample);
+              });
+	    });
 	  } 
 	  else if (vars.type == 2) {
 	    // Status Message
@@ -129,6 +87,23 @@ var tcp_server = net.createServer(function(sock) {
 	  }
 	})
   );
+  sock.on('file_written', function(id, sample) {
+    var db = catal_dir+id;
+    fs.exists(db, function(exists) {
+      if(exists) {
+	var cmd = './audfprint -dbase '+catal_dir+id+' -match '+sample;
+        worker.exe(cmd, function(err, out, stderr) {
+          // Results of matching
+          console.log(out);
+        });    
+      }
+      else {
+        // Edge case of no db for device
+        // Wat do?
+        console.log('device: '+id+' has no db');
+      }
+    });
+  });
   sock.setTimeout(tcp_timeout, function() {
     sock.end('Connection Closed', 'utf8');
     console.log("timeout" + sock.remoteAddress);	
@@ -168,39 +143,72 @@ http.createServer(function(req, res) {
       res.end('no filename specified');
     }
   }
+  else if (header.pathname === "/unwatch") {
+    if ('filename' in header.query && 'id' in header.query) {
+      res.writeHeader(200);
+      res.end('success!');
+      var cmd = "./audfprint -dbase "+catal_dir + header.query.id+'.mat'+" -remove "+sample_dir+header.query.filename;
+      worker.exec(cmd, function(err, out, stderr) {
+        // error check
+        console.log(out);
+      });
+    }
+    else {
+      res.writeHeader(418);
+      res.end('error ' + e.message);
+    }
+  }
+  else if (header.pathname === "/watch") {
+    if ('filename' in header.query && 'id' in header.query) {
+      res.writeHeader(200);
+      res.end('success!');
+      var cmd = "./audfprint -dbase "+catal_dir + header.query.id+'.mat'+" -add "+sample_dir+header.query.filename;
+      worker.exec(cmd, function(err, out, stderr) {
+        // error check
+        console.log(out);
+      });
+    }
+    else {
+      res.writeHeader(418);
+      res.end('error ' + e.message);
+    }
+  }
   else if (header.pathname === "/upload") {
-    req.on('dir_exists', function() {
-      if(('filename' in header.query)) {
-        var file = fs.createWriteStream(sample_dir + header.query.filename, {flags: 'w'});
-        file.on('error', function(e) {
-          req.emit('error', e);
+    if(('filename' in header.query && 'id' in header.query)) {
+      var sample = sample_dir + header.query.filename;
+      var file = fs.createWriteStream(sample, {flags: 'w'});
+      file.on('error', function(e) {
+        req.emit('error', e);
+      });
+      req.pipe(file);
+      req.on('end', function() {
+        res.writeHeader(200);
+        res.end('success!');
+        // add file to device's catalog
+        var db = catal_dir + header.query.id + '.mat';
+        var cmd;
+        fs.exists(db, function(exists) {
+          if (!exists) {
+            cmd = "./audfprint -dbase "+db+" -cleardbase 1 -add "+sample;
+          } 
+          else {
+            cmd = "./audfprint -dbase "+db+" -add "+sample;
+          }
+          console.log(cmd);
+          worker.exec(cmd, function(err, out, stderr) {
+            //error checking?
+            console.log(out);
+          });
         });
-        req.pipe(file);
-        req.on('end', function() {
-          res.writeHeader(200);
-          res.end('success!');
-        });
-      }
-      else {
-        res.writeHeader(418);
-        res.end('no filename specified');
-      }  
-    });
+      });
+    }
+    else {
+      res.writeHeader(418);
+      res.end('no filename specified');
+    }  
     req.on('error', function(e) {
       res.writeHeader(418);
       res.end('error ' + e.message);
-    });
-    fs.exists(sample_dir, function(yes) {
-      if (!yes) {
-        fs.mkdir(sample_dir, function(e) {
-          if(e) {
-            req.emit('error', e);
-          } 
-          req.emit('dir_exists');
-        });
-      } else {
-        req.emit('dir_exists');
-      }
     });
   }
   else if (header.pathname === "/return") {
