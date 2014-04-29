@@ -1,8 +1,9 @@
 var http = require('http');
+var fs = require('fs');
 
 var req = http.request({ hostname: 'klement.cs.washington.edu',
                port: 4774,
-               path: '/upload?filename=dumb.txt',
+               path: '/upload?filename=dumb.wav',
                method: 'POST' }, function(res) {
   console.log('STATUS: ' + res.statusCode);
   console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -12,5 +13,5 @@ var req = http.request({ hostname: 'klement.cs.washington.edu',
   });
 });
 
-req.write('data\n');
-req.end();
+fs.createReadStream('test.wav')
+.pipe(req);

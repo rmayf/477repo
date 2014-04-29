@@ -18,6 +18,8 @@ var url = require('url');
 var fs = require('fs');
 // HTTPS Client
 var https = require('https');
+// Used for multiple event trigger
+var async = require('async');
 
 const tcp_timeout = 10000;
 const sample_dir = "./samples/";
@@ -27,61 +29,103 @@ const tcp_port = 6969;
 const http_port = 4774;
 const server_name = 'Klement';
 
+/* TCP Message Formats (Network Ordered)
+
+Sample Upload [Type 1]
+
++----------------+----------+------------------+---------------+------------------------+----------
+| device id (32) | type (8) | sample rate (32) | bit depth (8) | number of channels (8) | data ... 
++----------------+----------+------------------+---------------+------------------------+----------
+
+
+Status Message [Type 2]
+
++----------------+----------+------------------------+---------
+| device id (32) | type (8) | battery percentage (8) | ??? ....
++----------------+----------+------------------------+---------
+
+
+*/
 
 var tcp_server = net.createServer(function(sock) {
-
   sock.pipe(binary()
     .word32bu('id')
 	.word8bu('type')
 	.tap(function(vars) {
 	  if (vars.type == 1) {
-	    var filenames = {};
-		
-	    // Get list of files from the server
+            var extractor = this;
+            async.parallel({
+              catalog: function(callback) {		
+	      // Get list of files from the server
 		https.get({
 	        hostname: parse_hostname,
 		    path: parse_path,
-                    // TODO put these keys in an obj with get functions
                     headers: { 'X-Parse-Application-Id': '0JBJLFotV9xF1MvdmihvrH8Ozx8EG9CPNlHX2WFM',
                                'X-Parse-REST-API-Key': 'OPzuRnFuJDcbOmVwZbfUdWEtgnphyKwqoh5RT4NR' }
 		  }, function(res) {
 		    var body = '';
-            if (res.statusCode != 200) {
-              sock.emit('error', new Error("HTTP Response: " + res.statusCode));
-            }
-			res.on('data', function(stuff) {
-			  body += stuff;
-			})
-			.on('end', function() {
-			  //var filenames = JSON.parse(body);
-			  sock.emit('file', JSON.parse(body));
-			});
+                    if (res.statusCode != 200) {
+                       callback (new Error("HTTP Response: " + res.statusCode), null);
+                    }
+		    res.on('data', function(stuff) {
+		      body += stuff;
+	            })
+		    res.on('end', function() {
+		      callback (null, JSON.parse(body));
+		    });
 		})
 		.on('error', function(e) {
-	      sock.emit('error', e);
-	    });
-		
-		this.word32bu('sample_rate')
+	          callback (e, null);
+	        });
+              },
+              sample: function(callback) {
+		extractor.word32bu('sample_rate')
 		    .word8bu('bit_depth')
 		    .word8bu('channels')
-			.tap(function(vars) {
-			  sock.unpipe();
-			  var sample = sample_dir + vars.id + "_" + moment().format('MMDDYY') + ".wav";
-			  sock.pipe(wav.FileWriter(sample, {
-	            format: 1,
+		    .tap(function(vars) {
+		      sock.unpipe();
+		      var sample = sample_dir + 'd'+vars.id + "_" + moment().format('MMDDYY_hhmmss') + ".wav";
+		      sock.pipe(wav.FileWriter(sample, {
+	                format: 1,
 		        channels: vars.channels,
 		        sampleRate: vars.sample_rate,
 		        bitDepth: vars.bit_depth
-	          }));
-			});
+	              }));
+                      sock.on('end', function() {
+                        callback(null, sample);
+                      });
+		    });
+             }
+           },
+           function(err, res) {
+             if(err) {
+               sock.emit('error', err);
+             }
+             // res {catalog: ["file1", "file2", ...], sample: "filename"}
+             var comparer = require('child_process').exec('./compare ' + res.sample, 
+                                                                        function(err, out, stderr) {
+               if(err) {
+                 console.log('error ' + err);
+               }
+               console.log('answer: ' + out);
+               // Send match alert to parse
+               // https.get(
+             });
+           });
 	  } 
 	  else if (vars.type == 2) {
 	    // Status Message
-		console.log("status message recv");
+            console.log("status message recv");
+            extractor.word8bu('battery')
+              .tap(function(vars) {
+                // Send battery level to Parse
+                // https.get(
+              });
+            
 	  } 
 	  else {
 	    //bad message type
-		sock.emit('error', new Error("InvalidMessageFormat"));
+            sock.emit('error', new Error("InvalidMessageFormat"));
 	  }
 	})
   );
@@ -91,10 +135,7 @@ var tcp_server = net.createServer(function(sock) {
   });
   sock.on('error', function(e) {
     console.log("error: " + e.message);
-	sock.destroy();
-  });
-  sock.on('file', function(sample) {
-    console.log(sample);
+    sock.destroy();
   });
 });
 
