@@ -1,0 +1,63 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dev_setup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.cs.washington.cse477.DeviceSetupActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <TextView
+        android:id="@+id/dev_setup_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="@string/dev_setup_net_sel" />
+
+    <Spinner
+        android:id="@+id/dev_setup_device_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/dev_setup_select" />
+
+    <Button
+        android:id="@+id/dev_setup_setup_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="45dp"
+        android:text="@string/dev_setup_b" />
+
+    <EditText
+        android:id="@+id/dev_setup_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/dev_setup_setup_b"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="28dp"
+        android:ems="10"
+        android:inputType="textPassword" >
+
+        <requestFocus />
+    </EditText>
+
+    <Spinner
+        android:id="@+id/dev_setup_security_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/dev_setup_password"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp" />
+
+    <TextView
+        android:id="@+id/dev_setup_security"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/dev_setup_security_spinner"
+        android:layout_centerHorizontal="true"
+        android:text="@string/dev_setup_encr_sel" />
+    
+</RelativeLayout>
