@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dev_setup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.cs.washington.cse477.StartActivity"
+    tools:ignore="MergeRootFrame" 
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/dev_setup_setup_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:text="@string/connect_b"
+        android:onClick="connect" />
+    
+    <ListView
+        android:id="@+id/listview_networks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dev_setup_setup_b"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
+
+</RelativeLayout>
