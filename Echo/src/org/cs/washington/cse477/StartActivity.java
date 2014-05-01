@@ -1,23 +1,11 @@
 package org.cs.washington.cse477;
 
-import java.util.List;
-
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
-import android.content.Context;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.os.Build;
 
 public class StartActivity extends Activity {
 
@@ -27,19 +15,6 @@ public class StartActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        
-        
-        /*
-        ListView lv = (ListView) findViewById(R.id.listview_networks);
-    	String[] wifiArray = new String[wifiList.size()];
-    	for( int i = 0; i < wifiList.size(); i++) {
-    		WifiConfiguration wc = wifiList.get(i); 
-    		wifiArray[i] = wc.SSID;
-    	}
-    	ArrayAdapter<String> aa = new ArrayAdapter<String>(this,
-    			android.R.layout.simple_list_item_1, android.R.id.text1, wifiArray);
-    	lv.setAdapter(aa);
-    	*/
     }
 
     @Override
@@ -62,5 +37,18 @@ public class StartActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
     
+    public void login(View v) {
+    	// Do login verification
+    	
+    	// If Error: pop-up and reprompt
+    	
+    	// If okay: go to Notifications activity
+    	Intent intent = new Intent(this, NotificationActivity.class);
+    	startActivity(intent);
+    }
     
+    public void createNewAccount(View v) {
+    	Intent intent = new Intent(this, NewAccountActivity.class);
+    	startActivity(intent);
+    }
 }

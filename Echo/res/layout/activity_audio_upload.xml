@@ -1,9 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dev_reg"
+    android:id="@+id/audio_upload"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.cs.washington.cse477.DeviceRegActivity"
+    tools:context="org.cs.washington.cse477.AudioUploadActivity"
     tools:ignore="MergeRootFrame" >
     
 </FrameLayout>

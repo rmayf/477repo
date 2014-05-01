@@ -7,15 +7,38 @@
     <string name="title_activity_device_reg">DeviceRegActivity</string>
     <string name="title_activity_device_setup">DeviceSetupActivity</string>
     <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_device_status">DeviceStatusActivity</string>
+    <string name="title_activity_audio_upload">AudioUploadActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
     
-    <string name="connect_b">Connect</string>
-    <string name="login_b">Login</string>
-    <string name="newacct_b">Create a New Account!</string>
-    <string name="dev_reg_b">Register Your Device</string>
+    <!-- Start Screen -->
+    <string name="dev_start_user_dlg">Username</string>
+    <string name="dev_start_pass_dlg">Password</string>
+    <string name="dev_start_login_b">Login</string>
+    <string name="dev_start_newacct_b">Create a New Account!</string>
+    
+    <!-- New Account Screen -->
+    <string name="new_account_user_dlg">Username</string>
+    <string name="new_account_pass_dlg">Password</string>
+    <string name="new_account_pass_confirm_dlg">Confirm Password</string>
+    <string name="new_account_create_b">Create Account!</string>
+    
+    <!-- Notification Screen -->
+    
+    <!-- Device Registration -->
+    <string name="dev_reg_b">Register Device!</string>
     
     <!-- Device Setup -->
     <string name="dev_setup_b">Configure Device!</string>
     <string name="dev_setup_net_sel">Select a Network</string>
     <string name="dev_setup_encr_sel">What is your network\'s security setting?</string>
 
+    <!-- Device Status -->
+    
+    <!-- Audio Upload -->
+    <string name="audio_upload_b">Upload Sample</string>
+    
+    <!-- Settings -->
+    
+    
 </resources>

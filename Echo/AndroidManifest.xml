@@ -19,12 +19,13 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
+        <!-- Start Activity: Login or Create Account -->
         <activity
             android:name="org.cs.washington.cse477.StartActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -36,14 +37,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.cs.washington.cse477.StartActivity" />
         </activity>
-        <activity
-            android:name="org.cs.washington.cse477.DeviceRegActivity"
-            android:label="@string/title_activity_device_reg" >
-        </activity>
-        <activity
-            android:name="org.cs.washington.cse477.DeviceSetupActivity"
-            android:label="@string/title_activity_device_setup" >
-        </activity>
+
+        <!-- Notifications Activity -->
         <activity
             android:name="org.cs.washington.cse477.NotificationActivity"
             android:label="@string/title_activity_notification" 
@@ -51,6 +46,41 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.cs.washington.cse477.StartActivity" />
+        </activity>
+                <activity
+            android:name="org.cs.washington.cse477.DeviceRegActivity"
+            android:label="@string/title_activity_device_reg" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.cs.washington.cse477.NotificationActivity" />
+        </activity>
+        <activity
+            android:name="org.cs.washington.cse477.DeviceSetupActivity"
+            android:label="@string/title_activity_device_setup" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.cs.washington.cse477.NotificationActivity" />
+        </activity>
+        <activity
+            android:name="org.cs.washington.cse477.DeviceStatusActivity"
+            android:label="@string/title_activity_device_status" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.cs.washington.cse477.NotificationActivity" />
+        </activity>
+        <activity
+            android:name="org.cs.washington.cse477.AudioUploadActivity"
+            android:label="@string/title_activity_audio_upload" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.cs.washington.cse477.NotificationActivity" />
+        </activity>
+        <activity
+            android:name="org.cs.washington.cse477.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.cs.washington.cse477.NotificationActivity" />
         </activity>
     </application>
 

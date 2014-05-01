@@ -16,11 +16,11 @@
         android:text="@string/dev_setup_net_sel" />
 
     <Spinner
-        android:id="@+id/dev_setup_device_spinner"
+        android:id="@+id/dev_setup_networks_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/dev_setup_select" />
+        android:layout_below="@+id/dev_setup_select"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/dev_setup_setup_b"

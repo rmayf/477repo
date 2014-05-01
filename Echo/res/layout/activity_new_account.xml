@@ -1,9 +1,75 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dev_setup"
+    android:id="@+id/new_account"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="org.cs.washington.cse477.NewAccountActivity"
     tools:ignore="MergeRootFrame" >
     
-</FrameLayout>
+    <TextView
+        android:id="@+id/new_account_user_dlg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="@string/new_account_user_dlg" />
+    
+    <EditText
+        android:id="@+id/new_account_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/new_account_user_dlg"
+        android:ems="10" 
+        android:inputType="text">
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/new_account_pass_dlg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/new_account_user"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/new_account_pass_dlg" />
+    
+    <EditText
+        android:id="@+id/new_account_pass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/new_account_user"
+        android:layout_below="@+id/new_account_pass_dlg"
+        android:ems="10"
+        android:inputType="textPassword" />
+    <TextView
+        android:id="@+id/new_account_pass_confirm_dlg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/new_account_pass"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/new_account_pass_confirm_dlg" />
+    
+    <EditText
+        android:id="@+id/new_account_pass_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/new_account_user"
+        android:layout_below="@+id/new_account_pass_confirm_dlg"
+        android:ems="10"
+        android:inputType="textPassword" />
+    
+    <Button 
+        android:id="@+id/new_account_create_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/new_account_pass_confirm"
+        android:layout_marginTop="10dp"
+        android:onClick="createAccount"
+        android:text="@string/new_account_create_b" />
+    
+</RelativeLayout>
