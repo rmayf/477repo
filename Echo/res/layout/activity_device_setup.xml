@@ -22,20 +22,29 @@
         android:layout_below="@+id/dev_setup_select"
         android:layout_centerHorizontal="true" />
 
+    <Button 
+        android:id="@+id/dev_setup_refresh_networks_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/dev_setup_networks_spinner"
+        android:onClick="refreshScan"
+        android:text="@string/dev_setup_refresh" />
+    
     <Button
         android:id="@+id/dev_setup_setup_b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/dev_setup_password"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="45dp"
+        android:onClick="connectToFlyport"
         android:text="@string/dev_setup_b" />
 
     <EditText
         android:id="@+id/dev_setup_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/dev_setup_setup_b"
+        android:layout_below="@+id/dev_setup_security_spinner"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="28dp"
         android:ems="10"
@@ -48,7 +57,7 @@
         android:id="@+id/dev_setup_security_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/dev_setup_password"
+        android:layout_below="@+id/dev_setup_security"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="18dp" />
 
@@ -56,7 +65,8 @@
         android:id="@+id/dev_setup_security"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/dev_setup_security_spinner"
+        android:layout_below="@+id/dev_setup_refresh_networks_b"
+        android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
         android:text="@string/dev_setup_encr_sel" />
     

@@ -3,19 +3,28 @@
 
     <string name="app_name">Echo</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_new_account">NewAccountActivity</string>
-    <string name="title_activity_device_reg">DeviceRegActivity</string>
-    <string name="title_activity_device_setup">DeviceSetupActivity</string>
-    <string name="title_activity_notification">NotificationActivity</string>
-    <string name="title_activity_device_status">DeviceStatusActivity</string>
-    <string name="title_activity_audio_upload">AudioUploadActivity</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_new_account">Create an Account</string>
+    <string name="title_activity_device_reg">Add Existing Device</string>
+    <string name="title_activity_device_setup">Setup New Device</string>
+    <string name="title_activity_notification">Echo</string>
+    <string name="title_activity_device_status">Status</string>
+    <string name="title_activity_audio_upload">Upload Audio</string>
+    <string name="title_activity_settings">Settings</string>
+    
+    <!-- Menu Items -->
+    <string name="menu_add_device">Add Existing Device</string>
+    <string name="menu_setup_device">Setup New Device</string>
+    <string name="menu_device_status">View Device Status</string>
+    <string name="menu_audio_upload">Upload Audio Sample</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_logout">Logout</string>
     
     <!-- Start Screen -->
     <string name="dev_start_user_dlg">Username</string>
     <string name="dev_start_pass_dlg">Password</string>
     <string name="dev_start_login_b">Login</string>
     <string name="dev_start_newacct_b">Create a New Account!</string>
+    <string name="dev_start_remember_cb">Remember Me</string>
     
     <!-- New Account Screen -->
     <string name="new_account_user_dlg">Username</string>
@@ -32,11 +41,15 @@
     <string name="dev_setup_b">Configure Device!</string>
     <string name="dev_setup_net_sel">Select a Network</string>
     <string name="dev_setup_encr_sel">What is your network\'s security setting?</string>
+    <string name="dev_setup_refresh">Refresh Networks</string>
 
     <!-- Device Status -->
     
     <!-- Audio Upload -->
     <string name="audio_upload_b">Upload Sample</string>
+    <string name="audio_upload_dlg_title">To add a new sample:</string>
+    <string name="audio_upload_dlg_cancel">Cancel</string>
+    <string name="audio_upload_dlg_continue">Go</string>
     
     <!-- Settings -->
     

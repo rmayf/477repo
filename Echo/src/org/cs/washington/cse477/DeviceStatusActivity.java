@@ -16,7 +16,7 @@ public class DeviceStatusActivity extends ActionBarActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.device_reg, menu);
+		//getMenuInflater().inflate(R.menu.device_reg, menu);
 		return true;
 	}
 

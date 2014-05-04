@@ -9,14 +9,14 @@ public class AudioUploadActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_device_reg);
+		setContentView(R.layout.activity_audio_upload);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.device_reg, menu);
+		//getMenuInflater().inflate(R.menu.audio_upload, menu);
 		return true;
 	}
 

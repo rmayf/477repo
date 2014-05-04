@@ -50,11 +50,11 @@
         android:id="@+id/dev_start_login_b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dev_start_pass"
+        android:layout_below="@+id/dev_start_remember_cb"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
         android:layout_alignLeft="@+id/dev_start_newacct_b"
         android:layout_alignRight="@+id/dev_start_newacct_b"
+        android:layout_marginTop="10dp"
         android:onClick="login"
         android:text="@string/dev_start_login_b" />
 
@@ -64,7 +64,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_start_login_b"
         android:layout_centerHorizontal="true"
-        android:onClick="login"
+        android:onClick="createNewAccount"
         android:text="@string/dev_start_newacct_b" />
+
+    <CheckBox
+        android:id="@+id/dev_start_remember_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/dev_start_newacct_b"
+        android:layout_below="@+id/dev_start_pass"
+        android:text="@string/dev_start_remember_cb"
+        android:textSize="12sp"
+        android:layout_marginTop="10dp" />
 
 </RelativeLayout>

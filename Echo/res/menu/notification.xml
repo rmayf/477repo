@@ -1,11 +1,55 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:echo="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.cs.washington.cse477.NotificationActivity" >
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:id="@+id/notification_action_refresh"
+        android:orderInCategory="2"
+        android:showAsAction="always"
+        android:title="@string/menu_refresh"
+        echo:showAsAction="always"
+        android:icon="@drawable/ic_action_refresh" />
+    <item
+        android:id="@+id/notification_action_add_sample"
+        android:orderInCategory="1"
+        android:showAsAction="always"
+        android:title="@string/menu_audio_upload"
+        echo:showAsAction="always"
+        android:icon="@drawable/ic_action_new" />
+    <item
+        android:id="@+id/notification_action_settings"
+        android:orderInCategory="1000"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
-
+    <item
+        android:id="@+id/notification_action_setup_device"
+        android:orderInCategory="400"
+        android:showAsAction="never"
+        android:title="@string/menu_setup_device"/>
+    <!-- 
+    <item
+        android:id="@+id/notification_action_audio_upload"
+        android:orderInCategory="500"
+        android:showAsAction="never"
+        android:title="@string/menu_audio_upload"/>
+    -->
+    
+    <!-- 
+    <item
+        android:id="@+id/notification_action_add_device"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/menu_add_device"/>
+    <item
+        android:id="@+id/notification_action_device_status"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_device_status"/>
+    <item
+        android:id="@+id/notification_action_logout"
+        android:orderInCategory="900"
+        android:showAsAction="never"
+        android:title="@string/menu_logout"/>
+         -->
 </menu>
