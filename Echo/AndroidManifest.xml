@@ -20,6 +20,7 @@
 <permission android:protectionLevel="signature"
     android:name="org.cs.washington.cse477.permission.C2D_MESSAGE" />
 <uses-permission android:name="org.cs.washington.cse477.permission.C2D_MESSAGE" />
+<!--  END parse push stuff -->
     
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE">
     </uses-permission>
@@ -128,6 +129,7 @@
     <category android:name="org.cs.washington.cse477" />
   </intent-filter>
 </receiver>
+<!--  END parse push stuff -->
     </application>
 
 </manifest>
