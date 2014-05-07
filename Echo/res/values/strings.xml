@@ -19,6 +19,22 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_logout">Logout</string>
     
+    <!-- Device Setup -->
+    <string name="dev_setup_b">Configure Device!</string>
+    <string name="dev_setup_net_sel">Select a Network</string>
+    <string name="dev_setup_encr_sel">What is your network\'s security setting?</string>
+    <string name="dev_setup_refresh">Refresh Networks</string>
+    
+    <!-- Notification Screen -->
+    <string name="notification_play_desc">Play</string>
+    
+    <!-- Settings -->
+    <string name="settings_play_desc">Play</string>
+    <string name="settings_toggle">Toggle</string>
+    
+    
+    
+    <!-- Old Screens Not Used -->
     <!-- Start Screen -->
     <string name="dev_start_user_dlg">Username</string>
     <string name="dev_start_pass_dlg">Password</string>
@@ -32,16 +48,8 @@
     <string name="new_account_pass_confirm_dlg">Confirm Password</string>
     <string name="new_account_create_b">Create Account!</string>
     
-    <!-- Notification Screen -->
-    
     <!-- Device Registration -->
     <string name="dev_reg_b">Register Device!</string>
-    
-    <!-- Device Setup -->
-    <string name="dev_setup_b">Configure Device!</string>
-    <string name="dev_setup_net_sel">Select a Network</string>
-    <string name="dev_setup_encr_sel">What is your network\'s security setting?</string>
-    <string name="dev_setup_refresh">Refresh Networks</string>
 
     <!-- Device Status -->
     
@@ -51,7 +59,6 @@
     <string name="audio_upload_dlg_cancel">Cancel</string>
     <string name="audio_upload_dlg_continue">Go</string>
     
-    <!-- Settings -->
     
     
 </resources>

@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip" >
+
+    <ImageView
+        android:id="@+id/settings_play"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="6dip"
+        android:contentDescription="@string/settings_play_desc"
+        android:src="@drawable/ic_launcher" />
+
+	<ToggleButton
+        android:id="@+id/settings_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/settings_play"
+        android:layout_margin="8dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/settings_toggle" />
+    
+    <TextView
+        android:id="@+id/settings_text"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_marginLeft="6dip"
+        android:layout_toLeftOf="@+id/settings_toggle"
+        android:gravity="center_vertical"
+        android:textSize="16sp" />
+
+    
+
+</RelativeLayout>

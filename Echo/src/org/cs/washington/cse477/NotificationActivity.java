@@ -21,25 +21,28 @@ public class NotificationActivity extends ActionBarActivity {
 	protected List<String> notifications;
 	protected ArrayAdapter<String> notifyAdapter;
 	protected ListView notifyView;
-	
+	protected List<ParseObject> sounds;
 	
 	//protected String[] dbg = {"notify 1", "notify 2", "notify 3"};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		List<ParseObject> sounds = getSounds();
+		sounds = getSounds();
 
 		setContentView(R.layout.activity_notification);
+
+		setupNotificationListView();		
+	}
+
+	protected void setupNotificationListView() {
 		notifyView = (ListView) findViewById(R.id.notification_listview);
 		notifications = new LinkedList<String>();
 		for (int i=0; i<sounds.size(); i++) {
 			notifications.add((String) sounds.get(i).get("name"));
 		}
-		notifyAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-				android.R.id.text1, notifications);
+		notifyAdapter = new NotificationListAdapter(this, notifications);
 		notifyView.setAdapter(notifyAdapter);
-		
 	}
 	// gets the Sound objects that are match targets. Subscriptions to these sounds
 	// may be on or off

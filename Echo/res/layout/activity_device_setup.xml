@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_setup_password"
         android:layout_centerHorizontal="true"
-        android:onClick="connectToFlyport"
+        android:onClick="postMessage"
         android:text="@string/dev_setup_b" />
 
     <EditText
