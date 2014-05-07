@@ -68,6 +68,11 @@ public class SettingsActivity extends ActionBarActivity {
 		new FetchInBackgroundThenPlaySound().execute(filename);
 	}
 	
+	/**
+	 * Fetches the file from the nodejs server in a background thread then plays the file
+	 * in the UI thread. Deletes the file from local storage when playback is done.
+	 * 
+	 */
 	private class FetchInBackgroundThenPlaySound extends AsyncTask<String, Void, String> {
 		
 		protected String doInBackground(String... filename) {
@@ -91,6 +96,12 @@ public class SettingsActivity extends ActionBarActivity {
 				// TODO Auto-generated catch block
 				Log.e(LOG_TAG, "IOException error: " + e.getMessage());
 				e.printStackTrace();
+			}
+			if (res == null) {
+				//TODO alert user that the server is down
+				Log.e(LOG_TAG, "Server is down, cannot fetch audio file");
+				httpGet.abort();
+				return null;
 			}
 			Header[] headers = res.getAllHeaders();
 			int len = 0;
@@ -126,7 +137,21 @@ public class SettingsActivity extends ActionBarActivity {
 		}
 		
 		protected void onPostExecute(String path) {
+			if (path == null) {
+				//TODO alert user that the server is down
+				return;
+			}
 			MediaPlayer mp = new MediaPlayer();
+			mp.setOnCompletionListener(new DeleteAfterPlay(path) {
+				public void onCompletion(MediaPlayer mp) {
+					mp.release();
+					if (deleteFromAppStorage(getPath())) {
+						Log.v(LOG_TAG, "successfully deleted file: " + getPath());
+					} else {
+						Log.e(LOG_TAG, "error deleting file: " + getPath());
+					}
+				}
+			});
 			try {
 				mp.setDataSource(path);
 			} catch (IllegalArgumentException e) {
@@ -153,94 +178,20 @@ public class SettingsActivity extends ActionBarActivity {
 			}
 			mp.start();	
 		}
-
+	}
+	
+	public abstract class DeleteAfterPlay implements MediaPlayer.OnCompletionListener {
+		private String path;
+		public DeleteAfterPlay(String path) {
+			this.path = path;
+		}
+		public String getPath() {
+			return path;
+		}
 		
 	}
 	
-	public void putSoundInRaw() {
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy); 
-		URI uri = null;
-		String filename = "isaiahtest.ogg";
-		try {
-			uri = new URI("http://klement.cs.washington.edu:9999/getMatchAgainst?filename=" + filename);
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(uri);
-		HttpResponse res = null;
-		try {
-			res = httpClient.execute(httpGet);
-		} catch (ClientProtocolException e) {
-			Log.e(LOG_TAG, "Protocol error: " + e.getMessage());
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			Log.e(LOG_TAG, "IOException error: " + e.getMessage());
-			e.printStackTrace();
-		}
-		Header[] headers = res.getAllHeaders();
-		int len = 0;
-		for (int i = 0; i < headers.length; i++) {
-			if (headers[i].getName().equalsIgnoreCase("content-length")) {
-				len = Integer.parseInt(headers[i].getValue());
-				Log.v(LOG_TAG, "file length in bytes: " + len);
-			}
-		}
-		HttpEntity entity = res.getEntity();
-		byte[] temp = new byte[1024];
-		int bytesRead = 0;
-		InputStream in = null;
-		FileOutputStream outputStream = null;
-		try {
-			outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE);
-			in = new BufferedInputStream(entity.getContent());
-			while ((bytesRead = in.read(temp)) > 0) {
-				outputStream.write(temp, 0, bytesRead);
-			}
-			in.close();
-			outputStream.close();
-			in.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		String path = getApplicationContext().getFilesDir().getAbsolutePath();
-		path += "/";
-		path += filename;
-		Log.v(LOG_TAG, "opening file at location: " + path);
-		
-		MediaPlayer mp = new MediaPlayer();
-		try {
-			mp.setDataSource(path);
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			mp.prepare();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		mp.start();
-	}
-	
+	// deletes a file from local storage
 	public boolean deleteFromAppStorage(String path) {
 		File toDelete = new File(path);
 		return toDelete.delete();
