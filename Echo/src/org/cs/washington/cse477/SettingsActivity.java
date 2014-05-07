@@ -20,7 +20,6 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -44,7 +43,6 @@ public class SettingsActivity extends ActionBarActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.device_reg, menu);
 		return true;
@@ -62,10 +60,18 @@ public class SettingsActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	
-	public void fetchThenPlaySound(View view)  {
+	/**
+	 *  
+	 */
+	public void fetchThenPlayTarget(View view)  {
 		String filename = "isaiahtest.ogg";
-		new FetchInBackgroundThenPlaySound().execute(filename);
+		new FetchInBackgroundThenPlaySound().execute("getMatchAgainst", filename);
+	}
+ 	// eventually we will implement this because we are either fetching target sounds or
+ 	// recordings of events.
+	public void fetchThenPlayEventRecording(View view) {
+		String filename = "donuts.m4a";
+		new FetchInBackgroundThenPlaySound().execute("getEventRecording", filename);
 	}
 	
 	/**
@@ -75,10 +81,15 @@ public class SettingsActivity extends ActionBarActivity {
 	 */
 	private class FetchInBackgroundThenPlaySound extends AsyncTask<String, Void, String> {
 		
-		protected String doInBackground(String... filename) {
+		//args[0] is the method you're calling on the server, either the string "getMatchAgainst"
+		// or the String "getEventRecording"
+		// args[1] is the file you want 
+		protected String doInBackground(String... args) {
 			URI uri = null;
+			String method = args[0];
+			String filename = args[1];
 			try {
-				uri = new URI("http://klement.cs.washington.edu:9999/getMatchAgainst?filename=" + filename[0]);
+				uri = new URI("http://klement.cs.washington.edu:9999/" + method + "?filename=" + filename);
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -101,6 +112,7 @@ public class SettingsActivity extends ActionBarActivity {
 				//TODO alert user that the server is down
 				Log.e(LOG_TAG, "Server is down, cannot fetch audio file");
 				httpGet.abort();
+				// null is passed to onPostExecute() and it knows what to do with null input
 				return null;
 			}
 			Header[] headers = res.getAllHeaders();
@@ -117,7 +129,7 @@ public class SettingsActivity extends ActionBarActivity {
 			InputStream in = null;
 			FileOutputStream outputStream = null;
 			try {
-				outputStream = openFileOutput(filename[0], Context.MODE_WORLD_READABLE);
+				outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE); // I don't know of any alternatives
 				in = new BufferedInputStream(entity.getContent());
 				while ((bytesRead = in.read(temp)) > 0) {
 					outputStream.write(temp, 0, bytesRead);
@@ -131,7 +143,7 @@ public class SettingsActivity extends ActionBarActivity {
 			}
 			String path = getApplicationContext().getFilesDir().getAbsolutePath();
 			path += "/";
-			path += filename[0];
+			path += filename;
 			Log.v(LOG_TAG, "opening file at location: " + path);	
 			return path;
 		}
@@ -179,7 +191,10 @@ public class SettingsActivity extends ActionBarActivity {
 			mp.start();	
 		}
 	}
-	
+	/**
+	 * Partial implementation of the class that is called when media playback completes.
+	 * The unimplemented method onCompletion() is implemented in the callback.
+	 */
 	public abstract class DeleteAfterPlay implements MediaPlayer.OnCompletionListener {
 		private String path;
 		public DeleteAfterPlay(String path) {
@@ -188,7 +203,6 @@ public class SettingsActivity extends ActionBarActivity {
 		public String getPath() {
 			return path;
 		}
-		
 	}
 	
 	// deletes a file from local storage
@@ -221,7 +235,4 @@ public class SettingsActivity extends ActionBarActivity {
 			}
 		});
 	}
-	
-	
-	// refresh notifications
 }
