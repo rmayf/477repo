@@ -3,46 +3,57 @@ package org.cs.washington.cse477;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.os.Build;
+
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 public class NotificationActivity extends ActionBarActivity {
-
+	private static final String LOG_TAG = "NotificationActivity";
 	protected List<String> notifications;
 	protected ArrayAdapter<String> notifyAdapter;
 	protected ListView notifyView;
 	
-	protected String[] dbg = {"notify 1", "notify 2", "notify 3"};
+	
+	//protected String[] dbg = {"notify 1", "notify 2", "notify 3"};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		List<ParseObject> sounds = getSounds();
+
 		setContentView(R.layout.activity_notification);
 		notifyView = (ListView) findViewById(R.id.notification_listview);
 		notifications = new LinkedList<String>();
-		for (int i=0; i<dbg.length; i++) {
-			notifications.add(dbg[i]);
+		for (int i=0; i<sounds.size(); i++) {
+			notifications.add((String) sounds.get(i).get("name"));
 		}
 		notifyAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
 				android.R.id.text1, notifications);
 		notifyView.setAdapter(notifyAdapter);
 		
+	}
+	// gets the Sound objects that are match targets. Subscriptions to these sounds
+	// may be on or off
+	public List<ParseObject> getSounds() {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
+		List<ParseObject> sounds = null;
+		try {
+			sounds = query.find();
+			Log.v(LOG_TAG, "success getting Sound objects");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return sounds;
 	}
 	
 	@Override
