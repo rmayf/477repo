@@ -15,7 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
-
+	public static final String LOG_TAG = "NotificationListAdapter";
+	
 	private final Context context;
 	private final List<ParseObject> values;
 	  
@@ -34,7 +35,9 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
         }
 		
 		TextView textview = (TextView) rowView.findViewById(R.id.notification_text);
-		textview.setText((String)values.get(position).get("eventFilename"));
+		final String text = (String)values.get(position).get("eventFilename");
+		Log.v(LOG_TAG, "populating: " + text);
+		textview.setText(text);
 		
 		ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
 		img.setClickable(true);
@@ -44,11 +47,11 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				// on click of the play button (image), initiate fetch of sound and playback
-				Log.e("DEBUG","clicked notifications play");
+				Log.v("DEBUG","clicked notifications play for file: " + text);
+				ParseInit.asf.fetchThenPlayEventRecording(text);
 			}
 		});
-		
-		
+
 		return rowView;
 	}
 }

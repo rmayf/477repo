@@ -7,6 +7,7 @@ import com.parse.ParseInstallation;
 import com.parse.PushService;
 
 public class ParseInit extends Application {
+	public static AudioSampleFetcher asf;
 
 	@Override
 	public void onCreate() {
@@ -15,7 +16,8 @@ public class ParseInit extends Application {
 		Parse.initialize(this, "t1oV8LeSRZsCFmBSe0yudiZv17eHIJdaHtytj0ZP", "CgnLN9dMbywD4CXELdVcAOxV8FFC6La6c1sYRV0S");
 		PushService.setDefaultPushCallback(this, NotificationActivity.class);
 		ParseInstallation.getCurrentInstallation().saveInBackground();
-		PushService.subscribe(this.getApplicationContext(), "cat", NotificationActivity.class);
+	//	PushService.subscribe(this.getApplicationContext(), "cat", NotificationActivity.class);
+		asf = new AudioSampleFetcher(this.getApplicationContext());
 	}
 
 }

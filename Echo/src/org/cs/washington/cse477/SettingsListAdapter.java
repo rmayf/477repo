@@ -21,6 +21,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 	private final Context context;
 	private final List<ParseObject> values;
 	private final List<Boolean> states;
+	private String text;
 	
 	public SettingsListAdapter(Context context, List<ParseObject> values) {
 		super(context, R.layout.settings_listview_item, values);
@@ -54,10 +55,12 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		
         // fetch current row's corresponding ParseObject
 		ParseObject obj = values.get(position);
+		final String objectId = obj.getObjectId();
 		
 		// set the TextView to display Sound object's name
 		TextView textview = (TextView) rowView.findViewById(R.id.settings_text);
-		textview.setText((String) obj.get("name"));
+		text = (String) obj.get("name");
+		textview.setText(text);
 
 		
 		Switch toggle = (Switch) rowView.findViewById(R.id.settings_toggle);
@@ -85,6 +88,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 				// TODO Auto-generated method stub
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.e("DEBUG","clicked settings play");
+				ParseInit.asf.fetchThenPlayTarget(objectId);
 			}			
 		});
 		

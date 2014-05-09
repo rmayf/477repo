@@ -28,22 +28,21 @@ import com.parse.GetCallback;
 import com.parse.ParseObject;
 import com.parse.PushService;
 
-public class AudioSampleFetcher {
-	
+public class AudioSampleFetcher {	
 	private static final String LOG_TAG = "AudioSampleFetcher";
+	private Context context;
 	
-	
-	/**
-	 *  
-	 */
-	public static void fetchThenPlayTarget(View view)  {
-		String filename = "isaiahtest.ogg";
-		new FetchInBackgroundThenPlaySound().execute("getMatchAgainst", filename);
+	public AudioSampleFetcher(Context context) {
+		this.context = context;
+	}
+
+	public void fetchThenPlayTarget(String filename)  {
+		AsyncTask<String, Void, String> task = new FetchInBackgroundThenPlaySound();
+		task.execute("getMatchAgainst", filename);
 	}
 	// eventually we will implement this because we are either fetching target sounds or
 	// recordings of events.
-	public static void fetchThenPlayEventRecording(View view) {
-		String filename = "donuts.m4a";
+	public void fetchThenPlayEventRecording(String filename) {
 		new FetchInBackgroundThenPlaySound().execute("getEventRecording", filename);
 	}
 	
@@ -53,9 +52,6 @@ public class AudioSampleFetcher {
 	 * 
 	 */
 	private class FetchInBackgroundThenPlaySound extends AsyncTask<String, Void, String> {
-		
-		
-
 		//args[0] is the method you're calling on the server, either the string "getMatchAgainst"
 		// or the String "getEventRecording"
 		// args[1] is the file you want 
@@ -64,7 +60,7 @@ public class AudioSampleFetcher {
 			String method = args[0];
 			String filename = args[1];
 			try {
-				uri = new URI("http://klement.cs.washington.edu:9999/" + method + "?filename=" + filename);
+				uri = new URI("http://klement.cs.washington.edu:9876/" + method + "?filename=" + filename);
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -104,7 +100,8 @@ public class AudioSampleFetcher {
 			InputStream in = null;
 			FileOutputStream outputStream = null;
 			try {
-				outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE); // I don't know of any alternatives
+
+				outputStream = context.openFileOutput(filename, Context.MODE_WORLD_READABLE); // I don't know of any alternatives
 				in = new BufferedInputStream(entity.getContent());
 				while ((bytesRead = in.read(temp)) > 0) {
 					outputStream.write(temp, 0, bytesRead);
@@ -116,7 +113,7 @@ public class AudioSampleFetcher {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			String path = getApplicationContext().getFilesDir().getAbsolutePath();
+			String path = context.getApplicationContext().getFilesDir().getAbsolutePath();
 			path += "/";
 			path += filename;
 			Log.v(LOG_TAG, "opening file at location: " + path);	
@@ -166,6 +163,7 @@ public class AudioSampleFetcher {
 			mp.start();	
 		}
 	}
+	
 	/**
 	 * Partial implementation of the class that is called when media playback completes.
 	 * The unimplemented method onCompletion() is implemented in the callback.
@@ -186,6 +184,7 @@ public class AudioSampleFetcher {
 		return toDelete.delete();
 	}
 	
+	/*
 	public void saveSoundNameToParse(View view) {
 		EditText soundNameText = (EditText) findViewById(R.id.soundNameText);
 		String soundName = soundNameText.getText().toString();
@@ -210,4 +209,6 @@ public class AudioSampleFetcher {
 			}
 		});
 	}
+	*/
+
 }

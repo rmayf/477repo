@@ -1,6 +1,5 @@
 package org.cs.washington.cse477;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONException;
@@ -28,6 +27,7 @@ public class NotificationActivity extends ActionBarActivity {
 	protected ArrayAdapter<ParseObject> notifyAdapter;
 	protected ListView notifyView;
 	protected List<ParseObject> parseNotifications;
+	//private AudioSampleFetcher asf;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +38,7 @@ public class NotificationActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_notification);
 
 		setupNotificationListView();		
+		//asf = new AudioSampleFetcher(getApplicationContext());
 	}
 
 	protected void setupNotificationListView() {
@@ -54,7 +55,7 @@ public class NotificationActivity extends ActionBarActivity {
 		List<ParseObject> mNotifications = null;
 		try {
 			mNotifications = query.find();
-			Log.v(LOG_TAG, "success getting Event objects");
+			Log.v(LOG_TAG, "success getting: " + mNotifications.size() + " event objects");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,13 +79,13 @@ public class NotificationActivity extends ActionBarActivity {
 	 * refresh()
 	 * 
 	 * pull MAX_REFRESH newest notifications from parse and display
+	 * clear() must be called AFTER getNotifications()
 	 */
 	public void refresh() {
-		parseNotifications.clear();
 		parseNotifications = getNotifications(MAX_REFRESH);
+		parseNotifications.clear();
 		notifyAdapter.notifyDataSetChanged();
 	}
-
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -113,13 +114,9 @@ public class NotificationActivity extends ActionBarActivity {
 	/**
 	 * 
 	 * An inner class that extends BroadcastReceiver MUST be static otherwise
-	 * 
 	 * the app crashes.
 	 * 
-	 * 
-	 * 
 	 * @author imathieu
-	 * 
 	 * 
 	 */
 	protected static JSONObject pushData;
