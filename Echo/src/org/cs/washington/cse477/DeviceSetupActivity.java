@@ -60,15 +60,17 @@ public class DeviceSetupActivity extends ActionBarActivity {
 
 	private boolean connectedToFlyPort = false;
 	private boolean postComplete = false;
-	private boolean setupComplete = false;
 
+	private static final String TAG = "DeviceSetupActivity";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-				.permitAll().build();
+		.permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_device_setup);
 
 		setupManagers();
@@ -112,9 +114,17 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	}
 	
 	@Override
+	protected void onStop() {
+		unregisterReceivers();
+		super.onStop();	
+	}
+	
+	@Override
 	protected void onResume() {
-		setupReceivers();
 		super.onResume();
+		setupManagers();
+		setupReceivers();
+		setupUI();
 	}
 
 	public void refreshScan(View v) {
@@ -141,7 +151,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		networksSpinner.setAdapter(networksAdapter);
 
 		// create and set adapter for security spinner
-		String[] secArray = new String[] { "WEP", "WPA", "WPA2" };
+		String[] secArray = new String[] { "Open", "WPA", "WPA2" };
 		securitySpinner = (Spinner) findViewById(R.id.dev_setup_security_spinner);
 		securityAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item,
@@ -168,28 +178,31 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	// 2. send HTTP POST FlyPort
 	// 3. reconnect phone to old WiFi network
 	// 4. wait for push notification indicating setup complete
+	int savedNetwork = -1;
 	public void configureFlyport(View view) {
 		// save info to send to FlyPort
-		Log.e("DEBUG", "Configure pressed");
+		Log.v(TAG, "Configure pressed");
 		if (wifiManager == null) {
 			wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		}
 		if (wifiManager == null) {
-			Log.e("DEBUG", "failed to get WifiManager");
+			Log.e(TAG, "failed to get WifiManager");
 			return;
 		}
 
-		final String SSID = "EchoSetup";
+		WifiInfo currentWifi = wifiManager.getConnectionInfo();
+		if (currentWifi != null) {
+			savedNetwork = currentWifi.getNetworkId();
+		}
 
-		
 		// Connect to EchoSetup
 		WifiConfiguration wificonf = new WifiConfiguration();
+		final String SSID = "EchoSetup";
 		wificonf.SSID = "\"" + SSID + "\"";
 		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 
-
+		
 		wifiConfigurations = wifiManager.getConfiguredNetworks();
-
 		// remove saved configuration for any matching SSID
 		for (WifiConfiguration i : wifiConfigurations) {
 			if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
@@ -198,18 +211,23 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		}
 		
 		// add new configuration to WiFi manager
-		wifiManager.addNetwork(wificonf);
-
-		// connect to new configuration
-		for (WifiConfiguration i : wifiConfigurations) {
-			if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
-				wifiManager.disconnect();
-				wifiManager.enableNetwork(i.networkId, true);
-				//wifiManager.reconnect();
-				break;
-			}
-		}
-		Log.e("DEBUG", "connecting...");
+		int newNetwork = wifiManager.addNetwork(wificonf);
+		wifiManager.disconnect();
+		wifiManager.enableNetwork(newNetwork, true);
+		
+		
+//		
+//		// connect to new configuration
+//		for (WifiConfiguration i : wifiConfigurations) {
+//			if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
+//				wifiManager.disconnect();
+//				wifiManager.enableNetwork(i.networkId, true);
+//				//wifiManager.reconnect();
+//				break;
+//			}
+//		}
+		
+		Log.v(TAG, "connecting...");
 		// After reconnecting, the WifiConnectionEstablishedReceiver will handle
 		// sending the POST to the FlyPort
 	}
@@ -220,30 +238,28 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 * parses user input and calls HttpPOSTGen functions to perform the post
 	 */
 	public boolean sendConfigurationPOST() {
-		String SSID_user = networksAdapter.getItem(networksSpinner.getSelectedItemPosition());
-		String pass_user = ((EditText) findViewById(R.id.dev_setup_password)).toString();
-		String encr_user = securityAdapter.getItem(securitySpinner.getSelectedItemPosition());
+		// grab user input data
+		final String SSID_user = networksAdapter.getItem(networksSpinner.getSelectedItemPosition());
+		final String pass_user = ((EditText) findViewById(R.id.dev_setup_password)).getText().toString();
+		final String encr_user = securityAdapter.getItem(securitySpinner.getSelectedItemPosition());
 		
-		String stat = SSID_user + " " + pass_user + " " + encr_user;
-		Log.e("DEBUG","sendConfigurationPOST(): " + stat);
-		// TODO: retry attempts
+		String stat = "SSID: " + SSID_user + "\nEncryption: " + encr_user + "\nPassword: " + pass_user;
+		Log.v(TAG,"sendConfigurationPOST():\n" + stat);
 		int attempts = 0;
 		final int MAX_ATTEMPTS = 3;
 		boolean res = false;
 		while (!res && attempts < MAX_ATTEMPTS) {
 			try {
 				attempts++;
-				//res = sendPOST(SSID_user, encr_user, pass_user);
+				res = HttpPOSTGen.sendPOST(SSID_user, encr_user, pass_user);
+				Log.v(TAG,"Attempt " + attempts + " result: " + res);
 			} catch (Exception e) {
-
+				Log.e(TAG,"Exception on attempt " + attempts);
 			}
 		}
 		return res;
 	}
 
-	
-
-	
 	/*
 	 * Broadcast Receivers for WiFi Events
 	 */
@@ -261,40 +277,46 @@ public class DeviceSetupActivity extends ActionBarActivity {
 
 	class WifiConnectionEstablishedReceiver extends BroadcastReceiver {
 		public void onReceive(Context c, Intent intent) {
-			Log.e("DEBUG", "receiver called");
+			Log.v(TAG, "receiver called");
 
 			NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
 			if (activeNetwork != null) {
 				boolean isWiFi = (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
 				boolean isConnected = (activeNetwork.isConnected() && activeNetwork
 						.getState() == NetworkInfo.State.CONNECTED);
-				if (isWiFi && isConnected) {
+				if (isWiFi && isConnected && !connectedToFlyPort) {
 					WifiInfo wifi = wifiManager.getConnectionInfo();
 					if (wifi.getSSID().equals("\"EchoSetup\"")) {
-						Log.e("DEBUG", "Connected to EchoSetup!");
+						Log.v(TAG, "Connected to EchoSetup!");
 						
 						connectedToFlyPort = true;
 						// send post message to FlyPort device
-						// TODO: do not want to infinite loop
-						setupComplete = sendConfigurationPOST();
+						postComplete = sendConfigurationPOST();
+						Log.v(TAG,"POST status: " + postComplete);
 						
-//						do {
-//							
-//						} while (!setupComplete);
-
+						if (savedNetwork != -1) {
+							Log.v(TAG, "reconnected to saved wifi network");
+							wifiManager.setWifiEnabled(true);
+							wifiManager.enableNetwork(savedNetwork, false);
+							wifiManager.reconnect();
+						}
+						
+						Intent i = new Intent(c, NotificationActivity.class);
+				    	startActivity(i);
+						
 					} else {
-						Log.e("DEBUG", "Connected to " + wifi.getSSID());
+						Log.v(TAG, "Connected to " + wifi.getSSID());
 					}
 				} else if (isWiFi && !isConnected) {
-					Log.e("DEBUG", "is WiFi, state is: "
-							+ activeNetwork.getDetailedState().toString());
+					Log.v(TAG, "ActiveNetwork is WiFi, but state is: "
+							+ activeNetwork.getDetailedState().toString() + " connected to FlyPort: " + connectedToFlyPort);
 				} else if (!isWiFi) {
-					Log.e("DEBUG", "not WiFi");
+					Log.v(TAG, "ActiveNetwork is not WiFi");
 				} else {
-					Log.e("DEBUG", "not WiFi or not Connected");
+					Log.v(TAG, "ActiveNetwork is not WiFi or is not Connected");
 				}
 			} else {
-				Log.e("DEBUG", "ActiveNetworkInfo == null");
+				Log.v(TAG, "ActiveNetworkInfo == null");
 			}
 		}
 	}

@@ -21,24 +21,22 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 public class NotificationActivity extends ActionBarActivity {
-	private static final String LOG_TAG = "NotificationActivity";
 	private static final int MAX_REFRESH = 20;
-//	protected List<String> notifications;
 	protected ArrayAdapter<ParseObject> notifyAdapter;
 	protected ListView notifyView;
 	protected List<ParseObject> parseNotifications;
-	//private AudioSampleFetcher asf;
+	
+	private static final String TAG = "NotificationActivity";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		Log.v(TAG,"after super.onCreate()");
 		parseNotifications = getNotifications(MAX_REFRESH);
 
 		setContentView(R.layout.activity_notification);
 
 		setupNotificationListView();		
-		//asf = new AudioSampleFetcher(getApplicationContext());
 	}
 
 	protected void setupNotificationListView() {
@@ -50,12 +48,13 @@ public class NotificationActivity extends ActionBarActivity {
 	// gets the Event objects that are match targets. Subscriptions to these sounds
 	// may be on or off
 	public List<ParseObject> getNotifications(int numToFetch) {
+		Log.v(TAG,"entering getNotifications");
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
 		query.setLimit(numToFetch);
 		List<ParseObject> mNotifications = null;
 		try {
 			mNotifications = query.find();
-			Log.v(LOG_TAG, "success getting: " + mNotifications.size() + " event objects");
+			Log.v(TAG, "success getting: " + mNotifications.size() + " event objects");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,8 +81,8 @@ public class NotificationActivity extends ActionBarActivity {
 	 * clear() must be called AFTER getNotifications()
 	 */
 	public void refresh() {
-		parseNotifications = getNotifications(MAX_REFRESH);
 		parseNotifications.clear();
+		parseNotifications.addAll(getNotifications(MAX_REFRESH));
 		notifyAdapter.notifyDataSetChanged();
 	}
 	
