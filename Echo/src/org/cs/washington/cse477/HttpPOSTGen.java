@@ -1,10 +1,12 @@
 package org.cs.washington.cse477;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -85,6 +87,37 @@ public class HttpPOSTGen {
 		// Intent intent_n = new Intent(getApplicationContext(),
 		// NotificationActivity.class);
 		// startActivity(intent_n);
+		
+	}
+	
+	public static String getPOSTMessage() {
+		ArrayList<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
+		nameValuePair.add(new BasicNameValuePair("NETTYPE", "infra"));
+		nameValuePair.add(new BasicNameValuePair("DHCPCL", "enabled"));
+
+		// set SSID
+		nameValuePair.add(new BasicNameValuePair("SSID", "TestSSID"));
+
+		// set security
+		
+		nameValuePair.add(new BasicNameValuePair("SECTYPE", "OPEN"));
+
+		nameValuePair.add(new BasicNameValuePair("WEP40KEY1", ""));
+		nameValuePair.add(new BasicNameValuePair("WEP40KEY2", ""));
+		nameValuePair.add(new BasicNameValuePair("WEP40KEY3", ""));
+		nameValuePair.add(new BasicNameValuePair("WEP40KEY4", ""));
+		nameValuePair.add(new BasicNameValuePair("WEP40KEYID", ""));
+		nameValuePair.add(new BasicNameValuePair("WEP104KEY", ""));
+		nameValuePair.add(new BasicNameValuePair("WPAPASS", ""));
+		nameValuePair.add(new BasicNameValuePair("WPA2PASS", ""));
+		HttpEntity ent = null;
+		try {
+			 ent = new UrlEncodedFormEntity(nameValuePair);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return (ent == null) ? null : ent.toString();
 		
 	}
 }

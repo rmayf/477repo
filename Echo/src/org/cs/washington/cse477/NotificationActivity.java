@@ -3,6 +3,11 @@ package org.cs.washington.cse477;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -103,5 +108,37 @@ public class NotificationActivity extends ActionBarActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}	
+	}
+	
+	/**
+	 * 
+	 * An inner class that extends BroadcastReceiver MUST be static otherwise
+	 * 
+	 * the app crashes.
+	 * 
+	 * 
+	 * 
+	 * @author imathieu
+	 * 
+	 * 
+	 */
+	protected static JSONObject pushData;
+	public static class PushDataReceiver extends BroadcastReceiver {
+
+		public final static String LOG_TAG = "PushDataReceiver";
+
+		public PushDataReceiver() {	}
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String stringPushData = intent.getExtras().getString("com.parse.Data");
+			Log.v(LOG_TAG, "Intent received: " + stringPushData);
+			try {
+				pushData = new JSONObject(stringPushData);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 }
