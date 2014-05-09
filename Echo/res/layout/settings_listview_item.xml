@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="6dip"
         android:contentDescription="@string/settings_play_desc"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/ic_action_play" />
 
 	<ToggleButton
         android:id="@+id/settings_toggle"

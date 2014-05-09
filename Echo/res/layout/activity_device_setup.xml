@@ -37,14 +37,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_setup_password"
         android:layout_centerHorizontal="true"
-        android:onClick="postMessage"
+        android:onClick="configureFlyport"
         android:text="@string/dev_setup_b" />
 
+    <TextView
+        android:id="@+id/dev_setup_security_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/dev_setup_security_spinner"
+        android:text="@string/dev_setup_sec_sel" />
+    
     <EditText
         android:id="@+id/dev_setup_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dev_setup_security_spinner"
+        android:layout_below="@+id/dev_setup_security_select"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="28dp"
         android:ems="10"
@@ -59,6 +68,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_setup_security"
         android:layout_centerHorizontal="true"
+        android:layout_alignLeft="@+id/dev_setup_networks_spinner"
+        android:layout_alignRight="@+id/dev_setup_networks_spinner"
         android:layout_marginBottom="18dp" />
 
     <TextView

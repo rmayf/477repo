@@ -21,9 +21,10 @@
     
     <!-- Device Setup -->
     <string name="dev_setup_b">Configure Device!</string>
-    <string name="dev_setup_net_sel">Select a Network</string>
-    <string name="dev_setup_encr_sel">What is your network\'s security setting?</string>
+    <string name="dev_setup_net_sel">Select your Wireless Network</string>
+    <string name="dev_setup_encr_sel">Select your network\'s security setting:</string>
     <string name="dev_setup_refresh">Refresh Networks</string>
+    <string name="dev_setup_sec_sel">Enter your network\'s password:</string>
     
     <!-- Notification Screen -->
     <string name="notification_play_desc">Play</string>
@@ -34,6 +35,9 @@
     
     
     
+    
+    
+    
     <!-- Old Screens Not Used -->
     <!-- Start Screen -->
     <string name="dev_start_user_dlg">Username</string>
@@ -41,24 +45,33 @@
     <string name="dev_start_login_b">Login</string>
     <string name="dev_start_newacct_b">Create a New Account!</string>
     <string name="dev_start_remember_cb">Remember Me</string>
-    
+
     <!-- New Account Screen -->
     <string name="new_account_user_dlg">Username</string>
     <string name="new_account_pass_dlg">Password</string>
     <string name="new_account_pass_confirm_dlg">Confirm Password</string>
     <string name="new_account_create_b">Create Account!</string>
-    
+
     <!-- Device Registration -->
     <string name="dev_reg_b">Register Device!</string>
 
     <!-- Device Status -->
-    
+
+
     <!-- Audio Upload -->
     <string name="audio_upload_b">Upload Sample</string>
     <string name="audio_upload_dlg_title">To add a new sample:</string>
     <string name="audio_upload_dlg_cancel">Cancel</string>
     <string name="audio_upload_dlg_continue">Go</string>
     
-    
-    
 </resources>
+    
+    
+    
+    
+    
+
+    
+    
+    
+

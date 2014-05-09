@@ -23,9 +23,12 @@ public class SettingsListAdapter extends ArrayAdapter<String> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
 		View rowView = inflater.inflate(R.layout.settings_listview_item, parent, false);
+		
 		TextView textview = (TextView) rowView.findViewById(R.id.settings_text);
 		textview.setText(values.get(position));
+		
 		return rowView;
 	}
 }

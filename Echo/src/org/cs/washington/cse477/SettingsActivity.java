@@ -17,13 +17,17 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 
 import java.util.LinkedList;
 import java.util.List;
-
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -54,13 +58,31 @@ public class SettingsActivity extends ActionBarActivity {
 	protected ListView settingsView;
 	protected TextView text;
 	protected String[] dbg = {"notify 1", "notify 2", "notify 3", "notify 4", "notify 5", "notify 6"};
+	protected List<ParseObject> parseSounds;
+	private static final int MAX_REFRESH = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
+		
 		//findViewById(R.id.makeSoundInstructions).setVisibility(View.GONE);
+		parseSounds = getSounds(MAX_REFRESH);
 		setupSettingsListView();
+	}
+	
+	public List<ParseObject> getSounds(int numToFetch) {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
+		query.setLimit(numToFetch);
+		List<ParseObject> sounds = null;
+		try {
+			sounds = query.find();
+			Log.v(LOG_TAG, "success getting Sound objects");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return sounds;
 	}
 	
 	// pull list of all targets being tracked by registered devices
@@ -69,13 +91,14 @@ public class SettingsActivity extends ActionBarActivity {
 		text = (TextView) findViewById(R.id.settings_text_test);
 		
 		settingsList = new LinkedList<String>();
-		for (int i=0; i<dbg.length; i++) {
-			settingsList.add(dbg[i]);
+		
+		for (int i=0; i<parseSounds.size(); i++) {
+			settingsList.add((String) parseSounds.get(i).get("name"));
 		}
 		
 		settingsView = (ListView) findViewById(R.id.settings_listview);
 		
-		settingsListAdapter = new NotificationListAdapter(this, settingsList);
+		settingsListAdapter = new SettingsListAdapter(this, settingsList);
 		settingsView.setAdapter(settingsListAdapter);
 		settingsView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -91,7 +114,7 @@ public class SettingsActivity extends ActionBarActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.device_reg, menu);
+		getMenuInflater().inflate(R.menu.settings, menu);
 		return true;
 	}
 
@@ -100,14 +123,28 @@ public class SettingsActivity extends ActionBarActivity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		Intent intent;
+		switch(item.getItemId()) {		
+		case R.id.notification_action_add_sample:
+			// pop-up dialog with instructions
+			addNewSample();
+			
+			// when push received for new audio sample, goto audio upload activity
+			//intent = new Intent(this, AudioUploadActivity.class);
+			// put data to intent that we can pull out from within AudioUploadActivity
+			//startActivity(intent);
 			return true;
+			
+		default:
+			return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	
+	public void addNewSample() {
+		AddAudioSampleDialog d = new AddAudioSampleDialog();
+		d.show(getFragmentManager(), "addaudiosampledialog");
+	}
 	
 	
 //	/**

@@ -18,17 +18,17 @@ import com.parse.ParseQuery;
 
 public class NotificationActivity extends ActionBarActivity {
 	private static final String LOG_TAG = "NotificationActivity";
+	private static final int MAX_REFRESH = 20;
 	protected List<String> notifications;
 	protected ArrayAdapter<String> notifyAdapter;
 	protected ListView notifyView;
-	protected List<ParseObject> sounds;
-	
-	//protected String[] dbg = {"notify 1", "notify 2", "notify 3"};
+	protected List<ParseObject> parseNotifications;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sounds = getSounds();
+		
+		parseNotifications = getNotifications(MAX_REFRESH);
 
 		setContentView(R.layout.activity_notification);
 
@@ -38,25 +38,27 @@ public class NotificationActivity extends ActionBarActivity {
 	protected void setupNotificationListView() {
 		notifyView = (ListView) findViewById(R.id.notification_listview);
 		notifications = new LinkedList<String>();
-		for (int i=0; i<sounds.size(); i++) {
-			notifications.add((String) sounds.get(i).get("name"));
+		for (int i=0; i<parseNotifications.size(); i++) {
+			notifications.add((String) parseNotifications.get(i).get("eventFilename"));
 		}
 		notifyAdapter = new NotificationListAdapter(this, notifications);
 		notifyView.setAdapter(notifyAdapter);
 	}
-	// gets the Sound objects that are match targets. Subscriptions to these sounds
+	
+	// gets the Event objects that are match targets. Subscriptions to these sounds
 	// may be on or off
-	public List<ParseObject> getSounds() {
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
-		List<ParseObject> sounds = null;
+	public List<ParseObject> getNotifications(int numToFetch) {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
+		query.setLimit(numToFetch);
+		List<ParseObject> mNotifications = null;
 		try {
-			sounds = query.find();
-			Log.v(LOG_TAG, "success getting Sound objects");
+			mNotifications = query.find();
+			Log.v(LOG_TAG, "success getting Event objects");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return sounds;
+		return mNotifications;
 	}
 	
 	@Override
@@ -74,23 +76,18 @@ public class NotificationActivity extends ActionBarActivity {
 	/**
 	 * refresh()
 	 * 
-	 * pull 20 newest notifications from parse and display
+	 * pull MAX_REFRESH newest notifications from parse and display
 	 */
-	int k = 0;
 	public void refresh() {
-		//notifications.clear();
-		
-		// debug code
-		notifications.add("notify " + Integer.toString(k));
-		k++;
+		notifications.clear();
+		parseNotifications = getNotifications(MAX_REFRESH);
+		for (int i=0; i<parseNotifications.size(); i++) {
+			notifications.add((String) parseNotifications.get(i).get("eventFilename"));
+		}
 		
 		notifyAdapter.notifyDataSetChanged();
 	}
-	
-	public void addNewSample() {
-		AddAudioSampleDialog d = new AddAudioSampleDialog();
-		d.show(getFragmentManager(), "addaudiosampledialog");
-	}
+
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -107,36 +104,10 @@ public class NotificationActivity extends ActionBarActivity {
 			intent = new Intent(this, SettingsActivity.class);
 	    	startActivity(intent);
 			return true;
-		case R.id.notification_action_add_sample:
-			// pop-up dialog with instructions
-			addNewSample();
-			
-			// when push received for new audio sample, goto audio upload activity
-			//intent = new Intent(this, AudioUploadActivity.class);
-			// put data to intent that we can pull out from within AudioUploadActivity
-			//startActivity(intent);
-			return true;
 		case R.id.notification_action_refresh:
 			refresh();
 			return true;
-		
-		/*
-		case R.id.notification_action_audio_upload:
-			intent = new Intent(this, AudioUploadActivity.class);
-	    	startActivity(intent);
-			return true;
-		case R.id.notification_action_add_device:
-			intent = new Intent(this, DeviceRegActivity.class);
-	    	startActivity(intent);
-			return true;
-		case R.id.notification_action_device_status:
-			intent = new Intent(this, DeviceStatusActivity.class);
-	    	startActivity(intent);
-			return true;
-		case R.id.notification_action_logout:
-			// logout and exit
-			return true;
-		*/
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
