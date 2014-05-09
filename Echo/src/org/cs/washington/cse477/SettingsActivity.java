@@ -1,6 +1,16 @@
 package org.cs.washington.cse477;
 
 
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import android.content.Context;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+
+import java.util.LinkedList;
 import java.util.List;
 
 import android.os.Bundle;
@@ -20,9 +30,6 @@ public class SettingsActivity extends ActionBarActivity {
 	
 	public static final String LOG_TAG = "SettingsActivity";
 	private static final int MAX_REFRESH = -1;
-	
-//	protected List<String> settingsList;
-	
 	protected ArrayAdapter<ParseObject> settingsListAdapter;
 	protected List<ParseObject> parseSounds;
 	
@@ -52,6 +59,16 @@ public class SettingsActivity extends ActionBarActivity {
 			e.printStackTrace();
 		}
 		return sounds;
+	}
+	/**
+	 * refresh()
+	 * 
+	 * pull MAX_REFRESH newest notifications from parse and display
+	 */
+	public void refresh() {
+		parseSounds.clear();
+		parseSounds.addAll(getSounds(MAX_REFRESH));
+		settingsListAdapter.notifyDataSetChanged();
 	}
 	
 	// pull list of all targets being tracked by registered devices
