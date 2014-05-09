@@ -26,15 +26,16 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		super(context, R.layout.settings_listview_item, values);
 		this.context = context;
 		this.values = values;
+		// store old values of the enabled state for each ParseObject
 		states = new ArrayList<Boolean>(values.size());
-		
 		for (int i = 0; i < values.size(); i++) {
-			states.add(i, Boolean.valueOf(false));
+			states.add(i, values.get(i).getBoolean("enabled"));
 		}
-		Log.e("DEBUG","size of values: " + values.size());
-		Log.e("DEBUG","size of states: " + states.size());
 	}
 
+	/**
+	 * Method for owners of instances of this Adapter to fetch the list of objects
+	 */
 	public List<Boolean> getEnabledStates() {
 		return states;
 	}
@@ -51,12 +52,20 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
         	rowView = inflater.inflate(R.layout.settings_listview_item, parent, false);
         }
 		
+        // fetch current row's corresponding ParseObject
 		ParseObject obj = values.get(position);
 		
+		// set the TextView to display Sound object's name
 		TextView textview = (TextView) rowView.findViewById(R.id.settings_text);
 		textview.setText((String) obj.get("name"));
 
+		
 		Switch toggle = (Switch) rowView.findViewById(R.id.settings_toggle);
+		toggle.setChecked(obj.getBoolean("enabled"));
+		
+		// Switch click handling
+		// On toggle, store updated state of switch in states list
+		// The states List is used to persist the enabled setting back to Parse at some future time
 		toggle.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -65,18 +74,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 				Log.e("DEBUG","checked: " + Boolean.valueOf(((Switch) v).isChecked()));
 				states.set(position, Boolean.valueOf(((Switch) v).isChecked()));
 			}
-		});
-		/*
-		boolean en = false;
-		String enStr = (String) obj.get("enabled");
-		if (enStr.equalsIgnoreCase("enabled")) {
-			en = true;
-		} else {
-			en = false;
-		}
-		*/
-		
-		toggle.setChecked(states.get(position).booleanValue());		
+		});		
 		
 		ImageView img = (ImageView) rowView.findViewById(R.id.settings_play);
 		img.setClickable(true);

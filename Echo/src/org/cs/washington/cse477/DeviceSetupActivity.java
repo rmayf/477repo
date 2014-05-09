@@ -180,24 +180,13 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		}
 
 		final String SSID = "EchoSetup";
-//		final String SSID = "RobotChicken";
-//		final String password = "X3bc57pl98";
+
 		
 		// Connect to EchoSetup
 		WifiConfiguration wificonf = new WifiConfiguration();
 		wificonf.SSID = "\"" + SSID + "\"";
 		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-		
-//		wificonf.preSharedKey = "\"" + password + "\"";
-//		wificonf.status = WifiConfiguration.Status.ENABLED;
-//		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-//		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-//		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-//		wificonf.allowedPairwiseCiphers
-//				.set(WifiConfiguration.PairwiseCipher.TKIP);
-//		wificonf.allowedPairwiseCiphers
-//				.set(WifiConfiguration.PairwiseCipher.CCMP);
-//		wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+
 
 		wifiConfigurations = wifiManager.getConfiguredNetworks();
 
@@ -216,7 +205,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
 				wifiManager.disconnect();
 				wifiManager.enableNetwork(i.networkId, true);
-				wifiManager.reconnect();
+				//wifiManager.reconnect();
 				break;
 			}
 		}
@@ -225,21 +214,26 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		// sending the POST to the FlyPort
 	}
 
+	/*
+	 * called to send POST to FlyPort
+	 * 
+	 * parses user input and calls HttpPOSTGen functions to perform the post
+	 */
 	public boolean sendConfigurationPOST() {
 		String SSID_user = networksAdapter.getItem(networksSpinner.getSelectedItemPosition());
 		String pass_user = ((EditText) findViewById(R.id.dev_setup_password)).toString();
 		String encr_user = securityAdapter.getItem(securitySpinner.getSelectedItemPosition());
 		
 		String stat = SSID_user + " " + pass_user + " " + encr_user;
-		Log.e("DEBUG",stat);
-		
+		Log.e("DEBUG","sendConfigurationPOST(): " + stat);
+		// TODO: retry attempts
 		int attempts = 0;
 		final int MAX_ATTEMPTS = 3;
 		boolean res = false;
 		while (!res && attempts < MAX_ATTEMPTS) {
 			try {
 				attempts++;
-				//res = postMessage(SSID_user, encr_user, pass_user);
+				//res = sendPOST(SSID_user, encr_user, pass_user);
 			} catch (Exception e) {
 
 			}
@@ -247,76 +241,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		return res;
 	}
 
-	public boolean postMessage(String SSID, String encryption, String pass) {
-		Log.e("DEBUG", "postMessage() called");
-		// send POST to FlyPort to configure
-		// 192.168.1.13
-		AndroidHttpClient client = AndroidHttpClient.newInstance("Echo");
-		
-		HttpPost post = null;
-		try {
-			post = new HttpPost(new URI("http://192.168.1.13/"));
-		} catch (Exception e) {
-
-		}
-
-		try {
-			// Add your data
-			post.addHeader("Content-Type", "application/x-www-form-urlencoded");
-			post.addHeader("", "");
-
-			/*
-			 * NETTYPE=infra &DHCPCL=enabled &SSID=big+titays &SECTYPE=OPEN
-			 * &WEP40KEY1= &WEP40KEY2= &WEP40KEY3= &WEP40KEY4= &WEP40KEYID=
-			 * &WEP104KEY= &WPAPASS= &WPA2PASS=
-			 */
-
-			ArrayList<NameValuePair> nameValuePair = new ArrayList<NameValuePair>();
-			nameValuePair.add(new BasicNameValuePair("NETTYPE", "infra"));
-			nameValuePair.add(new BasicNameValuePair("DHCPCL", "enabled"));
-
-			// set SSID
-			nameValuePair.add(new BasicNameValuePair("SSID", SSID));
-
-			// set security
-			
-			nameValuePair.add(new BasicNameValuePair("SECTYPE", "OPEN"));
-
-			nameValuePair.add(new BasicNameValuePair("WEP40KEY1", ""));
-			nameValuePair.add(new BasicNameValuePair("WEP40KEY2", ""));
-			nameValuePair.add(new BasicNameValuePair("WEP40KEY3", ""));
-			nameValuePair.add(new BasicNameValuePair("WEP40KEY4", ""));
-			nameValuePair.add(new BasicNameValuePair("WEP40KEYID", ""));
-			nameValuePair.add(new BasicNameValuePair("WEP104KEY", ""));
-			nameValuePair.add(new BasicNameValuePair("WPAPASS", ""));
-			nameValuePair.add(new BasicNameValuePair("WPA2PASS", ""));
-
-			// add entity to post
-			post.setEntity(new UrlEncodedFormEntity(nameValuePair));
-
-			for (Header h : post.getAllHeaders()) {
-				Log.e("DEBUG", h.toString());
-			}
-
-			// Execute HTTP Post Request
-			HttpResponse response = client.execute(post);
-			Log.e("DEBUG", "POST executed");
-			return true;
-		} catch (ClientProtocolException e) {
-			Log.e("DEBUG", "ClientProtocolException");
-		} catch (IOException e) {
-			Log.e("DEBUG", "IOException");
-			Log.e("DEBUG", e.getMessage());
-		}
-
-		return false;
-		
-		// go back to notifications
-		// Intent intent_n = new Intent(getApplicationContext(),
-		// NotificationActivity.class);
-		// startActivity(intent_n);
-		
-	}
+	
 
 	
 	/*
@@ -345,14 +270,17 @@ public class DeviceSetupActivity extends ActionBarActivity {
 						.getState() == NetworkInfo.State.CONNECTED);
 				if (isWiFi && isConnected) {
 					WifiInfo wifi = wifiManager.getConnectionInfo();
-					if (wifi.getSSID().equals("EchoSetup")) {
+					if (wifi.getSSID().equals("\"EchoSetup\"")) {
 						Log.e("DEBUG", "Connected to EchoSetup!");
 						
 						connectedToFlyPort = true;
 						// send post message to FlyPort device
-						do {
-							setupComplete = sendConfigurationPOST();
-						} while (!setupComplete);
+						// TODO: do not want to infinite loop
+						setupComplete = sendConfigurationPOST();
+						
+//						do {
+//							
+//						} while (!setupComplete);
 
 					} else {
 						Log.e("DEBUG", "Connected to " + wifi.getSSID());
@@ -371,3 +299,21 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		}
 	}
 }
+
+
+
+/*
+ * WiFi configuration to connect to mark's home network (WPA2)
+ */
+//final String SSID = "RobotChicken";
+//final String password = "X3bc57pl98";		
+//wificonf.preSharedKey = "\"" + password + "\"";
+//wificonf.status = WifiConfiguration.Status.ENABLED;
+//wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+//wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//wificonf.allowedPairwiseCiphers
+//		.set(WifiConfiguration.PairwiseCipher.TKIP);
+//wificonf.allowedPairwiseCiphers
+//		.set(WifiConfiguration.PairwiseCipher.CCMP);
+//wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);

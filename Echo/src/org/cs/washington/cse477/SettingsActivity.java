@@ -96,6 +96,7 @@ public class SettingsActivity extends ActionBarActivity {
 		settingsListAdapter = new SettingsListAdapter(this, parseSounds);
 		settingsView.setAdapter(settingsListAdapter);
 		
+		// Add click handler here
 		/*
 		settingsView.setOnItemClickListener(new OnItemClickListener() {
 

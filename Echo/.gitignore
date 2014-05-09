@@ -1,5 +1,7 @@
 /gen/
 /bin/
 /proguard-project.txt
-.classpath
-.settings/org.eclipse.jdt.core.prefs
+/libs/
+/.classpath
+/.settings/
+/lint.xml
