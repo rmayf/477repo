@@ -18,6 +18,7 @@
     <string name="menu_audio_upload">Upload Audio Sample</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_logout">Logout</string>
+    <string name="menu_notification_push">Push Settings</string>
     
     <!-- Device Setup -->
     <string name="dev_setup_b">Configure Device!</string>

@@ -19,8 +19,8 @@ import com.parse.ParseQuery;
 public class NotificationActivity extends ActionBarActivity {
 	private static final String LOG_TAG = "NotificationActivity";
 	private static final int MAX_REFRESH = 20;
-	protected List<String> notifications;
-	protected ArrayAdapter<String> notifyAdapter;
+//	protected List<String> notifications;
+	protected ArrayAdapter<ParseObject> notifyAdapter;
 	protected ListView notifyView;
 	protected List<ParseObject> parseNotifications;
 	
@@ -37,11 +37,7 @@ public class NotificationActivity extends ActionBarActivity {
 
 	protected void setupNotificationListView() {
 		notifyView = (ListView) findViewById(R.id.notification_listview);
-		notifications = new LinkedList<String>();
-		for (int i=0; i<parseNotifications.size(); i++) {
-			notifications.add((String) parseNotifications.get(i).get("eventFilename"));
-		}
-		notifyAdapter = new NotificationListAdapter(this, notifications);
+		notifyAdapter = new NotificationListAdapter(this, parseNotifications);
 		notifyView.setAdapter(notifyAdapter);
 	}
 	
@@ -68,8 +64,8 @@ public class NotificationActivity extends ActionBarActivity {
 		return true;
 	}
 
-	public void receivePush(String n) {
-		notifications.add(0, n);
+	public void receivePush(ParseObject n) {
+		parseNotifications.add(0, n);
 		notifyAdapter.notifyDataSetChanged();
 	}
 	
@@ -79,12 +75,8 @@ public class NotificationActivity extends ActionBarActivity {
 	 * pull MAX_REFRESH newest notifications from parse and display
 	 */
 	public void refresh() {
-		notifications.clear();
+		parseNotifications.clear();
 		parseNotifications = getNotifications(MAX_REFRESH);
-		for (int i=0; i<parseNotifications.size(); i++) {
-			notifications.add((String) parseNotifications.get(i).get("eventFilename"));
-		}
-		
 		notifyAdapter.notifyDataSetChanged();
 	}
 

@@ -72,8 +72,9 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_device_setup);
 
 		setupManagers();
-		setupUI();
 		setupReceivers();
+		setupUI();
+		
 	}
 
 	protected void setupManagers() {
@@ -116,13 +117,13 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		super.onResume();
 	}
 
-	protected boolean refreshScan(View v) {
-		return wifiManager.startScan();
+	public void refreshScan(View v) {
+		wifiManager.startScan();
 	}
 
 	protected void setupUI() {
 		
-		// collect scan results and store
+		// collect initial scan results and store
 		scanResults = wifiManager.getScanResults();
 		stringScanResults = new LinkedList<String>();
 		Iterator<ScanResult> iter = scanResults.iterator();

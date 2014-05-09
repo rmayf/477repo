@@ -42,7 +42,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.PushService;
 
-
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -52,21 +51,23 @@ import android.widget.TextView;
 public class SettingsActivity extends ActionBarActivity {
 	
 	public static final String LOG_TAG = "SettingsActivity";
-	
-	protected List<String> settingsList;
-	protected ArrayAdapter<String> settingsListAdapter;
-	protected ListView settingsView;
-	protected TextView text;
-	protected String[] dbg = {"notify 1", "notify 2", "notify 3", "notify 4", "notify 5", "notify 6"};
-	protected List<ParseObject> parseSounds;
 	private static final int MAX_REFRESH = -1;
+	
+//	protected List<String> settingsList;
+	
+	protected ArrayAdapter<ParseObject> settingsListAdapter;
+	protected List<ParseObject> parseSounds;
+	
+	protected ListView settingsView;
+		
+	// DEBUG
+	protected TextView text;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
 		
-		//findViewById(R.id.makeSoundInstructions).setVisibility(View.GONE);
 		parseSounds = getSounds(MAX_REFRESH);
 		setupSettingsListView();
 	}
@@ -89,17 +90,13 @@ public class SettingsActivity extends ActionBarActivity {
 	// display in the list, with toggle and play button
 	protected void setupSettingsListView() {
 		text = (TextView) findViewById(R.id.settings_text_test);
-		
-		settingsList = new LinkedList<String>();
-		
-		for (int i=0; i<parseSounds.size(); i++) {
-			settingsList.add((String) parseSounds.get(i).get("name"));
-		}
-		
+
 		settingsView = (ListView) findViewById(R.id.settings_listview);
 		
-		settingsListAdapter = new SettingsListAdapter(this, settingsList);
+		settingsListAdapter = new SettingsListAdapter(this, parseSounds);
 		settingsView.setAdapter(settingsListAdapter);
+		
+		/*
 		settingsView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -109,6 +106,7 @@ public class SettingsActivity extends ActionBarActivity {
 			}
 			
 		});
+		*/
 	}
 
 	@Override
@@ -123,7 +121,6 @@ public class SettingsActivity extends ActionBarActivity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		Intent intent;
 		switch(item.getItemId()) {		
 		case R.id.notification_action_add_sample:
 			// pop-up dialog with instructions
@@ -133,6 +130,10 @@ public class SettingsActivity extends ActionBarActivity {
 			//intent = new Intent(this, AudioUploadActivity.class);
 			// put data to intent that we can pull out from within AudioUploadActivity
 			//startActivity(intent);
+			return true;
+		case R.id.notification_action_push_settings:
+			// push settings to cloud if any have changed
+			// this can be done by comparing the new states to the old states
 			return true;
 			
 		default:
@@ -146,17 +147,16 @@ public class SettingsActivity extends ActionBarActivity {
 		d.show(getFragmentManager(), "addaudiosampledialog");
 	}
 	
-	
 //	/**
 //	 *  
 //	 */
-//	public void fetchThenPlayTarget(View view)  {
+//	public static void fetchThenPlayTarget(View view)  {
 //		String filename = "isaiahtest.ogg";
 //		new FetchInBackgroundThenPlaySound().execute("getMatchAgainst", filename);
 //	}
-// 	// eventually we will implement this because we are either fetching target sounds or
-// 	// recordings of events.
-//	public void fetchThenPlayEventRecording(View view) {
+//	// eventually we will implement this because we are either fetching target sounds or
+//	// recordings of events.
+//	public static void fetchThenPlayEventRecording(View view) {
 //		String filename = "donuts.m4a";
 //		new FetchInBackgroundThenPlaySound().execute("getEventRecording", filename);
 //	}
@@ -168,6 +168,8 @@ public class SettingsActivity extends ActionBarActivity {
 //	 */
 //	private class FetchInBackgroundThenPlaySound extends AsyncTask<String, Void, String> {
 //		
+//		
+//
 //		//args[0] is the method you're calling on the server, either the string "getMatchAgainst"
 //		// or the String "getEventRecording"
 //		// args[1] is the file you want 
@@ -322,6 +324,4 @@ public class SettingsActivity extends ActionBarActivity {
 //			}
 //		});
 //	}
-	
-	
 }
