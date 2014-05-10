@@ -1,24 +1,8 @@
 package org.cs.washington.cse477;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.DefaultClientConnection;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpParams;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.http.AndroidHttpClient;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -44,8 +27,8 @@ import android.widget.Spinner;
 
 public class DeviceSetupActivity extends ActionBarActivity {
 
-	protected ConnectivityManager conMgr;
-	protected WifiManager wifiManager;
+	protected ConnectivityManager conMgr = null;
+	protected WifiManager wifiManager = null;
 
 	protected List<WifiConfiguration> wifiConfigurations;
 	protected List<ScanResult> scanResults;
@@ -55,8 +38,8 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	protected ArrayAdapter<String> networksAdapter;
 	protected ArrayAdapter<String> securityAdapter;
 
-	protected WifiConnectionEstablishedReceiver wifiWaiter;
-	protected WifiScanResultsReceiver receiverWifi;
+	protected WifiConnectionEstablishedReceiver wifiWaiter= null;
+	protected WifiScanResultsReceiver receiverWifi = null;
 
 	private boolean connectedToFlyPort = false;
 	private boolean postComplete = false;
@@ -109,14 +92,14 @@ public class DeviceSetupActivity extends ActionBarActivity {
 
 	@Override
 	protected void onPause() {
-		unregisterReceivers();
 		super.onPause();
+		unregisterReceivers();
 	}
 	
 	@Override
 	protected void onStop() {
-		unregisterReceivers();
-		super.onStop();	
+		super.onStop();
+		unregisterReceivers();	
 	}
 	
 	@Override
@@ -160,16 +143,24 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	}
 	
 	protected void setupReceivers() {
-		receiverWifi = new WifiScanResultsReceiver();
-		registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		if (receiverWifi == null) {
+			receiverWifi = new WifiScanResultsReceiver();
+			registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		}
 
-		wifiWaiter = new WifiConnectionEstablishedReceiver();
-		registerReceiver(wifiWaiter, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+		if (wifiWaiter == null) {
+			wifiWaiter = new WifiConnectionEstablishedReceiver();
+			registerReceiver(wifiWaiter, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+		}
 	}
 	
 	protected void unregisterReceivers() {
-		unregisterReceiver(receiverWifi);
-		unregisterReceiver(wifiWaiter);
+		try {
+			unregisterReceiver(receiverWifi);
+			unregisterReceiver(wifiWaiter);
+		} catch (IllegalArgumentException iae) {
+			// do nothing...we don't really care if the receiver was already unregistered
+		}
 	}
 	
 	// Called on Configure Device! button click
@@ -195,13 +186,35 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			savedNetwork = currentWifi.getNetworkId();
 		}
 
+
 		// Connect to EchoSetup
 		WifiConfiguration wificonf = new WifiConfiguration();
-		final String SSID = "EchoSetup";
-		wificonf.SSID = "\"" + SSID + "\"";
-		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+		// TODO: uncomment following three lines for in lab/with decive testing
+//		final String SSID = "EchoSetup";
+//		wificonf.SSID = "\"" + SSID + "\"";
+//		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 
+		// TODO: comment out the following set of lines for in lab/weith device testing
+		// DEBUG
+		/*
+		 * WiFi configuration to connect to mark's home network (WPA2)
+		 */
+		final String SSID = "RobotChicken";
+		final String password = "X3bc57pl98";		
+		wificonf.SSID = "\"" + SSID + "\"";
+		wificonf.preSharedKey = "\"" + password + "\"";
+		wificonf.status = WifiConfiguration.Status.ENABLED;
+		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+		wificonf.allowedPairwiseCiphers
+				.set(WifiConfiguration.PairwiseCipher.TKIP);
+		wificonf.allowedPairwiseCiphers
+				.set(WifiConfiguration.PairwiseCipher.CCMP);
+		wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
 		
+		
+		// fetch list of all configured networks on this phone 
 		wifiConfigurations = wifiManager.getConfiguredNetworks();
 		// remove saved configuration for any matching SSID
 		for (WifiConfiguration i : wifiConfigurations) {
@@ -275,49 +288,59 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		}
 	}
 
+	private static final String WIFI_CON_EST_TAG = "WifiConnectionEstablishedReceiver";
 	class WifiConnectionEstablishedReceiver extends BroadcastReceiver {
 		public void onReceive(Context c, Intent intent) {
-			Log.v(TAG, "receiver called");
+			Log.v(WIFI_CON_EST_TAG, "onReceive() called");
 
 			NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
-			if (activeNetwork != null) {
+			if (activeNetwork != null && !connectedToFlyPort) {
 				boolean isWiFi = (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
-				boolean isConnected = (activeNetwork.isConnected() && activeNetwork
-						.getState() == NetworkInfo.State.CONNECTED);
-				if (isWiFi && isConnected && !connectedToFlyPort) {
+				boolean isConnected = (activeNetwork.isConnected() && activeNetwork.getState() == NetworkInfo.State.CONNECTED);
+				if (isWiFi && isConnected) {
 					WifiInfo wifi = wifiManager.getConnectionInfo();
-					if (wifi.getSSID().equals("\"EchoSetup\"")) {
-						Log.v(TAG, "Connected to EchoSetup!");
+					if (wifi.getSSID().equals("\"RobotChicken\""/*"\"EchoSetup\""*/)) {
+						Log.v(WIFI_CON_EST_TAG, "Connected to EchoSetup!");
 						
 						connectedToFlyPort = true;
 						// send post message to FlyPort device
-						postComplete = sendConfigurationPOST();
+						//postComplete = sendConfigurationPOST();
+						
+						// DEBUG
+						postComplete = true;
+						
 						Log.v(TAG,"POST status: " + postComplete);
 						
 						if (savedNetwork != -1) {
-							Log.v(TAG, "reconnected to saved wifi network");
-							wifiManager.setWifiEnabled(true);
-							wifiManager.enableNetwork(savedNetwork, false);
-							wifiManager.reconnect();
+							Log.v(WIFI_CON_EST_TAG, "reconnecting to saved wifi network");
+							wifiManager.enableNetwork(savedNetwork, true);
+							//wifiManager.reconnect();
+							reenableSavedNetworks();
 						}
 						
 						Intent i = new Intent(c, NotificationActivity.class);
 				    	startActivity(i);
 						
 					} else {
-						Log.v(TAG, "Connected to " + wifi.getSSID());
+						Log.v(WIFI_CON_EST_TAG, "Connected to " + wifi.getSSID());
 					}
 				} else if (isWiFi && !isConnected) {
-					Log.v(TAG, "ActiveNetwork is WiFi, but state is: "
+					Log.v(WIFI_CON_EST_TAG, "ActiveNetwork is WiFi, but state is: "
 							+ activeNetwork.getDetailedState().toString() + " connected to FlyPort: " + connectedToFlyPort);
 				} else if (!isWiFi) {
-					Log.v(TAG, "ActiveNetwork is not WiFi");
+					Log.v(WIFI_CON_EST_TAG, "ActiveNetwork is not WiFi");
 				} else {
-					Log.v(TAG, "ActiveNetwork is not WiFi or is not Connected");
+					Log.v(WIFI_CON_EST_TAG, "ActiveNetwork is not WiFi or is not Connected");
 				}
 			} else {
-				Log.v(TAG, "ActiveNetworkInfo == null");
+				Log.v(WIFI_CON_EST_TAG, "ActiveNetworkInfo == null");
 			}
+		}
+	}
+	
+	public void reenableSavedNetworks() {
+		for (WifiConfiguration w : wifiManager.getConfiguredNetworks()) {
+			wifiManager.enableNetwork(w.networkId, false);
 		}
 	}
 }

@@ -4,19 +4,16 @@ package org.cs.washington.cse477;
 import java.util.List;
 
 import org.cs.washington.cse477.AddAudioSampleDialog.AdduAudioSampleDialogListener;
+import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
 
 import android.app.DialogFragment;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,7 +23,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 public class SettingsActivity extends ActionBarActivity implements
-		AdduAudioSampleDialogListener, ConfirmDeleteDialog.ConfirmDeleteListener{
+		AdduAudioSampleDialogListener, ConfirmDeleteListener {
 	
 	public static final String LOG_TAG = "SettingsActivity";
 	private static final int MAX_REFRESH = -1;
@@ -68,8 +65,6 @@ public class SettingsActivity extends ActionBarActivity implements
 		return sounds;
 	}
 	/**
-	 * refresh()
-	 * 
 	 * pull MAX_REFRESH newest notifications from parse and display
 	 */
 	public void refresh() {
@@ -155,20 +150,25 @@ public class SettingsActivity extends ActionBarActivity implements
     public void onDialogPositiveClick(DialogFragment dialog) {
         // User touched the dialog's positive button
     	Log.v(LOG_TAG, dialog.toString());
-    	if (dialog == null) {
-    		Log.e(DLG_TAG,"null dialog");
-    	} else {
-    		Log.v(LOG_TAG, dialog.toString());
-    		// fetch user input
-    		EditText user_input_et = (EditText) dialog.getDialog().findViewById(R.id.add_audio_edit_text);
-    		if (user_input_et == null) {
-    			Log.e(DLG_TAG,"null EditText");
-    		} else {
-	    		String user_input = user_input_et.getText().toString();
-	    		saveSoundNameToParse(user_input);
-    		}
-    	}
+		// fetch user input
+		EditText user_input_et = (EditText) dialog.getDialog().findViewById(R.id.add_audio_edit_text);
+		if (user_input_et == null) {
+			Log.e(DLG_TAG,"null EditText");
+		} else {
+			String user_input = user_input_et.getText().toString();
+			saveSoundNameToParse(user_input);
+		}
     }
+    
+    // Delete dialog positive click handler
+    @Override
+	public void onDeleteDialogPositiveClick(DialogFragment dialog) {
+		Log.v(LOG_TAG,"positive click delete dialog");
+		Bundle args = dialog.getArguments();
+		if (args != null) {
+			doDelete(args.getString("name")); 
+		}
+	}
     
 	public void saveSoundNameToParse(String name) {
 		ParseObject sound = new ParseObject("Sound");
@@ -191,6 +191,26 @@ public class SettingsActivity extends ActionBarActivity implements
 				}
 			}
 		});
+	}
+	
+	private boolean doDelete(String toDelete) {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
+		Log.v(LOG_TAG, "going to delete sample with name: "+toDelete);
+		query.whereEqualTo("name", toDelete);
+		try {
+			List<ParseObject> results = query.find();
+			if (results.size() != 1) {
+				Log.e(LOG_TAG, "attempted to delete the sound but found: " + results.size() 
+						+ " sounds with name: " + toDelete);
+			}
+			ParseObject sound = (ParseObject) results.get(0);
+			sound.delete();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} finally {
+			refresh();
+		}
+		return true;
 	}
 
 }

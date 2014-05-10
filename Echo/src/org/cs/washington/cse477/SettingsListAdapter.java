@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +65,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		
 		// set the TextView to display Sound object's name
 		TextView textview = (TextView) rowView.findViewById(R.id.settings_text);
-		String text = (String) obj.get("name");
+		final String text = (String) obj.get("name");
 		textview.setText(text);
 
 		
@@ -78,9 +79,9 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 			
 			@Override
 			public void onClick(View v) {
-				Log.e("DEBUG","position: " + position);
+				Log.v(LOG_TAG,"position: " + position);
 				boolean checked = Boolean.valueOf(((Switch) v).isChecked());
-				Log.e("DEBUG","checked: " + checked);
+				Log.v(LOG_TAG,"checked: " + checked);
 				states.set(position, Boolean.valueOf(((Switch) v).isChecked()));
 				// update subscription information on parse
 				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Sound");
@@ -105,44 +106,30 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				// on click of the play button (image), initiate fetch of sound and playback
-				Log.e("DEBUG","clicked settings play");
+				Log.v(LOG_TAG,"clicked settings play");
 				ParseInit.asf.fetchThenPlayTarget(objectId);
 			}			
 		});
 		ImageView delete = (ImageView) rowView.findViewById(R.id.settings_delete);
 		delete.setClickable(true);
+		// text = "name" field of ParseObject
 		delete.setOnClickListener(new OnClickListenerWithArgs(text) {
 			
 			@Override
 			public void onClick(View v) {
-				//ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
-				//confirmDelete.show(fm, "confirm_delete");
+				// show the dialog
+				ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
+				Bundle b = new Bundle();
+				b.putString("name", text);
+				confirmDelete.setArguments(b);
+				confirmDelete.show(fm, "confirm_delete");
+				
 				// do the delete
-				doDelete(getString());
+				//doDelete(getString());
 			}
 		});
 		
 		return rowView;
-	}
-	
-	private boolean doDelete(String toDelete) {
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
-		Log.v(LOG_TAG, "going to delete sample with name: "+toDelete);
-		query.whereEqualTo("name", toDelete);
-		try {
-			List<ParseObject> results = query.find();
-			if (results.size() != 1) {
-				Log.e(LOG_TAG, "attempted to delete the sound but found: " + results.size() 
-						+ " sounds with name: " + toDelete);
-			}
-			ParseObject sound = (ParseObject) results.get(0);
-			sound.delete();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return true;
 	}
 }

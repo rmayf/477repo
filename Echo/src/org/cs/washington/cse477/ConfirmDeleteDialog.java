@@ -13,7 +13,7 @@ public class ConfirmDeleteDialog extends DialogFragment {
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
 	public interface ConfirmDeleteListener {
-		public void onDialogPositiveClick(DialogFragment dialog);
+		public void onDeleteDialogPositiveClick(DialogFragment dialog);
 	}
 	
     // Use this instance of the interface to deliver action events
@@ -42,11 +42,13 @@ public class ConfirmDeleteDialog extends DialogFragment {
                .setPositiveButton("Yes, Delete it", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   // perform the delete
+                	   mListener.onDeleteDialogPositiveClick(ConfirmDeleteDialog.this);
                    }
                })
                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // User cancelled the dialog
+                	   ConfirmDeleteDialog.this.getDialog().cancel();
                    }
                });
         // Create the AlertDialog object and return it
