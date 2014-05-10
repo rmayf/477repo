@@ -5,6 +5,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -13,12 +14,15 @@ import android.os.AsyncTask;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.cs.washington.cse477.AddAudioSampleDialog.AdduAudioSampleDialogListener;
+
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,7 +30,8 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-public class SettingsActivity extends ActionBarActivity {
+public class SettingsActivity extends ActionBarActivity implements
+		AdduAudioSampleDialogListener {
 	
 	public static final String LOG_TAG = "SettingsActivity";
 	private static final int MAX_REFRESH = -1;
@@ -74,7 +79,7 @@ public class SettingsActivity extends ActionBarActivity {
 	// pull list of all targets being tracked by registered devices
 	// display in the list, with toggle and play button
 	protected void setupSettingsListView() {
-		text = (TextView) findViewById(R.id.settings_text_test);
+		//text = (TextView) findViewById(R.id.settings_text_test);
 
 		settingsView = (ListView) findViewById(R.id.settings_listview);
 		
@@ -127,11 +132,39 @@ public class SettingsActivity extends ActionBarActivity {
 		}
 	}
 
+	protected AddAudioSampleDialog add_dlg = null;
+	private static final String DLG_TAG = "AddAudioSampleDialog";
 	
 	public void addNewSample() {
-		AddAudioSampleDialog d = new AddAudioSampleDialog();
-		d.show(getFragmentManager(), "addaudiosampledialog");
+		add_dlg = new AddAudioSampleDialog();
+		add_dlg.show(getFragmentManager(), "addaudiosampledialog");
 	}
+	
+	// The dialog fragment receives a reference to this Activity through the
+    // Fragment.onAttach() callback, which it uses to call the following methods
+    // defined by the AddAudioSampleDialog.AddAudioSampleDialogListener interface
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+    	if (dialog == null) {
+    		Log.e(DLG_TAG,"null dialog");
+    	} else {
+    		// fetch user input
+    		EditText user_input_et = (EditText) dialog.getDialog().findViewById(R.id.add_audio_edit_text);
+    		if (user_input_et == null) {
+    			Log.e(DLG_TAG,"null EditText");
+    		} else {
+	    		String user_input = user_input_et.getText().toString();
+	
+	    		// DEBUG -- set a textview to show user's input
+	    		text = (TextView) findViewById(R.id.settings_text_test);
+	    		text.setText(user_input);
+	    		
+	    		// TODO: add new sample code here
+    		}
+    	}
+    	
+    }
 	
 //	/**
 //	 *  
