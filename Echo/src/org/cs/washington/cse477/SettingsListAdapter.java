@@ -145,17 +145,4 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		}
 		return true;
 	}
-	
-	public abstract class OnClickListenerWithArgs implements View.OnClickListener {
-		private String str;
-		
-		public OnClickListenerWithArgs(String str) {
-			this.str = str;
-		}
-		
-		public String getString() {
-			return str;
-		}
-	}
-
 }

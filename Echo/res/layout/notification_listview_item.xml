@@ -7,9 +7,9 @@
         android:id="@+id/notification_play"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="6dip"
         android:contentDescription="@string/notification_play_desc"
         android:src="@drawable/ic_action_play" />
@@ -18,11 +18,10 @@
         android:id="@+id/notification_text"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
+        android:layout_toRightOf="@+id/notification_play"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginLeft="6dip"
-        android:layout_toLeftOf="@+id/notification_play"
         android:gravity="center_vertical"
         android:textSize="16sp" />
 
