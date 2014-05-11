@@ -3,6 +3,8 @@ package org.cs.washington.cse477;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,11 +27,13 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 	private final List<ParseObject> values;
 	private final List<Boolean> states;
 	private String text;
+	private FragmentManager fm;
 	
-	public SettingsListAdapter(Context context, List<ParseObject> values) {
+	public SettingsListAdapter(Context context, List<ParseObject> values, FragmentManager fm) {
 		super(context, R.layout.settings_listview_item, values);
 		this.context = context;
 		this.values = values;
+		this.fm = fm;
 		// store old values of the enabled state for each ParseObject
 		states = new ArrayList<Boolean>(values.size());
 		for (int i = 0; i < values.size(); i++) {
@@ -100,7 +104,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		ImageView img = (ImageView) rowView.findViewById(R.id.settings_play);
 		img.setClickable(true);
 		img.setOnClickListener(new OnClickListener() {
-			
+		
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -109,7 +113,18 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 				ParseInit.asf.fetchThenPlayTarget(objectId);
 			}			
 		});
+		ImageView delete = (ImageView) rowView.findViewById(R.id.settings_delete);
+		delete.setClickable(true);
+		delete.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
+				confirmDelete.show(fm, "confirm_delete");
+			}
+		});
 		
 		return rowView;
 	}
+
 }

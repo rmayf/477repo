@@ -38,6 +38,16 @@ public class NotificationActivity extends ActionBarActivity {
 
 		setupNotificationListView();		
 	}
+	
+	/**
+	 * When the activity resumes, such as when it is opened via a push notification on
+	 * the system tray, get the the latest data
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		refresh();
+	}
 
 	protected void setupNotificationListView() {
 		notifyView = (ListView) findViewById(R.id.notification_listview);
@@ -50,6 +60,7 @@ public class NotificationActivity extends ActionBarActivity {
 	public List<ParseObject> getNotifications(int numToFetch) {
 		Log.v(TAG,"entering getNotifications");
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
+		query.orderByDescending("createdAt");
 		query.setLimit(numToFetch);
 		List<ParseObject> mNotifications = null;
 		try {
