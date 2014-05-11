@@ -121,31 +121,5 @@ public class NotificationActivity extends ActionBarActivity {
 		}
 	}
 	
-	/**
-	 * 
-	 * An inner class that extends BroadcastReceiver MUST be static otherwise
-	 * the app crashes.
-	 * 
-	 * @author imathieu
-	 * 
-	 */
-	protected static JSONObject pushData;
-	public static class PushDataReceiver extends BroadcastReceiver {
-
-		public final static String LOG_TAG = "PushDataReceiver";
-
-		public PushDataReceiver() {	}
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String stringPushData = intent.getExtras().getString("com.parse.Data");
-			Log.v(LOG_TAG, "Intent received: " + stringPushData);
-			try {
-				pushData = new JSONObject(stringPushData);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+	
 }
