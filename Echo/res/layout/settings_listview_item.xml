@@ -1,28 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip" >
-
-    <ImageView
-        android:id="@+id/settings_play"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="6dip"
-        android:contentDescription="@string/settings_play_desc"
-        android:src="@drawable/ic_action_play" />
-
-	<Switch
-        android:id="@+id/settings_toggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/settings_play"
-        android:layout_margin="8dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-         />
+    android:padding="6dip" >	
+	
     
 	<!-- android:text="@string/settings_toggle" -->
 	
@@ -38,6 +18,33 @@
         android:gravity="center_vertical"
         android:textSize="16sp" />
 
+  
+    <Switch
+        android:id="@+id/settings_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/settings_text"
+        android:layout_alignBottom="@+id/settings_text"
+        android:layout_margin="8dp"
+        android:layout_toLeftOf="@+id/settings_delete" />
     
+      <ImageView
+        android:id="@+id/settings_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignTop="@+id/settings_text"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/settings_delete"
+        android:src="@drawable/ic_action_remove" />
+
+      <ImageView
+          android:id="@+id/settings_play"
+          android:layout_width="wrap_content"
+          android:layout_height="fill_parent"
+          android:layout_alignTop="@+id/settings_text"
+          android:layout_toLeftOf="@+id/settings_toggle"
+          android:contentDescription="@string/settings_play_desc"
+          android:src="@drawable/ic_action_play" />
 
 </RelativeLayout>

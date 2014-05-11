@@ -3,7 +3,6 @@ package org.cs.washington.cse477;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.util.Log;
@@ -26,7 +25,6 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 	private final Context context;
 	private final List<ParseObject> values;
 	private final List<Boolean> states;
-	private String text;
 	private FragmentManager fm;
 	
 	public SettingsListAdapter(Context context, List<ParseObject> values, FragmentManager fm) {
@@ -66,7 +64,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		
 		// set the TextView to display Sound object's name
 		TextView textview = (TextView) rowView.findViewById(R.id.settings_text);
-		text = (String) obj.get("name");
+		String text = (String) obj.get("name");
 		textview.setText(text);
 
 		
@@ -76,7 +74,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		// Switch click handling
 		// On toggle, store updated state of switch in states list
 		// The states List is used to persist the enabled setting back to Parse at some future time
-		toggle.setOnClickListener(new OnClickListener() {
+		toggle.setOnClickListener(new OnClickListenerWithArgs(text) {
 			
 			@Override
 			public void onClick(View v) {
@@ -85,10 +83,10 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 				Log.e("DEBUG","checked: " + checked);
 				states.set(position, Boolean.valueOf(((Switch) v).isChecked()));
 				// update subscription information on parse
-				ParseQuery query = new ParseQuery<ParseObject>("Sound");
-				Log.v(LOG_TAG, "updating subscription status for sound: " + text + 
+				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Sound");
+				Log.v(LOG_TAG, "updating subscription status for sound: " + getString() + 
 						" to: " + (checked ? "on" : "off"));
-				query.whereEqualTo("name", text);
+				query.whereEqualTo("name", getString());
 				query.findInBackground(new FindCallbackWithArgs(checked) {
 					public void done(List<ParseObject> result, ParseException e) {
 						if (e == null) {
@@ -115,16 +113,49 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		});
 		ImageView delete = (ImageView) rowView.findViewById(R.id.settings_delete);
 		delete.setClickable(true);
-		delete.setOnClickListener(new OnClickListener() {
+		delete.setOnClickListener(new OnClickListenerWithArgs(text) {
 			
 			@Override
 			public void onClick(View v) {
-				ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
-				confirmDelete.show(fm, "confirm_delete");
+				//ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
+				//confirmDelete.show(fm, "confirm_delete");
+				// do the delete
+				doDelete(getString());
 			}
 		});
 		
 		return rowView;
+	}
+	
+	private boolean doDelete(String toDelete) {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
+		Log.v(LOG_TAG, "going to delete sample with name: "+toDelete);
+		query.whereEqualTo("name", toDelete);
+		try {
+			List<ParseObject> results = query.find();
+			if (results.size() != 1) {
+				Log.e(LOG_TAG, "attempted to delete the sound but found: " + results.size() 
+						+ " sounds with name: " + toDelete);
+			}
+			ParseObject sound = (ParseObject) results.get(0);
+			sound.delete();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	public abstract class OnClickListenerWithArgs implements View.OnClickListener {
+		private String str;
+		
+		public OnClickListenerWithArgs(String str) {
+			this.str = str;
+		}
+		
+		public String getString() {
+			return str;
+		}
 	}
 
 }

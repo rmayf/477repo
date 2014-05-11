@@ -4,6 +4,13 @@
     tools:context="org.cs.washington.cse477.SettingsActivity" >
 
     <item
+        android:id="@+id/settings_action_refresh"
+        android:orderInCategory="2"
+        android:showAsAction="always"
+        android:title="@string/menu_refresh"
+        echo:showAsAction="always"
+        android:icon="@drawable/ic_action_refresh" />
+    <item
         android:id="@+id/notification_action_add_sample"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="1"

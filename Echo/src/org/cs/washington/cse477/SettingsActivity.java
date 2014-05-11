@@ -6,6 +6,8 @@ import java.util.List;
 import org.cs.washington.cse477.AddAudioSampleDialog.AdduAudioSampleDialogListener;
 
 import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,7 +24,6 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.PushService;
 
 public class SettingsActivity extends ActionBarActivity implements
 		AdduAudioSampleDialogListener, ConfirmDeleteDialog.ConfirmDeleteListener{
@@ -85,8 +87,7 @@ public class SettingsActivity extends ActionBarActivity implements
 		
 		settingsListAdapter = new SettingsListAdapter(this, parseSounds, getFragmentManager());
 		settingsView.setAdapter(settingsListAdapter);
-		
-		
+		settingsListAdapter.setNotifyOnChange(true);
 		
 		// Add click handler here
 		/*
@@ -136,6 +137,7 @@ public class SettingsActivity extends ActionBarActivity implements
 		}
 	}
 
+
 	protected AddAudioSampleDialog add_dlg = null;
 	private static final String DLG_TAG = "AddAudioSampleDialog";
 	
@@ -143,6 +145,8 @@ public class SettingsActivity extends ActionBarActivity implements
 		add_dlg = new AddAudioSampleDialog();
 		add_dlg.show(getFragmentManager(), "addaudiosampledialog");
 	}
+	
+	
 	
 	// The dialog fragment receives a reference to this Activity through the
     // Fragment.onAttach() callback, which it uses to call the following methods
@@ -162,12 +166,6 @@ public class SettingsActivity extends ActionBarActivity implements
     		} else {
 	    		String user_input = user_input_et.getText().toString();
 	    		saveSoundNameToParse(user_input);
-	    		/*
-	    		// DEBUG -- set a textview to show user's input
-	    		text = (TextView) findViewById(R.id.settings_text_test);
-	    		text.setText(user_input);
-	    		*/
-	    		
     		}
     	}
     }

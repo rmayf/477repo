@@ -33,12 +33,17 @@
     <!-- Settings -->
     <string name="settings_play_desc">Play</string>
     <string name="settings_toggle">Toggle</string>
+    <string name="settings_delete">Delete</string>
+
     
     <!-- Add Audio Dialog Fragment -->
     <string name="audio_dlg_hint">Name the sample</string>
     <string name="audio_dlg_prompt">To add a new sample, enter a name for the sample in the text box, then press Ready!</string>
     <string name="audio_dlg_cancel">Cancel</string>
     <string name="audio_dlg_ready">Ready!</string>        
+    
+    <!-- Confirm Delete Framgment -->
+    <string name="confirm_delete_prompt">Are you sure you want to delete?</string>
     
     <!-- Old Screens Not Used -->
     <!-- Start Screen -->
