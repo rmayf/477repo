@@ -110,7 +110,12 @@
                 android:value="org.cs.washington.cse477.NotificationActivity" />
         </activity>
          -->
-         
+         <!-- Push notification data payload getter stuff -->
+         <receiver android:name="org.cs.washington.cse477.NotificationActivity$PushDataReceiver" android:exported="false">
+  			<intent-filter>
+  			  	<action android:name="org.cs.washington.cse477.SOUND_DATA_GETTER" />
+  			</intent-filter>
+		</receiver>
          
          <!-- PARSE PUSH NOTIFICATION STUFF -->
         <service android:name="com.parse.PushService" />

@@ -1,34 +1,27 @@
 package org.cs.washington.cse477;
 
 
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-
-import android.app.DialogFragment;
-import android.content.Context;
-import android.content.Intent;
-import android.media.MediaPlayer;
-import android.os.AsyncTask;
-
-import java.util.LinkedList;
 import java.util.List;
 
 import org.cs.washington.cse477.AddAudioSampleDialog.AdduAudioSampleDialogListener;
 
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.PushService;
 
 public class SettingsActivity extends ActionBarActivity implements
 		AdduAudioSampleDialogListener {
@@ -42,6 +35,7 @@ public class SettingsActivity extends ActionBarActivity implements
 		
 	// DEBUG
 	protected TextView text;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +120,9 @@ public class SettingsActivity extends ActionBarActivity implements
 			// push settings to cloud if any have changed
 			// this can be done by comparing the new states to the old states
 			return true;
-			
+		case R.id.settings_action_refresh:
+			refresh();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -155,16 +151,39 @@ public class SettingsActivity extends ActionBarActivity implements
     			Log.e(DLG_TAG,"null EditText");
     		} else {
 	    		String user_input = user_input_et.getText().toString();
-	
+	    		saveSoundNameToParse(user_input);
+	    		/*
 	    		// DEBUG -- set a textview to show user's input
 	    		text = (TextView) findViewById(R.id.settings_text_test);
 	    		text.setText(user_input);
+	    		*/
 	    		
-	    		// TODO: add new sample code here
     		}
     	}
-    	
     }
+    
+	public void saveSoundNameToParse(String name) {
+		ParseObject sound = new ParseObject("Sound");
+		sound.put("name", name);
+		sound.put("enabled", true);
+		sound.put("useNextAsTarget", true);
+		try {
+			sound.save();
+		} catch (ParseException e) {
+			Log.e(LOG_TAG, "Parse error: " + e.getCode() + " " + e.getMessage());
+			// server is unavailable
+		}
+		sound.fetchInBackground(new GetCallback<ParseObject>() {
+			public void done(ParseObject object, ParseException e) {
+				if (e == null) {
+					// success, tell user to make sound
+					refresh();
+				} else {
+					// failure, tell user to try again
+				}
+			}
+		});
+	}
 	
 //	/**
 //	 *  
@@ -319,28 +338,5 @@ public class SettingsActivity extends ActionBarActivity implements
 //		return toDelete.delete();
 //	}
 //	
-//	public void saveSoundNameToParse(View view) {
-//		EditText soundNameText = (EditText) findViewById(R.id.soundNameText);
-//		String soundName = soundNameText.getText().toString();
-//		ParseObject sound = new ParseObject("Sound");
-//		sound.put("name", soundName);
-//		try {
-//			sound.save();
-//		} catch (ParseException e) {
-//			Log.e(LOG_TAG, "Parse Server not available");
-//			// server is unavailable
-//		}
-//		sound.fetchInBackground(new GetCallback<ParseObject>() {
-//			public void done(ParseObject object, ParseException e) {
-//				if (e == null) {
-//					// success, tell user to make sound then subscribe
-//					findViewById(R.id.makeSoundInstructions).setVisibility(View.VISIBLE);
-//					PushService.subscribe(getApplicationContext(), object.getObjectId(), NotificationActivity.class);
-//					Log.v(LOG_TAG, "Subscribing to channel: " + object.getObjectId());
-//				} else {
-//					// failure, tell user to try again
-//				}
-//			}
-//		});
-//	}
+
 }

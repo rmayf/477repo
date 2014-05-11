@@ -3,8 +3,6 @@ package org.cs.washington.cse477;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.parse.ParseObject;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,8 +14,13 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
+
+public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
+	public static final String LOG_TAG = "SettingsListAdapter";
 	private final Context context;
 	private final List<ParseObject> values;
 	private final List<Boolean> states;
@@ -74,8 +77,23 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 			@Override
 			public void onClick(View v) {
 				Log.e("DEBUG","position: " + position);
-				Log.e("DEBUG","checked: " + Boolean.valueOf(((Switch) v).isChecked()));
+				boolean checked = Boolean.valueOf(((Switch) v).isChecked());
+				Log.e("DEBUG","checked: " + checked);
 				states.set(position, Boolean.valueOf(((Switch) v).isChecked()));
+				// update subscription information on parse
+				ParseQuery query = new ParseQuery<ParseObject>("Sound");
+				Log.v(LOG_TAG, "updating subscription status for sound: " + text + 
+						" to: " + (checked ? "on" : "off"));
+				query.whereEqualTo("name", text);
+				query.findInBackground(new FindCallbackWithArgs(checked) {
+					public void done(List<ParseObject> result, ParseException e) {
+						if (e == null) {
+							ParseObject sound = (ParseObject) result.get(0);
+							sound.put("enabled", getBool());
+							sound.saveInBackground();
+						}
+					}
+				});
 			}
 		});		
 		
