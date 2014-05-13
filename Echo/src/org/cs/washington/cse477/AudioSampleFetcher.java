@@ -86,14 +86,7 @@ public class AudioSampleFetcher {
 				// null is passed to onPostExecute() and it knows what to do with null input
 				return null;
 			}
-			Header[] headers = res.getAllHeaders();
-			int len = 0;
-			for (int i = 0; i < headers.length; i++) {
-				if (headers[i].getName().equalsIgnoreCase("content-length")) {
-					len = Integer.parseInt(headers[i].getValue());
-					Log.v(LOG_TAG, "file length in bytes: " + len);
-				}
-			}
+			
 			HttpEntity entity = res.getEntity();
 			byte[] temp = new byte[1024];
 			int bytesRead = 0;
