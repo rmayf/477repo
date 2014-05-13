@@ -21,6 +21,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -132,14 +134,43 @@ public class DeviceSetupActivity extends ActionBarActivity {
 				android.R.layout.simple_spinner_dropdown_item,
 				android.R.id.text1, stringScanResults);
 		networksSpinner.setAdapter(networksAdapter);
+		networksSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> adview, View view, int pos,
+					long id) {
+				SSID_user = stringScanResults.get(pos);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				// do nothing
+			}
+		});
 
 		// create and set adapter for security spinner
-		String[] secArray = new String[] { "Open", "WPA", "WPA2" };
+		final String[] secArray = new String[] { "Open", "WPA", "WPA2" };
 		securitySpinner = (Spinner) findViewById(R.id.dev_setup_security_spinner);
 		securityAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item,
 				android.R.id.text1, secArray);
 		securitySpinner.setAdapter(securityAdapter);
+		securitySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> adview, View view, int pos,
+					long id) {
+				encr_user = secArray[pos];
+				
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				// do nothing
+			}
+		});
 	}
 	
 	protected void setupReceivers() {
@@ -169,10 +200,21 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	// 2. send HTTP POST FlyPort
 	// 3. reconnect phone to old WiFi network
 	// 4. wait for push notification indicating setup complete
-	int savedNetwork = -1;
+	protected int savedNetwork = -1;
+	protected String SSID_user;
+	protected String pass_user;
+	protected String encr_user;
+
 	public void configureFlyport(View view) {
 		// save info to send to FlyPort
 		Log.v(TAG, "Configure pressed");
+		// grab user input data
+		//SSID_user = networksAdapter.getItem(networksSpinner.getSelectedItemPosition());
+		pass_user = ((EditText) findViewById(R.id.dev_setup_password)).getText().toString();
+		//encr_user = securityAdapter.getItem(securitySpinner.getSelectedItemPosition());
+		String stat = "SSID: " + SSID_user + "\nEncryption: " + encr_user + "\nPassword: " + pass_user;
+		Log.v(TAG, stat);
+		
 		if (wifiManager == null) {
 			wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		}
@@ -190,28 +232,28 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		// Connect to EchoSetup
 		WifiConfiguration wificonf = new WifiConfiguration();
 		// TODO: uncomment following three lines for in lab/with decive testing
-//		final String SSID = "EchoSetup";
-//		wificonf.SSID = "\"" + SSID + "\"";
-//		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-
+		final String SSID = "EchoSetup";
+		wificonf.SSID = "\"" + SSID + "\"";
+		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+		
 		// TODO: comment out the following set of lines for in lab/weith device testing
 		// DEBUG
-		/*
-		 * WiFi configuration to connect to mark's home network (WPA2)
-		 */
-		final String SSID = "RobotChicken";
-		final String password = "X3bc57pl98";		
-		wificonf.SSID = "\"" + SSID + "\"";
-		wificonf.preSharedKey = "\"" + password + "\"";
-		wificonf.status = WifiConfiguration.Status.ENABLED;
-		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-		wificonf.allowedPairwiseCiphers
-				.set(WifiConfiguration.PairwiseCipher.TKIP);
-		wificonf.allowedPairwiseCiphers
-				.set(WifiConfiguration.PairwiseCipher.CCMP);
-		wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//		/*
+//		 * WiFi configuration to connect to mark's home network (WPA2)
+//		 */
+//		final String SSID = "RobotChicken";
+//		final String password = "X3bc57pl98";		
+//		wificonf.SSID = "\"" + SSID + "\"";
+//		wificonf.preSharedKey = "\"" + password + "\"";
+//		wificonf.status = WifiConfiguration.Status.ENABLED;
+//		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+//		wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//		wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//		wificonf.allowedPairwiseCiphers
+//				.set(WifiConfiguration.PairwiseCipher.TKIP);
+//		wificonf.allowedPairwiseCiphers
+//				.set(WifiConfiguration.PairwiseCipher.CCMP);
+//		wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
 		
 		
 		// fetch list of all configured networks on this phone 
@@ -228,18 +270,6 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		wifiManager.disconnect();
 		wifiManager.enableNetwork(newNetwork, true);
 		
-		
-//		
-//		// connect to new configuration
-//		for (WifiConfiguration i : wifiConfigurations) {
-//			if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
-//				wifiManager.disconnect();
-//				wifiManager.enableNetwork(i.networkId, true);
-//				//wifiManager.reconnect();
-//				break;
-//			}
-//		}
-		
 		Log.v(TAG, "connecting...");
 		// After reconnecting, the WifiConnectionEstablishedReceiver will handle
 		// sending the POST to the FlyPort
@@ -250,11 +280,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 * 
 	 * parses user input and calls HttpPOSTGen functions to perform the post
 	 */
-	public boolean sendConfigurationPOST() {
-		// grab user input data
-		final String SSID_user = networksAdapter.getItem(networksSpinner.getSelectedItemPosition());
-		final String pass_user = ((EditText) findViewById(R.id.dev_setup_password)).getText().toString();
-		final String encr_user = securityAdapter.getItem(securitySpinner.getSelectedItemPosition());
+	public boolean sendConfigurationPOST(String SSID_user, String pass_user, String encr_user) {
 		
 		String stat = "SSID: " + SSID_user + "\nEncryption: " + encr_user + "\nPassword: " + pass_user;
 		Log.v(TAG,"sendConfigurationPOST():\n" + stat);
@@ -268,6 +294,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 				Log.v(TAG,"Attempt " + attempts + " result: " + res);
 			} catch (Exception e) {
 				Log.e(TAG,"Exception on attempt " + attempts);
+				Log.e(TAG,e.getMessage());
 			}
 		}
 		return res;
@@ -299,27 +326,29 @@ public class DeviceSetupActivity extends ActionBarActivity {
 				boolean isConnected = (activeNetwork.isConnected() && activeNetwork.getState() == NetworkInfo.State.CONNECTED);
 				if (isWiFi && isConnected) {
 					WifiInfo wifi = wifiManager.getConnectionInfo();
-					if (wifi.getSSID().equals("\"RobotChicken\""/*"\"EchoSetup\""*/)) {
+					if (wifi.getSSID().equals("\"EchoSetup\""/*"\"RobotChicken\""*/)) {
 						Log.v(WIFI_CON_EST_TAG, "Connected to EchoSetup!");
 						
+
 						connectedToFlyPort = true;
-						// send post message to FlyPort device
-						//postComplete = sendConfigurationPOST();
+
 						
-						// DEBUG
-						postComplete = true;
+						// TODO: for debug, set postComplete = true, disable function call
+						// send post message to FlyPort device
+						postComplete = sendConfigurationPOST(SSID_user,pass_user,encr_user);
+//						postComplete = true;
 						
 						Log.v(TAG,"POST status: " + postComplete);
 						
+						// reconnect to old network
 						if (savedNetwork != -1) {
 							Log.v(WIFI_CON_EST_TAG, "reconnecting to saved wifi network");
 							wifiManager.enableNetwork(savedNetwork, true);
-							//wifiManager.reconnect();
 							reenableSavedNetworks();
 						}
 						
-						Intent i = new Intent(c, NotificationActivity.class);
-				    	startActivity(i);
+						// start NotificationActivity after iniating reconnect
+				    	startActivity(new Intent(c, NotificationActivity.class));
 						
 					} else {
 						Log.v(WIFI_CON_EST_TAG, "Connected to " + wifi.getSSID());
@@ -344,21 +373,3 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		}
 	}
 }
-
-
-
-/*
- * WiFi configuration to connect to mark's home network (WPA2)
- */
-//final String SSID = "RobotChicken";
-//final String password = "X3bc57pl98";		
-//wificonf.preSharedKey = "\"" + password + "\"";
-//wificonf.status = WifiConfiguration.Status.ENABLED;
-//wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-//wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-//wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-//wificonf.allowedPairwiseCiphers
-//		.set(WifiConfiguration.PairwiseCipher.TKIP);
-//wificonf.allowedPairwiseCiphers
-//		.set(WifiConfiguration.PairwiseCipher.CCMP);
-//wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);

@@ -2,13 +2,19 @@ package org.cs.washington.cse477;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
-import org.apache.http.Header;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -23,6 +29,34 @@ import android.util.Log;
 
 public class HttpPOSTGen {
 	private static final String TAG = "HttpPOSTGen";
+
+    private static String generateStrongPasswordHash(String password, String ssid)
+    		throws NoSuchAlgorithmException, InvalidKeySpecException {
+        int iterations = 4096;
+        char[] chars = password.toCharArray();
+        byte[] salt = ssid.getBytes();
+        
+        PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 256);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+        return toHex(hash);
+    }
+     
+    private static String generateWPAKey(String password, String ssid) {
+    	return null;
+    }
+     
+    private static String toHex(byte[] array) throws NoSuchAlgorithmException {
+        BigInteger bi = new BigInteger(1, array);
+        String hex = bi.toString(16);
+        int paddingLength = (array.length * 2) - hex.length();
+        if(paddingLength > 0)
+        {
+            return String.format("%0"  +paddingLength + "d", 0) + hex;
+        }else{
+            return hex;
+        }
+    }
 	
 	public static boolean sendPOST(String SSID, String encryption, String pass) {
 		// allow for network requests in this thread
@@ -31,6 +65,7 @@ public class HttpPOSTGen {
 		StrictMode.setThreadPolicy(policy);
 		
 		Log.v(TAG, "postMessage() called");
+
 		// send POST to FlyPort to configure
 		// 192.168.1.13
 		HttpClient client = new DefaultHttpClient();		
@@ -67,7 +102,9 @@ public class HttpPOSTGen {
 				nameValuePair.add(new BasicNameValuePair("WEP40KEY4", ""));
 				nameValuePair.add(new BasicNameValuePair("WEP40KEYID", ""));
 				nameValuePair.add(new BasicNameValuePair("WEP104KEY", ""));
-				nameValuePair.add(new BasicNameValuePair("WPAPASS", pass));
+				String p = generateStrongPasswordHash(pass, SSID);
+				Log.v(TAG, "passkey: " + p);
+				nameValuePair.add(new BasicNameValuePair("WPAKEY", p));
 				nameValuePair.add(new BasicNameValuePair("WPA2PASS", ""));
 			} else if (encryption.equals("WPA2")) {
 				nameValuePair.add(new BasicNameValuePair("SECTYPE", "WPA2"));
@@ -78,7 +115,9 @@ public class HttpPOSTGen {
 				nameValuePair.add(new BasicNameValuePair("WEP40KEYID", ""));
 				nameValuePair.add(new BasicNameValuePair("WEP104KEY", ""));
 				nameValuePair.add(new BasicNameValuePair("WPAPASS", ""));
-				nameValuePair.add(new BasicNameValuePair("WPA2PASS", pass));
+				String p = generateStrongPasswordHash(pass, SSID);
+				Log.v(TAG, "passkey: " + p);
+				nameValuePair.add(new BasicNameValuePair("WPA2KEY", p));
 			} else {
 				nameValuePair.add(new BasicNameValuePair("SECTYPE", "OPEN"));
 				nameValuePair.add(new BasicNameValuePair("WEP40KEY1", ""));
@@ -94,30 +133,23 @@ public class HttpPOSTGen {
 			// add entity to post
 			post.setEntity(new UrlEncodedFormEntity(nameValuePair));
 
-//			for (Header h : post.getAllHeaders()) {
-//				Log.v("DEBUG", h.toString());
-//			}
-
 			// Execute HTTP Post Request
-//			Log.v("DEBUG", "Printing Response Headers");
 			HttpResponse response = client.execute(post);
-//			for (Header h : response.getAllHeaders()) {
-//				Log.v("DEBUG", h.toString());
-//			}
 			Log.v(TAG, "POST executed");
+			try {
+				int sc = response.getStatusLine().getStatusCode();
+				Log.v(TAG,"HttpResponse StatusCode: " + sc);
+			} catch (Exception e) {
+				
+			}
+			
 			return true;
 		} catch (Exception e) {
-			Log.e(TAG, "Exception");
+			Log.e(TAG, "POST Execution Exception");
 			Log.e(TAG, e.getMessage());
 		}
 
-		return false;
-		
-		// go back to notifications
-		// Intent intent_n = new Intent(getApplicationContext(),
-		// NotificationActivity.class);
-		// startActivity(intent_n);
-		
+		return false;		
 	}
 	
 	// DEBUG to fetch the debug message

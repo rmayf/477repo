@@ -39,10 +39,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_setup_password"
         android:layout_centerHorizontal="true"
-        android:onClick="configureFlyport"
+     	android:onClick="configureFlyport"   
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:text="@string/dev_setup_b" />
+<!--  -->
 
     <TextView
         android:id="@+id/dev_setup_security_select"
