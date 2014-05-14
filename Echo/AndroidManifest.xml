@@ -74,13 +74,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.cs.washington.cse477.NotificationActivity" />
         </activity>
-        
-         <!-- Push notification data payload getter stuff -->
-         <receiver android:name="org.cs.washington.cse477.PushDataReceiver" android:exported="false">
-  			<intent-filter>
-  			  	<action android:name="org.cs.washington.cse477.SOUND_DATA_GETTER" />
-  			</intent-filter>
-		</receiver>
          
          <!-- PARSE PUSH NOTIFICATION STUFF -->
         <service android:name="com.parse.PushService" />
@@ -103,6 +96,16 @@
                 <category android:name="org.cs.washington.cse477" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="org.cs.washington.cse477.NotificationPushReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="org.cs.washington.cse477.NOTIFICATION_PUSH" />
+            </intent-filter>
+        </receiver>
+
         <!-- END parse push stuff -->
 
     </application>

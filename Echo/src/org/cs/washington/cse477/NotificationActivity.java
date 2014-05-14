@@ -21,9 +21,9 @@ public class NotificationActivity extends ActionBarActivity {
 	private static final String TAG = "NotificationActivity";
 	
 	// ListView & Adapter & Data
-	protected ArrayAdapter<ParseObject> notifyAdapter;
+	protected static ArrayAdapter<ParseObject> notifyAdapter;
 	protected ListView notifyView;
-	protected List<ParseObject> parseNotifications;
+	protected static List<ParseObject> parseNotifications;
 	private static final int MAX_REFRESH = 20;
 	
 	/**
@@ -51,10 +51,10 @@ public class NotificationActivity extends ActionBarActivity {
 			Log.e(TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
 		}
 	}
-	
+
 	// gets the Event objects that are match targets. Subscriptions to these sounds
 	// may be on or off
-	public void refreshNotifications() {
+	public static void refreshNotifications() {
 		Log.v(TAG,"refreshNotifications()");
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
 		query.orderByDescending("createdAt");

@@ -12,9 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 
 public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 	public static final String TAG = "NotificationListAdapter";
