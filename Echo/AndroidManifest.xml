@@ -75,41 +75,6 @@
                 android:value="org.cs.washington.cse477.NotificationActivity" />
         </activity>
         
-        
-        
-        <!-- Start Activity: Login or Create Account -->
-        <!-- 
-        <activity
-            android:name="org.cs.washington.cse477.StartActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="org.cs.washington.cse477.NewAccountActivity"
-            android:label="@string/title_activity_new_account"
-            android:parentActivityName="org.cs.washington.cse477.NotificationActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.cs.washington.cse477.NotificationActivity" />
-        </activity> 
-        <activity
-            android:name="org.cs.washington.cse477.DeviceStatusActivity"
-            android:label="@string/title_activity_device_status" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.cs.washington.cse477.NotificationActivity" />
-        </activity>
-        <activity
-            android:name="org.cs.washington.cse477.DeviceRegActivity"
-            android:label="@string/title_activity_device_reg" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.cs.washington.cse477.NotificationActivity" />
-        </activity>
-         -->
          <!-- Push notification data payload getter stuff -->
          <receiver android:name="org.cs.washington.cse477.PushDataReceiver" android:exported="false">
   			<intent-filter>
