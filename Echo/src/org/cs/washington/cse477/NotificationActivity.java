@@ -84,7 +84,7 @@ public class NotificationActivity extends ActionBarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		//refresh();
+		refreshNotifications();
 	}
 
 	@Override
