@@ -1,7 +1,5 @@
 package org.cs.washington.cse477;
 
-import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +17,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
-	public static final String LOG_TAG = "NotificationListAdapter";
+	public static final String TAG = "NotificationListAdapter";
 	
 	private final Context context;
 	private final List<ParseObject> values;
@@ -55,7 +53,7 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 					text += ": ";
 					text += soundName;
 				} else {
-					Log.e(LOG_TAG, "Expected one result from query but got: " + results.size());
+					Log.e(TAG, "Expected one result from query but got: " + results.size());
 					text += ": no match found";
 				}
 			} catch (ParseException e) {
@@ -65,7 +63,7 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 		} else {
 			text += ": no match found";
 		}
-		Log.v(LOG_TAG, "populating: " + text);
+		Log.v(TAG, "populating: " + text);
 		textview.setText(text);
 		
 		ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
@@ -74,9 +72,8 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				// on click of the play button (image), initiate fetch of sound and playback
-				Log.v("DEBUG","clicked notifications play for file: " + getString());
+				Log.v(TAG,"clicked notifications play for file: " + getString());
 				ParseInit.asf.fetchThenPlayEventRecording(getString());
 			}
 		});

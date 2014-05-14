@@ -10,15 +10,28 @@
         android:id="@+id/settings_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:choiceMode="singleChoice" />
+        android:choiceMode="singleChoice"
+        android:layout_below="@+id/loud_unknown_toggle" />
     
-        <Switch
+	<Switch
         android:id="@+id/loud_unknown_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         />
+        
+    <TextView
+        android:id="@+id/settings_all_switch"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:layout_alignBottom="@+id/loud_unknown_toggle"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/loud_unknown_toggle"
+        android:layout_toLeftOf="@+id/loud_unknown_toggle"
+        android:text="@string/settings_toggle_all"
+        android:textAlignment="center" />
     
 </RelativeLayout>

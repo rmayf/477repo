@@ -16,7 +16,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -28,30 +27,31 @@ import android.widget.Spinner;
 
 public class DeviceSetupActivity extends ActionBarActivity {
 
-	protected ConnectivityManager conManager;
-	protected WifiManager wifiManager;
+	protected ConnectivityManager conManager = null;
+	protected WifiManager wifiManager = null;
 
-	protected List<WifiConfiguration> wifiConfigurations;
-	protected List<ScanResult> scanResults;
-	protected List<String> stringScanResults;
-	protected Spinner networksSpinner;
-	protected Spinner securitySpinner;
-	protected ArrayAdapter<String> networksAdapter;
-	protected ArrayAdapter<String> securityAdapter;
+	protected List<WifiConfiguration> wifiConfigurations = null;
+	protected List<ScanResult> scanResults = null;
+	protected List<String> stringScanResults = null;
+	protected Spinner networksSpinner = null;
+	protected Spinner securitySpinner = null;
+	protected ArrayAdapter<String> networksAdapter = null;
+	protected ArrayAdapter<String> securityAdapter = null;
 
-	protected WifiConnectionEstablishedReceiver connectionEstablishedReceiver;
-	protected WifiScanResultsReceiver scanResultReceiver;
+	protected WifiConnectionEstablishedReceiver connectionEstablishedReceiver = null;
+	protected WifiScanResultsReceiver scanResultReceiver = null;
 
 	private boolean connectedToFlyPort = false;
 	private boolean postComplete = false;
 
 	private int savedNetworkID = -1;
-	private String SSID_user;
-	private String pass_user;
-	private String encr_user;
+	private String SSID_user = "";
+	private String pass_user = "";
+	private String encr_user = "";
 	
 	private static final String TAG = "DeviceSetupActivity";
 	private static final String WIFI_CON_EST_TAG = "WifiConnectionEstablishedReceiver";
+	private static final String WIFI_SCAN_TAG = "WifiScanResultsReceiver";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	protected void init() {
 		setupNetworkManagers();
 		registerReceivers();
+		initWifiScan(null);
 		setupUI();
 	}
 	
@@ -165,6 +166,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			@Override
 			public void onItemSelected(AdapterView<?> adview, View view, int pos,
 					long id) {
+				// on item selected, update SSID_user to selected item
 				SSID_user = stringScanResults.get(pos);
 				Log.v(TAG,"SSID_user = " + SSID_user);
 			}
@@ -187,6 +189,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			@Override
 			public void onItemSelected(AdapterView<?> adview, View view, int pos,
 					long id) {
+				// on item selected, update encr_user to selected item
 				encr_user = secArray[pos];
 				Log.v(TAG,"encr_user = " + encr_user);
 				
@@ -221,38 +224,67 @@ public class DeviceSetupActivity extends ActionBarActivity {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			// save current network id if present
-			WifiInfo currentWifi = wifiManager.getConnectionInfo();
-			if (currentWifi != null) {
-				savedNetworkID = currentWifi.getNetworkId();
-			}
-
-			// configure a new WifiConfiguration for EchoSetup
-			WifiConfiguration wificonf = new WifiConfiguration();
-			final String SSID = "EchoSetup";
-			wificonf.SSID = "\"" + SSID + "\"";
-			wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-
-			// fetch list of all configured networks on this phone and remove
-			// any that match on SSID with EchoSetup
-			wifiConfigurations = wifiManager.getConfiguredNetworks();
-			for (WifiConfiguration i : wifiConfigurations) {
-				if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
-					wifiManager.removeNetwork(i.networkId);
+			// if EchoSetup is in range, begin connection process
+			if (checkEchoSetupInRange()) {
+				// save current network id if present
+				WifiInfo currentWifi = wifiManager.getConnectionInfo();
+				if (currentWifi != null) {
+					savedNetworkID = currentWifi.getNetworkId();
 				}
+
+				// configure a new WifiConfiguration for EchoSetup
+				WifiConfiguration wificonf = new WifiConfiguration();
+				final String SSID = "EchoSetup";
+				wificonf.SSID = "\"" + SSID + "\"";
+				wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
+				// fetch list of all configured networks on this phone and remove
+				// any that match on SSID with EchoSetup
+				wifiConfigurations = wifiManager.getConfiguredNetworks();
+				for (WifiConfiguration i : wifiConfigurations) {
+					if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
+						wifiManager.removeNetwork(i.networkId);
+					}
+				}
+				// add new configuration to WiFi manager, disconnect,
+				// and initiate connection to EchoSetup
+				int newNetwork = wifiManager.addNetwork(wificonf);
+				wifiManager.disconnect();
+				wifiManager.enableNetwork(newNetwork, true);
+
+				// reenable all configured networks 
+				enableAllConfiguredNetworks();
+				
+				Log.v(TAG, "connecting...");
+			} else {
+				initWifiScan(null);
+				// notify user that EchoSetup not in range, press refresh
+				Log.v(TAG, "could not detect EchoSetup...did not attempt to connect");
 			}
-			
-			// add new configuration to WiFi manager, disconnect,
-			// and initiate connection to EchoSetup
-			int newNetwork = wifiManager.addNetwork(wificonf);
-			wifiManager.disconnect();
-			wifiManager.enableNetwork(newNetwork, true);
-			
-			Log.v(TAG, "connecting...");
-			
-			
 			return null;
 		}		
+	}
+	
+	private boolean checkEchoSetupInRange() {
+		boolean inRange = false;
+		for (ScanResult s : scanResults) {
+			if (s.SSID.equals("EchoSetup")) inRange = true;
+		}
+		return inRange;
+	}
+	
+	/**
+	 * re-enable all wifi networks
+	 */
+	public void reenableSavedWifiNetwork() {
+		Log.v(TAG,"re-enabling saved wifi network");
+		(new wifiConnectionRestorer()).execute();
+	}
+	
+	protected void enableAllConfiguredNetworks() {
+		for (WifiConfiguration w : wifiManager.getConfiguredNetworks()) {
+			wifiManager.enableNetwork(w.networkId, false);
+		}
 	}
 	
 	private class wifiConnectionRestorer extends AsyncTask<Void, Void, Void> {
@@ -262,11 +294,9 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			// reconnect to old network
 			if (savedNetworkID != -1) {
 				Log.v(WIFI_CON_EST_TAG, "reconnecting to saved wifi network");
-				wifiManager.enableNetwork(savedNetworkID, true);
-				for (WifiConfiguration w : wifiManager.getConfiguredNetworks()) {
-					wifiManager.enableNetwork(w.networkId, false);
-				}
+				wifiManager.enableNetwork(savedNetworkID, true);	
 			}
+			enableAllConfiguredNetworks();
 			return null;
 		}		
 	}
@@ -298,38 +328,19 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		
 		String stat = "SSID: " + SSID_user + "\nEncryption: " + encr_user + "\nPassword: " + pass_user;
 		Log.v(TAG,"sendConfigurationPOST():\n" + stat);
-		int attempts = 0;
+		
 		final String[] params = {SSID_user, pass_user, encr_user};
-		final int MAX_ATTEMPTS = 3;
 		boolean res = false;
-		while (!res && attempts < MAX_ATTEMPTS) {
-			try {
-				attempts++;
-				
-//				AsyncTask<String, Void, Boolean> task = new HttpPOSTGen();
-//				task.execute(params);
-//				res = task.get().booleanValue();
-				
-				
-				// TODO: blocks while waiting for results...probably a bad idea
-				res = ((new HttpPOSTGen()).execute(params)).get().booleanValue();
-				
-				Log.v(TAG,"Attempt " + attempts + " result: " + res);
-			} catch (Exception e) {
-				Log.e(TAG,"Exception on attempt " + attempts);
-				Log.e(TAG,e.getMessage());
-			}
+		try {
+			res =((new HttpPOSTAsyncTask()).execute(params)).get().booleanValue();
+		} catch (Exception e) {
+			Log.e(TAG,"Exception executing AsyncTask: " + e.getMessage());
+			return false;
 		}
 		return res;
 	}
 
-	/**
-	 * re-enable all wifi networks
-	 */
-	public void reenableWifi() {
-		Log.v(TAG,"reenableWifi() called");
-		(new wifiConnectionRestorer()).execute();
-	}
+	
 
 	
 /***************************************************************************************
@@ -341,6 +352,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 */
 	class WifiScanResultsReceiver extends BroadcastReceiver {
 		public void onReceive(Context c, Intent intent) {
+			Log.v(WIFI_SCAN_TAG,"updating scan results spinner");
 			scanResults = wifiManager.getScanResults();
 			stringScanResults.clear();
 			Iterator<ScanResult> iter = scanResults.iterator();
@@ -379,7 +391,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 							Log.w(WIFI_CON_EST_TAG,"configuration POST failed to send successfully");
 						}
 						
-						reenableWifi();
+						reenableSavedWifiNetwork();
 						
 						// start NotificationActivity after iniating reconnect
 				    	startActivity(new Intent(c, NotificationActivity.class));
@@ -404,25 +416,6 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	
 	
 }
-
-//@Override
-//public boolean onCreateOptionsMenu(Menu menu) {
-//	// Inflate the menu; this adds items to the action bar if it is present.
-//	getMenuInflater().inflate(R.menu.device_setup, menu);
-//	return true;
-//}
-
-//@Override
-//public boolean onOptionsItemSelected(MenuItem item) {
-//	// Handle action bar item clicks here. The action bar will
-//	// automatically handle clicks on the Home/Up button, so long
-//	// as you specify a parent activity in AndroidManifest.xml.
-//	int id = item.getItemId();
-//	if (id == R.id.action_settings) {
-//		return true;
-//	}
-//	return super.onOptionsItemSelected(item);
-//}
 
 ///*
 //* WiFi configuration to connect to mark's home network (WPA2)

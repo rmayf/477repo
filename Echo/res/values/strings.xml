@@ -34,6 +34,7 @@
     <string name="settings_play_desc">Play</string>
     <string name="settings_toggle">Toggle</string>
     <string name="settings_delete">Delete</string>
+    <string name="settings_toggle_all">Enable All Notifications</string>
 
     
     <!-- Add Audio Dialog Fragment -->

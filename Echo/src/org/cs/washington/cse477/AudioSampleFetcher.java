@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -18,15 +17,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.net.ParseException;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-
-import com.parse.GetCallback;
-import com.parse.ParseObject;
-import com.parse.PushService;
 
 public class AudioSampleFetcher {	
 	private static final String LOG_TAG = "AudioSampleFetcher";
