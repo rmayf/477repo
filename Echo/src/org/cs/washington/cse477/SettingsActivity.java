@@ -2,6 +2,7 @@ package org.cs.washington.cse477;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.cs.washington.cse477.AddAudioSampleDialog.AdduAudioSampleDialogListener;
 import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
@@ -12,15 +13,19 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.PushService;
 
 public class SettingsActivity extends ActionBarActivity implements
 		AdduAudioSampleDialogListener, ConfirmDeleteListener {
@@ -43,12 +48,40 @@ public class SettingsActivity extends ActionBarActivity implements
 		
 		parseSounds = getSounds(MAX_REFRESH);
 		setupSettingsListView();
+		initializeLoudUnknownToggle();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		refresh();
+	}
+	
+	public void initializeLoudUnknownToggle() {
+		Switch toggle = (Switch) findViewById(R.id.loud_unknown_toggle);
+		toggle.setChecked(getLoudUnknownSubscriptionStatus());
+		toggle.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				boolean checked = Boolean.valueOf(((Switch) v).isChecked());
+				Log.v(LOG_TAG,"checked: " + checked);
+				if (checked) {
+					PushService.subscribe(getApplicationContext(), ParseInit.loudUnknownChannel, NotificationActivity.class);
+				} else {
+					PushService.unsubscribe(getApplicationContext(), ParseInit.loudUnknownChannel);
+				}
+				Set<String> setOfAllSubscriptions = PushService.getSubscriptions(getApplicationContext());
+				Log.v(LOG_TAG, "current channels subscribed to: " + setOfAllSubscriptions.toString());
+			}
+		});
+	}
+	
+	public boolean getLoudUnknownSubscriptionStatus() {
+		//PushService.subscribe(this.getApplicationContext(), defaultChannel, NotificationActivity.class);
+		Set<String> setOfAllSubscriptions = PushService.getSubscriptions(getApplicationContext());
+		Log.v(LOG_TAG, "current channels subscribed to: " + setOfAllSubscriptions.toString());
+		return setOfAllSubscriptions.contains("loudUnknown");
 	}
 	
 	public List<ParseObject> getSounds(int numToFetch) {

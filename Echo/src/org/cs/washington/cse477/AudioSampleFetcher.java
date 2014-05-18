@@ -31,6 +31,8 @@ import com.parse.PushService;
 public class AudioSampleFetcher {	
 	private static final String LOG_TAG = "AudioSampleFetcher";
 	private Context context;
+	private String host = "128.208.7.228";
+	private int port = 9876;
 	
 	public AudioSampleFetcher(Context context) {
 		this.context = context;
@@ -60,7 +62,8 @@ public class AudioSampleFetcher {
 			String method = args[0];
 			String filename = args[1];
 			try {
-				uri = new URI("http://klement.cs.washington.edu:9876/" + method + "?filename=" + filename);
+				//uri = new URI("http://klement.cs.washington.edu:9876/" + method + "?filename=" + filename);
+				uri = new URI("http://" + host + ":" + port + "/" + method + "?filename=" + filename);
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

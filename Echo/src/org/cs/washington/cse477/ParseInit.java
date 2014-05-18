@@ -9,6 +9,7 @@ import com.parse.PushService;
 public class ParseInit extends Application {
 	public static AudioSampleFetcher asf;
 	public static final String defaultChannel = "default";
+	public static final String loudUnknownChannel = "loudUnknown";
 
 	@Override
 	public void onCreate() {
@@ -20,5 +21,4 @@ public class ParseInit extends Application {
 		PushService.subscribe(this.getApplicationContext(), defaultChannel, NotificationActivity.class);
 		asf = new AudioSampleFetcher(this.getApplicationContext());
 	}
-
 }
