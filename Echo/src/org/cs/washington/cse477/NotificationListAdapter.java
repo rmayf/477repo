@@ -42,24 +42,7 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 		String text = time.toString();
 		boolean match = obj.getBoolean("match");
 		if (match) {
-			String matchFilename = obj.getString("matchFilename");
-			ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Sound");
-			query.whereEqualTo("objectId", matchFilename);
-			try {
-				List<ParseObject> results = query.find();
-				if (results.size() == 1) {
-					ParseObject result = results.get(0);
-					String soundName = result.getString("name");
-					text += ": ";
-					text += soundName;
-				} else {
-					Log.e(TAG, "Expected one result from query but got: " + results.size());
-					text += ": no match found";
-				}
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			text += ": " + obj.getString("matchSoundName");
 		} else {
 			text += ": no match found";
 		}

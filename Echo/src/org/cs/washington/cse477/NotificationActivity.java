@@ -38,7 +38,6 @@ public class NotificationActivity extends ActionBarActivity {
 		init();
 		
 		refreshNotifications();
-
 		
 	}
 	
