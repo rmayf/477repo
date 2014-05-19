@@ -2,6 +2,9 @@ package org.cs.washington.cse477;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import android.content.Context;
 import android.util.Log;
@@ -34,18 +37,27 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
         	rowView = inflater.inflate(R.layout.notification_listview_item, parent, false);
         }
         ParseObject obj = values.get(position);
-		TextView textview = (TextView) rowView.findViewById(R.id.notification_text);
-		String filename = (String) obj.get("eventFilename");
-		Date time = obj.getCreatedAt();
-		String text = time.toString();
+        String filename = (String) obj.get("eventFilename");
+        
+        TextView textview = (TextView) rowView.findViewById(R.id.notification_text);
+		TextView dateview = (TextView) rowView.findViewById(R.id.notification_text_date);
+		
+		String text;
+		Date date = obj.getCreatedAt();
+		DateFormat df = new SimpleDateFormat("h:mm:ss aaa '('z')'  'on'  EEE MMM dd, yyyy",Locale.US);
+		String dateText = df.format(date);
+		
 		boolean match = obj.getBoolean("match");
 		if (match) {
-			text += ": " + obj.getString("matchSoundName");
+			text = obj.getString("matchSoundName");
 		} else {
-			text += ": no match found";
+			text = "Loud Unrecognized Event";
 		}
-		Log.v(TAG, "populating: " + text);
+		
+		Log.v(TAG, "populating: " + text + " " + date);
+		
 		textview.setText(text);
+		dateview.setText(dateText);
 		
 		ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
 		img.setClickable(true);

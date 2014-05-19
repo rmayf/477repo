@@ -18,7 +18,7 @@
     <string name="menu_audio_upload">Upload Audio Sample</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_logout">Logout</string>
-    <string name="menu_notification_push">Push Settings</string>
+    <string name="menu_notification_push">Save Settings</string>
     
     <!-- Device Setup -->
     <string name="dev_setup_b">Configure Device!</string>
@@ -39,33 +39,13 @@
     
     <!-- Add Audio Dialog Fragment -->
     <string name="audio_dlg_hint">Name the sample</string>
-    <string name="audio_dlg_prompt">To add a new sample, enter a name for the sample in the text box, then press Ready!</string>
+    <string name="audio_dlg_prompt">To add a new sample, enter a descriptive name in the text field below, then press Ready!\n\nAfter pressing Ready!, the next loud sound detected by Echo will be stored using this name.\n\nYou can then review the sample from the Settings screen.\n</string>
+    <string name="audio_dlg_prompt2"></string>
     <string name="audio_dlg_cancel">Cancel</string>
     <string name="audio_dlg_ready">Ready!</string>        
     
     <!-- Confirm Delete Framgment -->
     <string name="confirm_delete_prompt">Are you sure you want to delete?</string>
-    
-    <!-- Old Screens Not Used -->
-    <!-- Start Screen -->
-    <string name="dev_start_user_dlg">Username</string>
-    <string name="dev_start_pass_dlg">Password</string>
-    <string name="dev_start_login_b">Login</string>
-    <string name="dev_start_newacct_b">Create a New Account!</string>
-    <string name="dev_start_remember_cb">Remember Me</string>
-
-    <!-- New Account Screen -->
-    <string name="new_account_user_dlg">Username</string>
-    <string name="new_account_pass_dlg">Password</string>
-    <string name="new_account_pass_confirm_dlg">Confirm Password</string>
-    <string name="new_account_create_b">Create Account!</string>
-
-    <!-- Device Registration -->
-    <string name="dev_reg_b">Register Device!</string>
-
-    <!-- Device Status -->
-
-
     
 </resources>
     

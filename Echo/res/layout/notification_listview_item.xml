@@ -14,15 +14,27 @@
         android:contentDescription="@string/notification_play_desc"
         android:src="@drawable/ic_action_play" />
 
-    <TextView
-        android:id="@+id/notification_text"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_toRightOf="@+id/notification_play"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_marginLeft="6dip"
-        android:gravity="center_vertical"
-        android:textSize="16sp" />
+	    android:layout_height="fill_parent"
+	    android:layout_toRightOf="@+id/notification_play"
+	    android:layout_marginLeft="6dip"
+	    android:layout_alignWithParentIfMissing="true" >
+        <TextView
+	        android:id="@+id/notification_text"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center_vertical"
+	        android:textSize="16sp" />
+	    
+	    <TextView
+	        android:id="@+id/notification_text_date"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center_vertical"
+	        android:textSize="12sp" />
+    </LinearLayout>
+    
 
 </RelativeLayout>
