@@ -56,7 +56,7 @@ void FlyportTask() {
 
   // Initialze the wifi module.  If the device has already been configured,
   // It will connect to the saved network.  Otherwise, the device enters SoftAP mode
-  // and required the user to save setup parameters using the app or http page.
+  // and requires the user to save setup parameters using the app or http page.
   #ifdef _AUTOMATIC_SETUP
   _dbprint("Atomatic Setup\r\n");
   WFSetParam(NETWORK_TYPE, "infra");
@@ -108,7 +108,7 @@ void FlyportTask() {
   SPIConfig(&spi_ctx, SPI_OPT_MASTER | SPI_OPT_MODE_0, SPI_SS_PIN, SPI_SPEED);
   SPIContextRestore(&spi_ctx);
 
-  // Envelope detection variables
+  // Initialize the environment to use for inside the main while loop
   int env_hist[ENVELOPE_HISTORY_SIZE];
   int env_idx, prev, curr, next, mem_idx, txbuf_idx, amount_read;
   BYTE samp;
