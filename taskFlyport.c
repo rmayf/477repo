@@ -12,8 +12,10 @@
 #endif
 
 
-#include "SPIHelper.h"
 #include "taskFlyport.h"
+#include "spi_custom.h"
+
+
 #define SERV_PORT "6969"
 #define SERV_IP_ADDR "128.208.1.164"
 #define UPLOAD_HEADER_LEN 11
@@ -35,7 +37,7 @@
 /*
  * Global Variables
  */
-char txbuf[TXBUF_SIZE];
+BYTE txbuf[TXBUF_SIZE];
 
 void reset() {
   _dbprint("Resest Button Pushed\r\n");
@@ -49,7 +51,7 @@ void FlyportTask() {
   IOInit(p2, inup);
   IOInit(p2, EXT_INT2);
   INTInit(2, reset, 1);
-  IntEnable(2);
+  INTEnable(2);
 
   TCP_SOCKET server = INVALID_SOCKET;
   UINT32 magic_num = MAGIC_NUM;
@@ -58,14 +60,17 @@ void FlyportTask() {
   // It will connect to the saved network.  Otherwise, the device enters SoftAP mode
   // and requires the user to save setup parameters using the app or http page.
   #ifdef _AUTOMATIC_SETUP
-  _dbprint("Atomatic Setup\r\n");
+  _dbprint("Automatic Setup\r\n");
   WFSetParam(NETWORK_TYPE, "infra");
   WFSetParam(DHCP_ENABLE, ENABLED);
   WFSetParam(SSID_NAME, "big titays");
   WFSetSecurity(WF_SECURITY_OPEN, "", 0, 0);
   WFConnect(WF_CUSTOM);
   while (WFStatus != CONNECTED);
+  vTaskDelay(50);
+  
   #else
+  
   if (WFCustomExist()) {
     _dbprint("Loading Custom WIFI\r\n");
     WFCustomLoad();
@@ -97,85 +102,107 @@ void FlyportTask() {
   }
   #endif
 
-  // SPI Setup
-  IOInit(SPI_CLK_PIN, SPICLKOUT);
-  IOInit(SPI_OUT_PIN, SPI_OUT);
-  IOInit(SPI_IN_PIN, SPI_IN);
-  IOInit(SPI_SS_PIN, out);
-  IOPut(SPI_SS_PIN, on);
-  IOInit(SPI_SS_PIN, out);
-  SPIContext spi_ctx;
-  SPIConfig(&spi_ctx, SPI_OPT_MASTER | SPI_OPT_MODE_0, SPI_SS_PIN, SPI_SPEED);
-  SPIContextRestore(&spi_ctx);
+  
+  // start up SPI2
+  // p8 = SPI_CLOCK
+  // p12 = SPI_IN
+  // p10 = SPI_OUT
+  // p7 = CS
+  cSPIInit(p8, p12, p10, p7);
 
   // Initialize the environment to use for inside the main while loop
   int env_hist[ENVELOPE_HISTORY_SIZE];
   int env_idx, prev, curr, next, mem_idx, txbuf_idx, amount_read;
-  BYTE samp;
+//  BYTE samp;
   INT64 sum;
   for (env_idx = 0; env_idx < ENVELOPE_HISTORY_SIZE; env_idx++)
     env_hist[env_idx] = 0;
   env_idx = sum = prev = curr = next = 0;
 
+  
   // Amplitude envelope detection loop. This samples the ADC and uses a running average plus a
   // fixed threshold to detect distinct sounds.
+  vTaskSuspendAll();
   while(1) {
     next = ADCVal(1) - ADC_ZERO;
+
     if ((curr > next) && (curr > prev)) {
       if (curr > ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_FIXED_THRES)) {
 
-	// Threshold was surpassed.  Sample at a fixed rate and write to sram
-	_dbprint("Envelope Surpassed\r\n");
-	SPIOpen();
-	SPIWriteByte(MEM_SEQUENTIAL_WRITE);
-	SPIWriteByte(0x0);
-	vTaskSuspendAll();
-	for (mem_idx = 0; mem_idx < MEM_SIZE; mem_idx += 2) {
-	  SPIWriteWord(ADCVal(1));
-	}
-	SPIClose();
-	_dbprint("Done Sampling\r\n");
+			// Threshold was surpassed.  Sample at a fixed rate and write to sram
+			_dbprint("Envelope Surpassed\r\n");
+			
+			
+			unsigned long bytes_written;
+			
+			// start sequential write
+			cSPIStartSeqWrite(0, (unsigned long) MEM_SIZE);
+			
+			for (mem_idx = 0; mem_idx < (int)MEM_SIZE; mem_idx += 2) {
+				WORD val = (WORD)ADCVal(1);
+				cSPIWriteNextWORDSeq(val);
+			}
+			
+			cSPIEndSeqWrite(&bytes_written);
+		
+			
+			
+			
+			_dbprint("Done Sampling\r\n");
+			char m[40];
+			sprintf(m, "sampled %d bytes\r\n", bytes_written);
+			_dbprint(m);
 
-        // A 3 sec sample of 16 bit samples should now be stored in the sram.  These data are 
-	// read back in from memory and sent to the server along with metadata about the 
-	// sample.
-	xTaskResumeAll();
-	server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT);
-	while (!TCPisConn(server));
-	_dbprint("Connected to the server\r\n");
-	memcpy(txbuf, &magic_num, 4);
-	txbuf[4] = OPT_UPLOAD;
-	memcpy(&txbuf[5], /*TODO &sampling_rate*/&magic_num, 4);
-	txbuf[9] = 8;
-	txbuf[10] = 1;
-	SPIOpen();
-	SPIWriteByte(MEM_SEQUENTIAL_READ);
-	SPIWriteByte(0x0);
-	txbuf_idx = UPLOAD_HEADER_LEN;
-	amount_read = 0;
-	while (amount_read < MEM_SIZE) {
-          for (;(txbuf_idx < TXBUF_SIZE) && (amount_read < MEM_SIZE); txbuf_idx++) {
-            SPIReadByte(&samp);
-	    txbuf[txbuf_idx] = samp;
-	    amount_read++;
-	  }
-	  TCPWrite(server, txbuf, txbuf_idx);
-	  _dbprint("Wrote a chunk\r\n");
-	  txbuf_idx = 0;
-	}
-	TCPClose(server);
-	server = INVALID_SOCKET;
-	SPIClose();
-	_dbprint("Done Sending!\r\n");
-      }
-      sum -= env_hist[env_idx];
-      history[env_idx] = curr;
-      sum += history[env_idx];
-      if (++env_idx == ENVELOPE_HISTORY_SIZE)
-	env_idx = 0;
+				// A 3 sec sample of 16 bit samples should now be stored in the sram.  These data are 
+			// read back in from memory and sent to the server along with metadata about the 
+			// sample.
+			xTaskResumeAll();
+			
+			server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT);
+			while (!TCPisConn(server));
+			_dbprint("Connected to the server\r\n");
+			memcpy(txbuf, &magic_num, 4);
+			txbuf[4] = OPT_UPLOAD;
+			memcpy(&txbuf[5], /*TODO &sampling_rate*/&magic_num, 4);
+			txbuf[9] = 8;
+			txbuf[10] = 1;
+			
+			
+			txbuf_idx = UPLOAD_HEADER_LEN;
+			amount_read = 0;
+			int remaining = bytes_written;
+			
+			while (remaining > 0) {
+				int to_read = TXBUF_SIZE;
+				if (remaining < TXBUF_SIZE) {
+					to_read = remaining;
+				}
+				cSPIReadSeq((WORD)amount_read, (unsigned long)to_read, &txbuf[txbuf_idx]);
+				txbuf_idx = 0;
+				
+				TCPWrite(server, txbuf, to_read);
+				
+				remaining -= to_read;
+				amount_read += (TXBUF_SIZE - txbuf_idx);
+			  
+				_dbprint("Wrote a chunk\r\n");
+			}
+			
+			TCPClose(server);
+			server = INVALID_SOCKET;
+			_dbprint("Done Sending!\r\n");
+		  }
+		  
+		  sum -= env_hist[env_idx];
+		  env_hist[env_idx] = curr;
+		  sum += env_hist[env_idx];
+		  if (++env_idx == ENVELOPE_HISTORY_SIZE)
+		env_idx = 0;
     }
     prev = curr;
     curr = next;
   }
+  
+  //cSPITerminate();
+  
 }
-
