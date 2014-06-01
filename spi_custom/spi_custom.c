@@ -286,7 +286,7 @@ BOOL cSPIWriteSeq(WORD addr, unsigned long to_write, BYTE* write_in) {
 
 static unsigned long BYTES_WRITTEN;
 
-BOOL cSPIStartSeqWrite(WORD addr, unsigned long to_write) {
+BOOL cSPIStartSeqWrite(WORD addr, unsigned long long to_write) {
   if (to_write > MAX_BYTE_TO_WRITE || to_write <= 0) {
     return FALSE;
   }
@@ -331,7 +331,7 @@ BOOL cSPIWriteNextWORDSeq(WORD write_in) {
   return TRUE;
 }
 
-BOOL cSPIEndSeqWrite(unsigned long* bytes_written) {
+BOOL cSPIEndSeqWrite(unsigned long long* bytes_written) {
   *bytes_written = BYTES_WRITTEN;
 	
   deselect();

@@ -31,10 +31,10 @@ BOOL cSPIWrite(WORD addr, BYTE write_in);
 BOOL cSPIReadSeq(WORD addr, unsigned long to_read, BYTE* read_out);
 BOOL cSPIWriteSeq(WORD addr, unsigned long to_write, BYTE* write_in);
 
-BOOL cSPIStartSeqWrite(WORD addr, unsigned long to_write);
+BOOL cSPIStartSeqWrite(WORD addr, unsigned long long to_write);
 BOOL cSPIWriteNextBYTESeq(BYTE write_in);
 BOOL cSPIWriteNextWORDSeq(WORD write_in);
-BOOL cSPIEndSeqWrite(unsigned long* bytes_written);
+BOOL cSPIEndSeqWrite(unsigned long long* bytes_written);
 
 BOOL cSPITerminate();
 

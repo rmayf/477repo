@@ -24,7 +24,11 @@
 #define OPT_SETUP 2
 #define OPT_UPLOAD 1
 #define ENVELOPE_HISTORY_SIZE 1024
-#define ADC_ZERO 512
+
+#define ADC_ZERO 768
+// this needs to fixed: zero may change based on exact input voltage to mic
+// the initial zero needs to be correctly established somehow
+
 #define ENVELOPE_FIXED_THRES 60
 #define MEM_SEQUENTIAL_READ 0x3
 #define MEM_SEQUENTIAL_WRITE 0x2
@@ -132,25 +136,42 @@ void FlyportTask() {
 			// Threshold was surpassed.  Sample at a fixed rate and write to sram
 			_dbprint("Envelope Surpassed\r\n");
 			
-			
-			unsigned long bytes_written;
-			
+			// weird type shit was going on with the sampling loop
+			// how many bits is int, unsigned, unsigned long, long??
+			// using unsigned long long appears to fix the problem and the ADC samples correct number of times
+			unsigned long long bytes_written;
+			unsigned long long k = 65536;
 			// start sequential write
-			cSPIStartSeqWrite(0, (unsigned long) MEM_SIZE);
-			
-			for (mem_idx = 0; mem_idx < (int)MEM_SIZE; mem_idx += 2) {
+			cSPIStartSeqWrite(0, k);
+			char msg3[40];
+			sprintf(msg3, "%llu\r\n", k);
+			_dbprint(msg3);
+			_dbprint("Before loop\r\n");
+			unsigned long long counter = 0;
+			for (counter = 0; counter < k; counter += 2) {
 				WORD val = (WORD)ADCVal(1);
 				cSPIWriteNextWORDSeq(val);
 			}
-			
+			_dbprint("After loop\r\n");
+			char msg2[40];
+			sprintf(msg2, "loop ran %llu times\r\n", counter/2);
+			_dbprint(msg2);
 			cSPIEndSeqWrite(&bytes_written);
 		
-			
+			/* DEBUG */
+			cSPIsetMODE(MODE_BYTE);
+			for (counter = 0; counter < k/16384; counter++) {
+				BYTE b;
+				cSPIRead((WORD)counter,&b);
+				char m[40];
+				sprintf(m, "read back 0x%X\r\n", b);
+				_dbprint(m);
+			}
 			
 			
 			_dbprint("Done Sampling\r\n");
 			char m[40];
-			sprintf(m, "sampled %d bytes\r\n", bytes_written);
+			sprintf(m, "sampled %llu bytes\r\n", bytes_written);
 			_dbprint(m);
 
 				// A 3 sec sample of 16 bit samples should now be stored in the sram.  These data are 
