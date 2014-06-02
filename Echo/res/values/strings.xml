@@ -39,10 +39,11 @@
     
     <!-- Add Audio Dialog Fragment -->
     <string name="audio_dlg_hint">Name the sample</string>
-    <string name="audio_dlg_prompt">To add a new sample, enter a descriptive name in the text field below, then press Ready!\n\nAfter pressing Ready!, the next loud sound detected by Echo will be stored using this name.\n\nYou can then review the sample from the Settings screen.\n</string>
+    <string name="audio_dlg_prompt">Enter a descriptive name for the noise you want Echo to listen for in the text field below.\n\nWhen you are ready to generate the noise, tap Ready. Echo will use the next loud noise it hears as the sound to listen for.\n\nBe
+    sure to verify that the sound Echo picked up is indeed the noise of interest by tapping the play button to hear it.</string>
     <string name="audio_dlg_prompt2"></string>
     <string name="audio_dlg_cancel">Cancel</string>
-    <string name="audio_dlg_ready">Ready!</string>        
+    <string name="audio_dlg_ready">Ready</string>        
     
     <!-- Confirm Delete Framgment -->
     <string name="confirm_delete_prompt">Are you sure you want to delete?</string>

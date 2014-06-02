@@ -23,7 +23,8 @@ import android.util.Log;
 public class AudioSampleFetcher {	
 	private static final String LOG_TAG = "AudioSampleFetcher";
 	private Context context;
-	private String host = "128.208.7.228";
+	//private String host = "128.208.7.228";
+	private String host = "klement.cs.washington.edu";
 	private int port = 9876;
 	
 	public AudioSampleFetcher(Context context) {
