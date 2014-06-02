@@ -17,7 +17,8 @@
 
 
 #define SERV_PORT "6969"
-#define SERV_IP_ADDR "128.208.1.164"
+// #define SERV_IP_ADDR "128.208.1.164"
+#define SERV_IP_ADDR "192.168.8.133"
 #define UPLOAD_HEADER_LEN 11
 #define TXBUF_SIZE 2048
 #define MAGIC_NUM 0xdeadbabe
@@ -37,16 +38,27 @@
 #define SPI_OUT_PIN p17
 #define SPI_IN_PIN p7
 #define SPI_SS_PIN p8
-#define SPI_SPEED 250000 // TODO can increase up to 8000000
 /*
  * Global Variables
  */
 BYTE txbuf[TXBUF_SIZE];
+BOOL ParamSet = FALSE;
+unsigned long long counter = 0;
 
 void reset() {
   _dbprint("Resest Button Pushed\r\n");
   WFCustomDelete();
   Reset();
+}
+
+// ISR for sampling timer
+void __attribute__((__interrupt__, auto_psv)) _T4Interrupt( void )
+{
+  TMR4 = 0;// interrupt counter reinitialized
+  WORD val = (WORD)ADCVal(1);
+  cSPIWriteNextWORDSeq(val);
+  counter += 2;
+  IFS1bits.T4IF = 0;//clear interrupt flag
 }
 
 void FlyportTask() {
@@ -59,6 +71,13 @@ void FlyportTask() {
 
   TCP_SOCKET server = INVALID_SOCKET;
   UINT32 magic_num = MAGIC_NUM;
+  
+  // interrupt config for real time timer
+  T4CON = 0;  //turn off timer(good practise!)        
+  T4CONbits.TCKPS = 0; //clock divider=1
+  PR4 = 0x5AB; //limit to raise interrupt=1451
+  TMR4 = 0; // init timer counter value
+  IFS1bits.T4IF = 0; //interrupt flag off
 
   // Initialze the wifi module.  If the device has already been configured,
   // It will connect to the saved network.  Otherwise, the device enters SoftAP mode
@@ -71,7 +90,7 @@ void FlyportTask() {
   WFSetSecurity(WF_SECURITY_OPEN, "", 0, 0);
   WFConnect(WF_CUSTOM);
   while (WFStatus != CONNECTED);
-  vTaskDelay(50);
+  //vTaskDelay(50);
   
   #else
   
@@ -82,7 +101,7 @@ void FlyportTask() {
     while (WFStatus != CONNECTED);
   }
   else {
-    _dbprintf("Loading Default WIFI\r\n");
+    _dbprint("Loading Default WIFI\r\n");
     WFConnect(WF_DEFAULT);
     while(!ParamSet) {
       vTaskDelay(25);
@@ -100,24 +119,19 @@ void FlyportTask() {
     memcpy(txbuf, &magic_num, 4);
     txbuf[4] = OPT_SETUP;
     TCPWrite(server, txbuf, 5);
-    TCPClose(server);
+    TCPClientClose(server);
     server = INVALID_SOCKET;
     _dbprint("Sent Setup Complete message to the server\r\n");
   }
   #endif
-
-  
-  // start up SPI2
-  // p8 = SPI_CLOCK
-  // p12 = SPI_IN
-  // p10 = SPI_OUT
-  // p7 = CS
+  vTaskDelay(100);
+  // Initialize SPI
   cSPIInit(p8, p12, p10, p7);
 
   // Initialize the environment to use for inside the main while loop
   int env_hist[ENVELOPE_HISTORY_SIZE];
   int env_idx, prev, curr, next, mem_idx, txbuf_idx, amount_read;
-//  BYTE samp;
+  //  BYTE samp;
   INT64 sum;
   for (env_idx = 0; env_idx < ENVELOPE_HISTORY_SIZE; env_idx++)
     env_hist[env_idx] = 0;
@@ -126,7 +140,6 @@ void FlyportTask() {
   
   // Amplitude envelope detection loop. This samples the ADC and uses a running average plus a
   // fixed threshold to detect distinct sounds.
-  vTaskSuspendAll();
   while(1) {
     next = ADCVal(1) - ADC_ZERO;
 
@@ -147,11 +160,15 @@ void FlyportTask() {
 			sprintf(msg3, "%llu\r\n", k);
 			_dbprint(msg3);
 			_dbprint("Before loop\r\n");
-			unsigned long long counter = 0;
-			for (counter = 0; counter < k; counter += 2) {
-				WORD val = (WORD)ADCVal(1);
-				cSPIWriteNextWORDSeq(val);
-			}
+			
+			// Start Timer
+            IEC1bits.T4IE = 1; //interrupt activated
+			T4CONbits.TON = 1; // timer start
+			
+			//vTaskDelay();
+			for (counter = 0; counter < k;);\
+			//xTaskResumeAll();
+			
 			_dbprint("After loop\r\n");
 			char msg2[40];
 			sprintf(msg2, "loop ran %llu times\r\n", counter/2);
@@ -174,13 +191,14 @@ void FlyportTask() {
 			sprintf(m, "sampled %llu bytes\r\n", bytes_written);
 			_dbprint(m);
 
-				// A 3 sec sample of 16 bit samples should now be stored in the sram.  These data are 
+			// A 3 sec clip of 16 bit samples should now be stored in the sram.  These data are 
 			// read back in from memory and sent to the server along with metadata about the 
 			// sample.
-			xTaskResumeAll();
 			
-			server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT);
-			while (!TCPisConn(server));
+			while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET)
+			  vTaskDelay(10);
+			while (!TCPisConn(server))
+			  vTaskDelay(10);
 			_dbprint("Connected to the server\r\n");
 			memcpy(txbuf, &magic_num, 4);
 			txbuf[4] = OPT_UPLOAD;
@@ -191,7 +209,7 @@ void FlyportTask() {
 			
 			txbuf_idx = UPLOAD_HEADER_LEN;
 			amount_read = 0;
-			int remaining = bytes_written;
+			unsigned long long remaining = bytes_written;
 			
 			while (remaining > 0) {
 				int to_read = TXBUF_SIZE;
@@ -209,7 +227,7 @@ void FlyportTask() {
 				_dbprint("Wrote a chunk\r\n");
 			}
 			
-			TCPClose(server);
+			TCPClientClose(server);
 			server = INVALID_SOCKET;
 			_dbprint("Done Sending!\r\n");
 		  }
