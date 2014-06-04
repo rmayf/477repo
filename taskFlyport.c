@@ -2,8 +2,8 @@
 //
 // Echo, Audio Detection Device v2.3
 
-#define _AUTOMATIC_SETUP 1
-#define _DEBUG_PRINTING 1
+#define _AUTOMATIC_SETUP 
+#define _DEBUG_PRINTING 
 
 #ifdef _DEBUG_PRINTING
 #  define _dbprint(x) UARTWrite(1, x)
@@ -17,22 +17,21 @@
 
 
 #define SERV_PORT "6969"
-// #define SERV_IP_ADDR "128.208.1.164"
-#define SERV_IP_ADDR "192.168.8.133"
+//#define SERV_IP_ADDR "128.208.1.164"
+#define SERV_IP_ADDR "192.168.8.110"
 #define UPLOAD_HEADER_LEN 11
 #define TXBUF_SIZE 2048
 #define MAGIC_NUM 0xdeadbabe
 #define SAMPLE_FREQ 0x2B11 // 11025 Hz
-#define BIT_DEPTH 16
+#define BIT_DEPTH 8
 #define OPT_SETUP 2
 #define OPT_UPLOAD 1
-#define ENVELOPE_HISTORY_SIZE 1024
+#define ENVELOPE_HISTORY_SIZE 2048
 
-#define ADC_ZERO 768
 // this needs to fixed: zero may change based on exact input voltage to mic
 // the initial zero needs to be correctly established somehow
 
-#define ENVELOPE_FIXED_THRES 60
+#define ENVELOPE_FIXED_THRES 120
 #define MEM_SEQUENTIAL_READ 0x3
 #define MEM_SEQUENTIAL_WRITE 0x2
 #define SPI_CLK_PIN p18
@@ -43,14 +42,16 @@
  * Global Variables
  */
 BYTE txbuf[TXBUF_SIZE];
+unsigned int env_hist[ENVELOPE_HISTORY_SIZE];
 BOOL ParamSet = FALSE;
 unsigned long long counter = 0;
-const unsigned long long k = 60000;
+const unsigned long long k = 32768;
 const UINT16 half_max = 0xFFC0 / 2;
+TCP_SOCKET server;
 
 int testI = 0;
 
-BOOL FLAG = TRUE;
+BOOL TIMER = TRUE;
 
 void reset() {
   _dbprint("Resest Button Pushed\r\n");
@@ -62,34 +63,11 @@ void reset() {
 void __attribute__((__interrupt__, auto_psv)) _T4Interrupt( void )
 {
   TMR4 = 0;// interrupt counter reinitialized
-  
-  FLAG = FALSE;
-  
+  TIMER = TRUE;
   IFS1bits.T4IF = 0;//clear interrupt flag
-  T4CON = 0;
-  
-  /*
-  testI++;
-  WORD val = (((WORD)ADCVal(1)) << 6) - half_max;
-  counter += 2;
-  */
-  /*
-  WORD val = (((WORD)ADCVal(1)) << 6) - half_max;
-  cSPIWriteNextWORDSeq((WORD)val);
-  counter += 2;
-  
-  IFS1bits.T4IF = 0;//clear interrupt flag
-  if ( counter >= k )
-  {
-    T4CON = 0;
-	IEC1bits.T4IE = 0;
-	T4CONbits.TON = 0;
-  }
-  */
 }
 
 void stop_sampling() {
-	FLAG = FALSE;
   char stupid[40];
   sprintf(stupid, "Sample Rate: %u\r\n ", testI);
   UARTWrite(1, "*******************************\r\n");
@@ -97,6 +75,8 @@ void stop_sampling() {
 }
 
 void FlyportTask() {
+	
+
   
   // Initialize the GPIO pins for the reset button
   IOInit(p2, inup);
@@ -104,16 +84,18 @@ void FlyportTask() {
   INTInit(2, reset, 1);
   INTEnable(2);
 
-  TCP_SOCKET server = INVALID_SOCKET;
+  server = INVALID_SOCKET;
   UINT32 magic_num = MAGIC_NUM;
+  UINT32 freq = SAMPLE_FREQ;
   
   // interrupt config for real time timer
-  T4CON = 0;  //turn off timer(good practise!)        
+  T4CON = 0x00;  //turn off timer(good practise!)
+  TMR4 = 0x00;
   T4CONbits.TCKPS = 0; //clock divider=1
+  IPC6bits.T4IP = 0x07;  // Priority
   PR4 = 0x5AB; //limit to raise interrupt=1451
-  //PR4 = 0x1E84800;
-  TMR4 = 0; // init timer counter value
   IFS1bits.T4IF = 0; //interrupt flag off
+  IEC1bits.T4IE = 1; //interrupt activated
 
   // Initialze the wifi module.  If the device has already been configured,
   // It will connect to the saved network.  Otherwise, the device enters SoftAP mode
@@ -150,8 +132,10 @@ void FlyportTask() {
     _dbprint("Saved Custom Profile\r\n");
     
     // Send the setupSuccess message to the server 
-    server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT);
-    while (!TCPisConn(server));
+	while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET)
+	  vTaskDelay(10);
+	while (!TCPisConn(server))
+	  vTaskDelay(10);
     memcpy(txbuf, &magic_num, 4);
     txbuf[4] = OPT_SETUP;
     TCPWrite(server, txbuf, 5);
@@ -160,24 +144,36 @@ void FlyportTask() {
     _dbprint("Sent Setup Complete message to the server\r\n");
   }
   #endif
-  vTaskDelay(100);
+  vTaskDelay(200);
   // Initialize SPI
   cSPIInit(p8, p12, p10, p7);
 
   // Initialize the environment to use for inside the main while loop
-  int env_hist[ENVELOPE_HISTORY_SIZE];
-  int env_idx, prev, curr, next, mem_idx, txbuf_idx, amount_read;
+  unsigned int env_idx, prev, curr, next, mem_idx, txbuf_idx, amount_read;
   //  BYTE samp;
-  INT64 sum;
-  for (env_idx = 0; env_idx < ENVELOPE_HISTORY_SIZE; env_idx++)
-    env_hist[env_idx] = 0;
-  env_idx = sum = prev = curr = next = 0;
-
+  UINT64 sum;
+  env_idx = 0;
+  sum = 0;
+  prev = curr = next = ADCVal(1);
+  while( env_idx < ENVELOPE_HISTORY_SIZE)
+  {
+	next = ADCVal(1);
+	if ((curr > next) && (curr > prev)) {
+	  env_hist[env_idx++] = curr;
+	  sum += curr;
+	}
+	prev = curr;
+	curr = next;
+  }
+ char msg[50];
+ sprintf(msg, "Envelope Starting Average %lu", (unsigned long)sum/(unsigned long)ENVELOPE_HISTORY_SIZE);
+ _dbprint(msg);
   
   // Amplitude envelope detection loop. This samples the ADC and uses a running average plus a
   // fixed threshold to detect distinct sounds.
+  env_idx = 0;
   while(1) {
-    next = ADCVal(1) - ADC_ZERO;
+    next = ADCVal(1);
 
     if ((curr > next) && (curr > prev)) {
       if (curr > ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_FIXED_THRES)) {
@@ -196,45 +192,27 @@ void FlyportTask() {
 			_dbprint(msg3);
 			_dbprint("Before loop\r\n");
 			
-			//WFHibernate();
-		    vTaskSuspendAll();
-			
-			
-			struct tm dumb;
-		    RTCCSet(&dumb);
-		    RTCCAlarmConf(&dumb, REPEAT_INFINITE/*REPEAT_NO*/, EVERY_SEC, stop_sampling);
-			RTCCAlarmSet(TRUE);
-			
-			
 			// Start Timer
-            //IEC1bits.T4IE = 1; //interrupt activated
-			//T4CONbits.TON = 1; // timer start
-			
-			RTCCAlarmSet(TRUE);
-			
-			while (FLAG)
-			{
-				//WORD dummy = (((WORD)ADCVal(1)) << 6) - half_max;
-				WORD dummy = (WORD)ADCVal(1);
-				BYTE b = (dummy>>2) & 0xFF;
-				//cSPIWriteNextWORDSeq((WORD)dummy);
-				cSPIWriteNextBYTESeq(b);
-				//counter += 2;
-				counter++;
+			vTaskSuspendAll();
+			T4CONbits.TON = 1; // timer start
+			counter = 0;
+			while (counter < k) {
+				if (TIMER) {
+				  counter++;
+				  BYTE sample = (BYTE)(ADCVal(1) >> 2);
+				  cSPIWriteNextBYTESeq(sample);
+				  TIMER = FALSE;
+				}
 			}
-			
-			
-			
-			
-			//vTaskDelay();
-			//for (counter = 0; counter < k;);
-			
+			T4CONbits.TON = 0; // timer stop
 			xTaskResumeAll();
+			
+
 			
 			_dbprint("After loop\r\n");
 			char msg2[40];
 			
-			sprintf(msg2, "loop ran %llu times\r\n", counter/2);
+			sprintf(msg2, "loop ran %llu times\r\n", counter);
 			_dbprint(msg2);
 			cSPIEndSeqWrite(&bytes_written);
 		
@@ -249,8 +227,6 @@ void FlyportTask() {
 				_dbprint(m);
 			}
 			
-			//WFOn();
-			
 			_dbprint("Done Sampling\r\n");
 			char m[40];
 			sprintf(m, "sampled %llu bytes\r\n", bytes_written);
@@ -260,18 +236,22 @@ void FlyportTask() {
 			// read back in from memory and sent to the server along with metadata about the 
 			// sample.
 			
-			while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET)
-			  vTaskDelay(10);
-			while (!TCPisConn(server))
-			  vTaskDelay(10);
+			while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
+			  vTaskDelay(25);
+			  _dbprint("TCP Client Open\r\n");
+			}
+			_dbprint("In between while loops\r\n");
+			while (!TCPisConn(server)) {
+			  vTaskDelay(25);
+			  _dbprint("TCP connecting\r\n");
+			}
 			_dbprint("Connected to the server\r\n");
 			memcpy(txbuf, &magic_num, 4);
 			txbuf[4] = OPT_UPLOAD;
-			memcpy(&txbuf[5], SAMPLE_FREQ , 4); // SAMPLE_FREQ = 0x2B11 = 11025 Hz
-			txbuf[9] = BIT_DEPTH; // BIT_DEPTH = 16
+			memcpy(&txbuf[5], &freq , 4); // SAMPLE_FREQ = 0x2B11 = 11025 Hz
+			txbuf[9] = BIT_DEPTH; // BIT_DEPTH = 8
 			txbuf[10] = 1;
 			TCPWrite(server, txbuf, UPLOAD_HEADER_LEN);
-			
 			amount_read = 0;
 			unsigned long long remaining = bytes_written;
 			cSPIsetMODE(MODE_SEQ);
@@ -282,7 +262,11 @@ void FlyportTask() {
 				}
 				cSPIReadSeq((WORD)amount_read, (unsigned long)to_read, txbuf);
 				
-				TCPWrite(server, txbuf, to_read);
+				int tcp_written = to_read;
+				while (tcp_written > 0) {
+				  tcp_written -= TCPWrite(server, &txbuf[to_read - tcp_written], tcp_written);
+				  vTaskDelay(25);
+				}
 				
 				remaining -= to_read;
 				amount_read += to_read;
@@ -298,8 +282,8 @@ void FlyportTask() {
 		  sum -= env_hist[env_idx];
 		  env_hist[env_idx] = curr;
 		  sum += env_hist[env_idx];
-		  if (++env_idx == ENVELOPE_HISTORY_SIZE)
-		env_idx = 0;
+		  if (++env_idx >= ENVELOPE_HISTORY_SIZE)
+		    env_idx = 0;
     }
     prev = curr;
     curr = next;
