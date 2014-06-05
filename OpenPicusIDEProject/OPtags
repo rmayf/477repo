@@ -1,0 +1,166 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BIT_DEPTH	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	32;"	kind:d	line:32	file:
+BYTES_WRITTEN	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static unsigned long BYTES_WRITTEN;$/;"	kind:v	line:287	file:
+CMD_RD	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	15;"	kind:d	line:15
+CMD_RDMR	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	7;"	kind:d	line:7
+CMD_WR	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	16;"	kind:d	line:16
+CMD_WRMR	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	8;"	kind:d	line:8
+CS_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void CS_HIGH()$/;"	kind:f	line:39	file:
+CS_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void CS_HIGH();$/;"	kind:p	line:18	file:
+CS_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void CS_LOW()$/;"	kind:f	line:33	file:
+CS_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void CS_LOW();$/;"	kind:p	line:17	file:
+ENVELOPE_FIXED_THRES	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	38;"	kind:d	line:38	file:
+ENVELOPE_HISTORY_SIZE	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	35;"	kind:d	line:35	file:
+FlyportTask	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^void FlyportTask() {$/;"	kind:f	line:78
+HTTPCheckAuth	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^BYTE HTTPCheckAuth(BYTE* cUser, BYTE* cPass)$/;"	kind:f	line:383
+HTTPExecuteGet	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^HTTP_IO_RESULT HTTPExecuteGet(void)$/;"	kind:f	line:58
+HTTPExecutePost	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^HTTP_IO_RESULT HTTPExecutePost(void)$/;"	kind:f	line:76
+HTTPNeedsAuth	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^BYTE HTTPNeedsAuth(BYTE* cFile)$/;"	kind:f	line:365
+MAGIC_NUM	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	30;"	kind:d	line:30	file:
+MAX_BYTE_TO_WRITE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	21;"	kind:d	line:21
+MEM_SEQUENTIAL_READ	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	39;"	kind:d	line:39	file:
+MEM_SEQUENTIAL_WRITE	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	40;"	kind:d	line:40	file:
+MODE_BYTE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	10;"	kind:d	line:10
+MODE_PAGE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	11;"	kind:d	line:11
+MODE_RES	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	13;"	kind:d	line:13
+MODE_SEQ	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	12;"	kind:d	line:12
+OPT_SETUP	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	33;"	kind:d	line:33	file:
+OPT_UPLOAD	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	34;"	kind:d	line:34	file:
+OnConnectionFailed	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^void OnConnectionFailed(UINT8 ev, UINT16 evinfo)$/;"	kind:f	line:16
+OnConnectionPermLost	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^void OnConnectionPermLost(UINT8 ev, UINT16 evinfo)$/;"	kind:f	line:34
+OnConnectionReestablished	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^void OnConnectionReestablished(UINT8 ev, UINT16 evinfo)$/;"	kind:f	line:28
+OnConnectionSuccessful	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^void OnConnectionSuccessful(UINT8 ev, UINT16 evinfo)$/;"	kind:f	line:9
+OnConnectionTempLost	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^void OnConnectionTempLost(UINT8 ev, UINT16 evinfo)$/;"	kind:f	line:22
+OnScanResult	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^void OnScanResult(UINT8 ev, UINT16 evinfo)$/;"	kind:f	line:41
+ParamSet	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^BOOL ParamSet = FALSE;$/;"	kind:v	line:50
+PassKey	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^static char PassKey[129];$/;"	kind:v	line:48	file:
+SAMPLE_FREQ	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	31;"	kind:d	line:31	file:
+SERV_IP_ADDR	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	23;"	kind:d	line:23	file:
+SERV_IP_ADDR	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	25;"	kind:d	line:25	file:
+SERV_PORT	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	20;"	kind:d	line:20	file:
+SPIBUF	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	6;"	kind:d	line:6	file:
+SPICON1	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	7;"	kind:d	line:7	file:
+SPICON2	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	8;"	kind:d	line:8	file:
+SPI_CLK_PIN	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	41;"	kind:d	line:41	file:
+SPI_CUSTOM	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	2;"	kind:d	line:2
+SPI_IN_PIN	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	43;"	kind:d	line:43	file:
+SPI_OUT_PIN	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	42;"	kind:d	line:42	file:
+SPI_SS_PIN	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	44;"	kind:d	line:44	file:
+ScanCompleted	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^BOOL ScanCompleted = FALSE;$/;"	kind:v	line:7
+String_post	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^char String_post[String_post_Len];$/;"	kind:v	line:45
+String_post_Len	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	44;"	kind:d	line:44	file:
+TIMER	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^BOOL TIMER = TRUE;$/;"	kind:v	line:54
+TXBUF_SIZE	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	29;"	kind:d	line:29	file:
+UPLOAD_HEADER_LEN	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	28;"	kind:d	line:28	file:
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	19;"	kind:d	line:19
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_HIGH(addr));$/;"	kind:p	line:210	file:
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_HIGH(addr));$/;"	kind:p	line:229	file:
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_HIGH(addr));$/;"	kind:p	line:252	file:
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_HIGH(addr));$/;"	kind:p	line:274	file:
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_HIGH(addr));$/;"	kind:p	line:303	file:
+WORD_HIGH	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_HIGH(write_in));$/;"	kind:p	line:328	file:
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	18;"	kind:d	line:18
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_LOW(addr));$/;"	kind:p	line:211	file:
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_LOW(addr));$/;"	kind:p	line:230	file:
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_LOW(addr));$/;"	kind:p	line:253	file:
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_LOW(addr));$/;"	kind:p	line:275	file:
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_LOW(addr));$/;"	kind:p	line:304	file:
+WORD_LOW	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  xmit_spi(WORD_LOW(write_in));$/;"	kind:p	line:329	file:
+_AUTOMATIC_SETUP	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	5;"	kind:d	line:5	file:
+_DEBUG_PRINTING	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	6;"	kind:d	line:6	file:
+_SPIEN	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	4;"	kind:d	line:4	file:
+_SPIRBF	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	5;"	kind:d	line:5	file:
+_T4Interrupt	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^void __attribute__((__interrupt__, auto_psv)) _T4Interrupt( void )$/;"	kind:f	line:71
+__HTTPAPP_C	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	42;"	kind:d	line:42	file:
+_dbprint	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	10;"	kind:d	line:10	file:
+_dbprint	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	12;"	kind:d	line:12	file:
+addval	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static int addval;$/;"	kind:v	line:31	file:
+amount_read	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^  unsigned int env_idx, prev, curr, next, amount_read;$/;"	kind:l	line:151
+buf	Z:\cse477\477repo\smart_network_configuration\Master\WF_Events.c	/^	char buf[8];$/;"	kind:l	line:44
+bytes_written	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^			unsigned long long bytes_written = 0;$/;"	kind:l	line:187
+cSPIEndSeqWrite	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIEndSeqWrite(unsigned long long* bytes_written);$/;"	kind:p	line:37
+cSPIEndSeqWrite	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIEndSeqWrite(unsigned long long* bytes_written) {$/;"	kind:f	line:334
+cSPIInit	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIInit(int pin_sck, int pin_si, int pin_so, int pin_cs);$/;"	kind:p	line:23
+cSPIInit	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIInit(int pin_sck, int pin_si, int pin_so, int pin_cs) {$/;"	kind:f	line:159
+cSPIRead	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIRead(WORD addr, BYTE* read_out);$/;"	kind:p	line:28
+cSPIRead	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIRead(WORD addr, BYTE* read_out) {$/;"	kind:f	line:202
+cSPIReadSeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIReadSeq(WORD addr, unsigned long to_read, BYTE* read_out);$/;"	kind:p	line:31
+cSPIReadSeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIReadSeq(WORD addr, unsigned long to_read, BYTE* read_out) {$/;"	kind:f	line:240
+cSPIStartSeqWrite	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIStartSeqWrite(WORD addr, unsigned long long to_write);$/;"	kind:p	line:34
+cSPIStartSeqWrite	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIStartSeqWrite(WORD addr, unsigned long long to_write) {$/;"	kind:f	line:289
+cSPITerminate	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPITerminate();$/;"	kind:p	line:39
+cSPITerminate	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPITerminate() {$/;"	kind:f	line:342
+cSPIWrite	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIWrite(WORD addr, BYTE write_in);$/;"	kind:p	line:29
+cSPIWrite	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIWrite(WORD addr, BYTE write_in) {$/;"	kind:f	line:221
+cSPIWriteNextBYTESeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIWriteNextBYTESeq(BYTE write_in);$/;"	kind:p	line:35
+cSPIWriteNextBYTESeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIWriteNextBYTESeq(BYTE write_in) {$/;"	kind:f	line:309
+cSPIWriteNextWORDSeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIWriteNextWORDSeq(WORD write_in);$/;"	kind:p	line:36
+cSPIWriteNextWORDSeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIWriteNextWORDSeq(WORD write_in) {$/;"	kind:f	line:321
+cSPIWriteSeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIWriteSeq(WORD addr, unsigned long to_write, BYTE* write_in);$/;"	kind:p	line:32
+cSPIWriteSeq	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIWriteSeq(WORD addr, unsigned long to_write, BYTE* write_in) {$/;"	kind:f	line:266
+cSPIgetMODE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIgetMODE(BYTE* mode_out);$/;"	kind:p	line:25
+cSPIgetMODE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIgetMODE(BYTE* mode_out) {$/;"	kind:f	line:172
+cSPIsetMODE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\Include\spi_custom.h	/^BOOL cSPIsetMODE(BYTE mode);$/;"	kind:p	line:26
+cSPIsetMODE	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^BOOL cSPIsetMODE(BYTE mode) {$/;"	kind:f	line:187
+counter	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^unsigned long long counter = 0;$/;"	kind:v	line:51
+curr	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^  unsigned int env_idx, prev, curr, next, amount_read;$/;"	kind:l	line:151
+deselect	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void deselect (void) {$/;"	kind:f	line:48	file:
+deselect	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void deselect(void);$/;"	kind:p	line:21	file:
+dummy	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^					WORD_VAL dummy;$/;"	kind:l	line:209
+dummy	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^					WORD_VAL dummy;$/;"	kind:l	line:285
+dummy	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^				WORD_VAL dummy;$/;"	kind:l	line:246
+dummy	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^				WORD_VAL dummy;$/;"	kind:l	line:320
+env_hist	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^unsigned int env_hist[ENVELOPE_HISTORY_SIZE];$/;"	kind:v	line:49
+env_idx	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^  unsigned int env_idx, prev, curr, next, amount_read;$/;"	kind:l	line:151
+filename	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^	BYTE filename[20];$/;"	kind:l	line:79
+freq	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^const UINT32 freq = SAMPLE_FREQ;$/;"	kind:v	line:56
+i	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  unsigned long i = 0;$/;"	kind:l	line:255
+i	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  unsigned long i = 0;$/;"	kind:l	line:277
+j	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^					int j = 0, j1 = 0;$/;"	kind:l	line:208
+j	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^					int j = 0, j1 = 0;$/;"	kind:l	line:284
+j	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^				int j = 0, j1 = 0;$/;"	kind:l	line:245
+j	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^				int j = 0, j1 = 0;$/;"	kind:l	line:319
+j1	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^					int j = 0, j1 = 0;$/;"	kind:l	line:208
+j1	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^					int j = 0, j1 = 0;$/;"	kind:l	line:284
+j1	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^				int j = 0, j1 = 0;$/;"	kind:l	line:245
+j1	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^				int j = 0, j1 = 0;$/;"	kind:l	line:319
+k_index	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^			int k_index;$/;"	kind:l	line:230
+len	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^	int len;$/;"	kind:l	line:80
+magic_num	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^const UINT32 magic_num = MAGIC_NUM;$/;"	kind:v	line:55
+mode	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  BYTE mode = rcvr_spi();$/;"	kind:l	line:179
+next	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^  unsigned int env_idx, prev, curr, next, amount_read;$/;"	kind:l	line:151
+num_samps	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^const unsigned long long num_samps = 32768;$/;"	kind:v	line:52
+pinConfig	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void pinConfig(int _sdsc, int _sdsi, int _sdso, int _sdcs) {$/;"	kind:f	line:116	file:
+pinConfig	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void pinConfig(int _sdsc, int _sdsi, int _sdso, int _sdcs);$/;"	kind:p	line:19	file:
+power_off	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void power_off (void) {$/;"	kind:f	line:109	file:
+power_off	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void power_off(void);$/;"	kind:p	line:24	file:
+power_on	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void power_on(void) {$/;"	kind:f	line:78	file:
+power_on	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static void power_on(void);$/;"	kind:p	line:23	file:
+prev	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^  unsigned int env_idx, prev, curr, next, amount_read;$/;"	kind:l	line:151
+rcvr_spi	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	11;"	kind:d	line:11	file:
+rcvr_spi_m	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	12;"	kind:d	line:12	file:
+read	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^    BYTE read = rcvr_spi();$/;"	kind:l	line:257
+read	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^  BYTE read = rcvr_spi();$/;"	kind:l	line:213
+remaining	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^			unsigned long long remaining = bytes_written;$/;"	kind:l	line:232
+reset	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^void reset() {$/;"	kind:f	line:64
+sample	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^				  BYTE sample = (BYTE)(ADCVal(1) >> 2);$/;"	kind:l	line:198
+sdcs	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^int sdsi, sdso, sdcs, sdsc;$/;"	kind:v	line:27
+sdsc	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^int sdsi, sdso, sdcs, sdsc;$/;"	kind:v	line:27
+sdsi	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^int sdsi, sdso, sdcs, sdsc;$/;"	kind:v	line:27
+sdso	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^int sdsi, sdso, sdcs, sdsc;$/;"	kind:v	line:27
+security	Z:\cse477\477repo\smart_network_configuration\Master\HTTPApp.c	/^static BYTE security;$/;"	kind:v	line:47	file:
+select	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static int select (void) {	\/* 1:Successful, 0:Timeout *\/$/;"	kind:f	line:58	file:
+select	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static int select(void);$/;"	kind:p	line:22	file:
+server	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^TCP_SOCKET server = INVALID_SOCKET;$/;"	kind:v	line:53
+sum	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^  UINT64 sum;$/;"	kind:l	line:152
+tcp_written	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^				int tcp_written = to_read;$/;"	kind:l	line:242
+to_read	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^				unsigned int to_read = TXBUF_SIZE;$/;"	kind:l	line:236
+txbuf	Z:\cse477\477repo\smart_network_configuration\Master\taskFlyport.c	/^BYTE txbuf[TXBUF_SIZE];$/;"	kind:v	line:48
+xchg_spi	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static BYTE xchg_spi (BYTE dat) {$/;"	kind:f	line:72	file:
+xchg_spi	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	/^static BYTE xchg_spi(BYTE dat);$/;"	kind:p	line:20	file:
+xmit_spi	Z:\cse477\477repo\smart_network_configuration\Master\Libs\ExternalLib\spi_custom.c	10;"	kind:d	line:10	file:

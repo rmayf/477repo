@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Flyport configuration page</title>
+<link href="style/style.css" rel="stylesheet" type="text/css" />
+<script type="application/javascript" src="scripts/main_conf.js"></script>
+
+</head>
+
+<body>
+<div id="content" align="center">
+	
+	<div id="logo" ><img id="logo_img" src="images/logo.png"/> 
+	</div>
+	
+	
+	<div id="data" class="center">
+		<table border="0">
+			<tr>
+				<th align="left">
+					<form id="configuration"  method="post">
+						<div class="network">
+							<div style="padding-top: 30px; width: 360px;  font-weight: bold;">Network Type:</div>
+							<div style="padding: 15px 0px; border-bottom: 2px solid #ccc;">
+								<input type="radio" id="NETTYPE_INFRA" name="NETTYPE" value="infra" checked="checked" onclick="SetValue('infrastructure');"/><label for="NETTYPE_INFRA">Infrastructure</label><br />
+								<input type="radio" id="NETTYPE_ADHOC" name="NETTYPE" value="adhoc"  onclick="SetValue('adhoc');"/><label for="NETTYPE_ADHOC">Ad hoc</label> <br />
+								<input type="radio" id="NETTYPE_SOFTAP" name="NETTYPE" value="softap"  onclick="SetValue('softap');"/><label for="NETTYPE_SOFTAP">SoftAp</label> <br />
+							</div>
+						</div>
+						<div class="dhcp">
+							<div style="padding: 35px 0px 15px 0px;  border-bottom: 2px solid #ccc;">				
+								<table>
+									<tr>
+										<td style="font-weight: bold;">DHCP Client:</td>
+										<td>
+											<input type="radio" id="DHCPCL_ON" name="DHCPCL" value="enabled" onclick="SetValue('dhcpon');" /><label for="DHCPCL_ON">On</label> 
+											<input type="radio" id="DHCPCL_OFF" name="DHCPCL" value="disabled" checked="checked" onclick="SetValue('dhcpoff');" /><label for="DHCPCL_OFF">Off</label> 
+										</td>
+									</tr>
+
+									<tr>
+										<td style="font-weight: bold;">IP Address:</td>
+										<td><input type="text" style="width: 160px;" id="IPADDR" name="IPADDR" /></td>
+									</tr>
+									<tr>
+										<td style="font-weight: bold;">Subnet Mask:</td>
+										<td><input type="text" style="width: 160px;" id="SUBNET" name="SUBNET" /></td>
+									</tr>
+									<tr>
+										<td style="font-weight: bold;">Default Gateway:</td>
+										<td><input type="text" style="width: 160px;" id="GATEWAY" name="GATEWAY" /></td>
+									</tr>
+									<tr>
+										<td style="font-weight: bold;">Primary DNS:</td>
+										<td><input type="text" style="width: 160px;" id="DNS1" name="DNS1" /></td>
+									</tr>
+									<tr>
+										<td style="font-weight: bold;">Secondary DNS:</td>
+										<td><input type="text" style="width: 160px;" id="DNS2" name="DNS2" /></td>
+									</tr>
+								</table>
+							</div>				
+						</div>
+						<div id="wifi_content" class="wireless">
+							<div style="padding-top: 35px;">
+							<table>
+									<tr>
+										<td style="font-weight: bold;">SSID:</td>
+										<td><input type="text" style="width: 160px;" id="SSID" name="SSID" maxlength="32" /></td>
+									</tr>
+									<tr>
+										<td style="font-weight: bold;">Security Type:</td>
+										<td>
+											<select id="SECTYPE" name="SECTYPE" onchange="SetValue('sectype');">
+												<option value="OPEN">Open</option>
+												<option value="WEP40">WEP 40 bit</option>
+												<option value="WEP104">WEP 104 bit</option>
+												<option value="WPA">WPA</option>
+												<option value="WPA2">WPA2</option>
+											</option>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="2">
+										
+											<table id="WEP40" style="display: none;">
+												<tr>
+													<td style="font-weight: bold;">Passkey 1:</td>
+													<td><input type="text" style="width: 160px;" maxlength="10" id="WEP40KEY1" name="WEP40KEY1" /></td>
+												</tr>
+												<tr>
+													<td style="font-weight: bold;">Passkey 2:</td>
+													<td><input type="text" style="width: 160px;" maxlength="10" id="WEP40KEY2" name="WEP40KEY2" /></td>
+												</tr>
+												<tr>
+													<td style="font-weight: bold;">Passkey 3:</td>
+													<td><input type="text" style="width: 160px;" maxlength="10" id="WEP40KEY3" name="WEP40KEY3" /></td>
+												</tr>
+												<tr>
+													<td style="font-weight: bold;">Passkey 4:</td>
+													<td><input type="text" style="width: 160px;" maxlength="10" id="WEP40KEY4" name="WEP40KEY4" /></td>
+												</tr>
+												<tr>
+													<td style="font-weight: bold;">Passkey Index:</td>
+													<td><input type="text" style="width: 30px; text-align: center;" maxlength="1" id="WEP40KEYID" name="WEP40KEYID" /></td>
+												</tr>
+											</table>
+											
+											<table id="WEP104" style="display: none;">
+												<tr>
+													<td style="font-weight: bold;">Passkey:</td>
+													<td><input type="text" style="width: 250px;" maxlength="32" id="WEP104KEY" name="WEP104KEY" /></td>
+												</tr>
+											</table>
+											
+											<table id="WPA" style="display: none;">
+												<tr>
+													<td></td>
+
+												</tr>
+												<tr>
+													<td style="font-weight: bold;">Phrase:</td>
+													<td><input type="text" style="width: 280px;" maxlength="64" id="WPAPASS" name="WPAPASS" /></td>
+												</tr>
+												<tr>
+													<td style="font-weight: bold;">Key:</td>
+													<td><input type="text" style="width: 280px;" maxlength="64" disabled="disabled" id="WPAKEY" name="WPAKEY" /></td>
+												</tr>
+											</table>
+											
+											<table id="WPA2" style="display: none;">
+												<tr>
+													<td></td>
+
+												</tr>
+												<tr>
+													<td style="font-weight: bold; text-align: left;">Phrase:</td>
+													<td><input type="text" style="width: 280px;" maxlength="64" id="WPA2PASS" name="WPA2PASS" /></td>
+												</tr>
+												<tr>
+													<td style="font-weight: bold; text-align: left;">Key:</td>
+													<td><input type="text" style="width: 280px;" maxlength="64" disabled="disabled" id="WPA2KEY" name="WPA2KEY" /></td>
+												</tr>
+											</table>
+											
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+						<div style="text-align: left; float: left">
+							<input type="button" class="mybtn" id="CALCKEY" value="Calculate" onclick="fcalc();" style="display: none" />
+						</div>
+						<div style="text-align: left; ">
+							<input type="button" class="mybtn" id="CLEARKEY" value="Clear" onclick="fclear();" style="display: none" />
+						</div>
+						<div class="action" style="text-align: right;">
+							<input type="submit" class="mybtn" value="Save Settings" onclick="alert('Settings saved correctly, click on OK.'); return CheckSend();" />
+						</div>
+					</form>
+				</th>
+				<th align="left">
+				</th>
+			</tr>
+		</table>
+	</div>
+	<div >
+		<a href="http://www.openpicus.com/" title="Validate">Powered by openPICUS technology</a>
+	</div>
+</div>
+
+</body>
+</html>

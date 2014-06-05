@@ -1,0 +1,110 @@
+
+body{
+	font-family: Corbel, Arial, Verdana, 'Sans serif';
+	background: #f8f8f8 url(../images/bg.jpg) repeat top left;
+	font-weight: 400;
+	font-size: 15px;
+	color: #442214;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+#logo{
+	margin-left: auto;
+	margin-right: auto;
+	display: inline-block;
+}
+
+#logo_img{
+	margin-left: auto;
+	margin-right: auto;
+	display: inline-block;
+	width: 55%;
+}
+
+#data{
+	background: rgba(255,255,255,0.3);
+	width: 480px;
+	padding: 10px 60px 30px;
+	margin:10px auto;
+	border-radius: 20px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.09) inset;
+	height:100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+
+/* LINKS AND HEADINGS STYLING */
+h1  { font: bold 2em "Trebuchet MS", Helvetica, Sans-Serif; margin: 0; color: #fff; background-color:transparent; }
+h2  { font: bold 1.4em "Trebuchet MS", Helvetica, Sans-Serif; }
+h3 { clear: both; font-size: 1.1em; color: #000; background: #fff url(../images/h3bg.gif) no-repeat center left; padding: 0 14px; margin: 0;}
+
+
+
+.dhcp {
+	height: 230px;
+}
+
+.wireless {
+	height: 100%;
+}
+
+.action {
+	height: 30px;
+}
+
+
+.mybtn {
+	background-image: linear-gradient(bottom, rgb(244,49,0) 29%, rgb(248,132,0) 83%);
+	background-image: -o-linear-gradient(bottom, rgb(244,49,0) 29%, rgb(248,132,0) 83%);
+	background-image: -moz-linear-gradient(bottom, rgb(244,49,0) 29%, rgb(248,132,0) 83%);
+	background-image: -webkit-linear-gradient(bottom, rgb(244,49,0) 29%, rgb(248,132,0) 83%);
+	background-image: -ms-linear-gradient(bottom, rgb(244,49,0) 29%, rgb(248,132,0) 83%);
+
+	background-image: -webkit-gradient(
+	linear,
+	left bottom,
+	left top,
+	color-stop(0.29, rgb(244,49,0)),
+	color-stop(0.83, rgb(248,132,0))
+	);
+    border: 1px solid #c22d00;
+    border-radius: 5px 5px 5px 5px;
+    color: #FFFFFF;
+    font-size: 12px;
+    padding: 10px;
+    position: relative;
+    text-decoration: none;
+    margin-top: 8px;
+}
+.mybtn:before {
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 0 1px 1px #909193 inset, 0 1px 0 #FFFFFF;
+    content: "";
+    display: block;
+    height: 100%;
+    left: -8px;
+    padding: 8px;
+    position: absolute;
+    top: -8px;
+    width: 100%;
+    z-index: -1;
+}
+.mybtn:active {
+	background-image: linear-gradient(bottom, rgb(248,132,0) 29%, rgb(244,49,0) 83%);
+	background-image: -o-linear-gradient(bottom, rgb(248,132,0) 29%, rgb(244,49,0) 83%);
+	background-image: -moz-linear-gradient(bottom, rgb(248,132,0) 29%, rgb(244,49,0) 83%);
+	background-image: -webkit-linear-gradient(bottom, rgb(248,132,0) 29%, rgb(244,49,0) 83%);
+	background-image: -ms-linear-gradient(bottom, rgb(248,132,0) 29%, rgb(244,49,0) 83%);
+
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.29, rgb(248,132,0)),
+		color-stop(0.83, rgb(244,49,0))
+	);
+    padding: 11px 10px 9px;
+    top: 1px;
+}
