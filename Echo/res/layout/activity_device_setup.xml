@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_setup_security"
         android:layout_centerHorizontal="true"
+        android:spinnerMode="dropdown"
         android:layout_alignLeft="@+id/dev_setup_networks_spinner"
         android:layout_alignRight="@+id/dev_setup_networks_spinner"
         android:layout_marginBottom="18dp" />
@@ -37,23 +38,28 @@
         android:layout_marginLeft="10dp"
         android:layout_below="@+id/dev_setup_description"
         android:layout_marginTop="20dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:text="@string/dev_setup_net_sel" />
     
     <Spinner
         android:id="@+id/dev_setup_networks_spinner"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/dev_setup_refresh_networks_b"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/dev_setup_select"
+        android:layout_marginLeft="20dp"
+        android:spinnerMode="dropdown"
         android:layout_below="@+id/dev_setup_select"
         android:layout_marginTop="6dp" />
+<!--         android:layout_alignRight="@+id/dev_setup_select" -->
 
     <ImageView 
         android:id="@+id/dev_setup_refresh_networks_b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/dev_setup_networks_spinner"
+        android:layout_marginRight="25dp"
+        android:minWidth="60dp"
         android:layout_alignParentRight="true"
         android:layout_alignBottom="@+id/dev_setup_networks_spinner"
         android:layout_alignTop="@+id/dev_setup_networks_spinner"
@@ -61,6 +67,7 @@
         android:onClick="initWifiScan"
         android:contentDescription="@string/dev_setup_refresh_b_desc"
         android:src="@drawable/ic_action_refresh_dark" />
+<!--     android:layout_toRightOf="@+id/dev_setup_networks_spinner" -->
     
     <TextView
         android:id="@+id/dev_setup_security"
@@ -70,7 +77,8 @@
         android:layout_marginTop="10dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:text="@string/dev_setup_encr_sel" />
     
     
@@ -82,7 +90,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
         android:layout_below="@+id/dev_setup_security_spinner"
-        android:textSize="16sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:text="@string/dev_setup_sec_sel" />
     
     
@@ -94,6 +103,7 @@
         android:layout_centerHorizontal="true"
      	android:onClick="configureFlyport"   
         android:focusable="false"
+        android:minWidth="140dp"
         android:focusableInTouchMode="false"
         android:text="@string/dev_setup_b" />
     
@@ -102,7 +112,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/dev_setup_password_prompt"
-        android:layout_centerHorizontal="true"
+        android:layout_alignLeft="@+id/dev_setup_networks_spinner"
+        android:layout_alignRight="@+id/dev_setup_networks_spinner"
         android:layout_marginBottom="28dp"
         android:inputType="textPassword" >
     </EditText>

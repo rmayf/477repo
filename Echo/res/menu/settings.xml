@@ -10,12 +10,25 @@
         android:title="@string/menu_refresh"
         echo:showAsAction="always"
         android:icon="@drawable/ic_action_refresh" />
+    
     <item
-        android:id="@+id/notification_action_add_sample"
+        android:id="@+id/settings_action_add_sample"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="1"
         android:showAsAction="always"
         android:title="@string/menu_audio_upload"
         echo:showAsAction="always"/>
+    
+    <item
+        android:id="@+id/settings_action_setup_device"
+        android:orderInCategory="400"
+        android:showAsAction="never"
+        android:title="@string/menu_setup_device"/>
+    
+    <item
+        android:id="@+id/settings_action_notifications"
+        android:orderInCategory="1000"
+        android:showAsAction="never"
+        android:title="@string/menu_notifications"/>
     
 </menu>

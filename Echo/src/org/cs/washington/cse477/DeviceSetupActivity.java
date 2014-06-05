@@ -4,10 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.cs.washington.cse477.DeviceSetupErrorDialog.DeviceSetupErrorDialogListener;
-
-import android.annotation.SuppressLint;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,10 +27,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.graphics.Color;
 
-public class DeviceSetupActivity extends ActionBarActivity 
-implements	DeviceSetupErrorDialogListener 
-{
+public class DeviceSetupActivity extends ActionBarActivity {
 
 	private static final String LOG_TAG = "DeviceSetupActivity";
 	private static final String WIFI_CON_EST_TAG = "WifiConnectionEstablishedReceiver";
@@ -99,9 +94,7 @@ implements	DeviceSetupErrorDialogListener
 	/**
 	 * called when activity resumes, register receivers
 	 */
-	@SuppressLint("NewApi")
 	@Override
-	// TODO: fix this
 	protected void onResume() {
 		super.onResume();
 		registerReceivers();
@@ -167,10 +160,10 @@ implements	DeviceSetupErrorDialogListener
 				
 				if (mEncr_user.equalsIgnoreCase("open")) {
 					mPassEditText.setEnabled(false);
-					mPassTextView.setTextColor(getResources().getColor(R.color.gray));
+					mPassTextView.setTextColor(Color.LTGRAY);
 				} else {
 					mPassEditText.setEnabled(true);
-					mPassTextView.setTextColor(getResources().getColor(R.color.black));
+					mPassTextView.setTextColor(Color.BLACK);
 				}
 			}
 
@@ -215,20 +208,12 @@ implements	DeviceSetupErrorDialogListener
 			Log.v(LOG_TAG,"failed to unregister connectionEstablishedReceiver with: " + iae.getMessage());
 		}
 	}
-
-	@Override
-	public void onErrorDialogPositiveClick(DialogFragment dialog) {
-		dialog.getDialog().cancel();
-		
-	}
 	
 	/**
 	 * initiate scan for available WiFi networks
 	 * 
 	 * called onClick of refresh button
 	 */
-	// TODO: fix this
-	@SuppressLint("NewApi")
 	public void initWifiScan(View v) {
 		Log.v(LOG_TAG,"initWifiScan() called");
 		if (mWifiManager != null) {
@@ -368,8 +353,6 @@ implements	DeviceSetupErrorDialogListener
 	 * Broadcast Receiver for WiFi Scan Result Event
 	 */
 	class WifiScanResultsReceiver extends BroadcastReceiver {
-		@SuppressLint("NewApi")
-		// TODO: fix this
 		public void onReceive(Context c, Intent intent) {
 			Log.v(WIFI_SCAN_TAG,"updating scan results spinner");
 			mScanResults = mWifiManager.getScanResults();

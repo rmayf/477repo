@@ -1,6 +1,5 @@
 package org.cs.washington.cse477;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.FragmentManager;
@@ -25,7 +24,6 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 	public static final String LOG_TAG = "SettingsListAdapter";
 	private final Context context;
 	private final List<ParseObject> values;
-	private final List<Boolean> states;
 	private FragmentManager fm;
 	
 	public SettingsListAdapter(Context context, List<ParseObject> values, FragmentManager fm) {
@@ -33,29 +31,8 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		this.context = context;
 		this.values = values;
 		this.fm = fm;
-		// store old values of the enabled state for each ParseObject
-		states = new ArrayList<Boolean>(values.size());
-		for (int i = 0; i < values.size(); i++) {
-			states.add(i, values.get(i).getBoolean("enabled"));
-		}
 	}
 
-	@Override
-	public void notifyDataSetChanged() {
-		super.notifyDataSetChanged();
-		states.clear();
-		for (int i = 0; i < values.size(); i++) {
-			states.add(i, values.get(i).getBoolean("enabled"));
-		}
-	}
-	
-	/**
-	 * Method for owners of instances of this Adapter to fetch the list of objects
-	 */
-	public List<Boolean> getEnabledStates() {
-		return states;
-	}
-	
 	public List<ParseObject> getValues() {
 		return values;
 	}
@@ -82,8 +59,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		toggle.setChecked(obj.getBoolean("enabled"));
 		
 		// Switch click handling
-		// On toggle, store updated state of switch in states list
-		// The states List is used to persist the enabled setting back to Parse at some future time
+		// On toggle, asynchronously update the toggle setting
 		toggle.setOnClickListener(new OnClickListenerWithArgs(text) {
 			
 			@Override
@@ -91,7 +67,6 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 				Log.v(LOG_TAG,"position: " + position);
 				boolean checked = Boolean.valueOf(((Switch) v).isChecked());
 				Log.v(LOG_TAG,"checked: " + checked);
-				states.set(position, Boolean.valueOf(((Switch) v).isChecked()));
 				// update subscription information on parse
 				ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Sound");
 				Log.v(LOG_TAG, "updating subscription status for sound: " + getString() + 
@@ -128,14 +103,11 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 			@Override
 			public void onClick(View v) {
 				// show the dialog
-				DeviceSetupErrorDialog confirmDelete = new DeviceSetupErrorDialog();
+				ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
 				Bundle b = new Bundle();
-				b.putString("name", text);
+				b.putString("objectId", values.get(position).getObjectId());
 				confirmDelete.setArguments(b);
 				confirmDelete.show(fm, "confirm_delete");
-				
-				// do the delete
-				//doDelete(getString());
 			}
 		});
 		

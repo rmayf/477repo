@@ -10,6 +10,7 @@ import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -142,12 +143,21 @@ public class SettingsActivity extends ActionBarActivity implements
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
+		Intent intent;
 		switch(item.getItemId()) {		
-		case R.id.notification_action_add_sample:
+		case R.id.settings_action_add_sample:
 			mAdd_dlg.show(getFragmentManager(), "addaudiosampledialog");
 			return true;
 		case R.id.settings_action_refresh:
 			refreshSounds();
+			return true;
+		case R.id.settings_action_notifications:
+			intent = new Intent(this, NotificationActivity.class);
+	    	startActivity(intent);
+			return true;
+		case R.id.settings_action_setup_device:
+			intent = new Intent(this, DeviceSetupActivity.class);
+	    	startActivity(intent);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -197,21 +207,17 @@ public class SettingsActivity extends ActionBarActivity implements
 		Log.v(LOG_TAG,"positive click delete dialog");
 		Bundle args = dialog.getArguments();
 		if (args != null) {
-			deleteSound(args.getString("name")); 
+			deleteSound(args.getString("objectId")); 
 		}
 	}
 	
 	/**
-	 * delete sound from Parse asynchronously
+	 * delete sound from Parse asynchronously, using objectId as key
 	 * 
-	 * note: this method does not check if more than one object with the name exists,
-	 *       and simply deletes the first match returned
-	 *       
-	 *       THIS COULD BE DANGEROUS!!!
 	 */
 	private boolean deleteSound(String toDelete) {		
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
-		query.whereEqualTo("name", toDelete);
+		query.whereEqualTo("objectId", toDelete);
 		query.getFirstInBackground(new GetCallback<ParseObject>() {
 			
 			@Override
