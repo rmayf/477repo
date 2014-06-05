@@ -41,13 +41,13 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	protected WifiConnectionEstablishedReceiver connectionEstablishedReceiver = null;
 	protected WifiScanResultsReceiver scanResultReceiver = null;
 
-	private boolean connectedToFlyPort = false;
-	private boolean postComplete = false;
+	protected boolean connectedToFlyPort = false;
+	protected boolean postComplete = false;
 
-	private int savedNetworkID = -1;
-	private String SSID_user = "";
-	private String pass_user = "";
-	private String encr_user = "";
+	protected int savedNetworkID = -1;
+	protected String SSID_user = "";
+	protected String pass_user = "";
+	protected String encr_user = "";
 	
 	private static final String TAG = "DeviceSetupActivity";
 	private static final String WIFI_CON_EST_TAG = "WifiConnectionEstablishedReceiver";
@@ -220,7 +220,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		init();
 	}
 
-	private class EchoSetupConnector extends AsyncTask<Void, Void, Void> {
+	class EchoSetupConnector extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -287,7 +287,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		}
 	}
 	
-	private class wifiConnectionRestorer extends AsyncTask<Void, Void, Void> {
+	class wifiConnectionRestorer extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected Void doInBackground(Void... params) {

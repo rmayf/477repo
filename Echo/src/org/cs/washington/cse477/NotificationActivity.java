@@ -12,19 +12,21 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 public class NotificationActivity extends ActionBarActivity {
 	// logging tag
-	private static final String TAG = "NotificationActivity";
+	private static final String LOG_TAG = "NotificationActivity";
+	
+	private static final int MAX_REFRESH = 20;
 	
 	// ListView & Adapter & Data
-	protected static ArrayAdapter<ParseObject> notifyAdapter;
-	protected ListView notifyView;
-	protected static List<ParseObject> parseNotifications;
-	private static final int MAX_REFRESH = 20;
+	protected ListView mNotifyView;
+	protected static ArrayAdapter<ParseObject> mNotifyAdapter;
+	protected static List<ParseObject> mParseNotifications;
 	
 	/**
 	 * onCreate(): initialize and fetch notifications
@@ -37,43 +39,8 @@ public class NotificationActivity extends ActionBarActivity {
 		
 		init();
 		
-		refreshNotifications();
+		//refreshNotifications();
 		
-	}
-	
-	protected void init() {
-		parseNotifications = new ArrayList<ParseObject>(MAX_REFRESH);
-		notifyView = (ListView) findViewById(R.id.notification_listview);
-		notifyAdapter = new NotificationListAdapter(this, parseNotifications);
-		try {
-			notifyView.setAdapter(notifyAdapter);
-		} catch (Exception e) {
-			Log.e(TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
-		}
-	}
-
-	// gets the Event objects that are match targets. Subscriptions to these sounds
-	// may be on or off
-	public static void refreshNotifications() {
-		Log.v(TAG,"refreshNotifications()");
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
-		query.orderByDescending("createdAt");
-		query.setLimit(MAX_REFRESH);
-		List<ParseObject> mNotifications = null;
-		try {
-			mNotifications = query.find();
-			Log.v(TAG, "success getting: " + mNotifications.size() + " event objects");
-		} catch (ParseException e) {
-			Log.e(TAG,"failed to fetch notifications from Parse\n" + e.getMessage());
-		}
-		if (mNotifications != null) {
-			parseNotifications.clear();
-			for (ParseObject p : mNotifications) {
-				parseNotifications.add(p);
-			}
-			//parseNotifications = mNotifications;
-			notifyAdapter.notifyDataSetChanged();
-		}
 	}
 	
 	/**
@@ -85,7 +52,49 @@ public class NotificationActivity extends ActionBarActivity {
 		super.onResume();
 		refreshNotifications();
 	}
+	
+	/**
+	 * initialize activity member data and set view adapter 
+	 */
+	protected void init() {
+		mParseNotifications = new ArrayList<ParseObject>(MAX_REFRESH);
+		mNotifyView = (ListView) findViewById(R.id.notification_listview);
+		mNotifyAdapter = new NotificationListAdapter(this, mParseNotifications);
+		try {
+			mNotifyView.setAdapter(mNotifyAdapter);
+		} catch (Exception e) {
+			Log.e(LOG_TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
+		}
+	}
 
+	/**
+	 * fetch notifications list from parse asynchronously
+	 */
+	public static void refreshNotifications() {
+		Log.v(LOG_TAG,"refreshNotifications()");
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
+		query.orderByDescending("createdAt");
+		query.setLimit(MAX_REFRESH);
+		query.findInBackground(new FindCallback<ParseObject>() {
+			
+			@Override
+			public void done(List<ParseObject> objs, ParseException e) {
+				if (e == null) {
+					mParseNotifications.clear();
+					mParseNotifications.addAll(objs);
+					mNotifyAdapter.notifyDataSetChanged();
+					Log.v(LOG_TAG, "success getting: " + mParseNotifications.size() + " event objects");
+				} else {
+					// ParseException, do nothing, log error
+					Log.e(LOG_TAG,"failed to fetch notifications from Parse\n" + e.getMessage());
+				}
+			}
+		});
+	}
+
+	/**
+	 * add menu to view
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -93,6 +102,9 @@ public class NotificationActivity extends ActionBarActivity {
 		return true;
 	}
 
+	/**
+	 * handle menu clicks
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will

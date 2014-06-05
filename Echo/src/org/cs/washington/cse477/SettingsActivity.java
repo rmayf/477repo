@@ -1,6 +1,7 @@
 package org.cs.washington.cse477;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.cs.washington.cse477.AddAudioSampleDialog.AdduAudioSampleDialogListen
 import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
 
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -21,43 +23,57 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.parse.CountCallback;
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.PushService;
+import com.parse.SaveCallback;
 
 public class SettingsActivity extends ActionBarActivity implements
 		AdduAudioSampleDialogListener, ConfirmDeleteListener {
 	
-	public static final String LOG_TAG = "SettingsActivity";
+	private static final String LOG_TAG = "SettingsActivity";
 	private static final int MAX_REFRESH = -1;
-	protected ArrayAdapter<ParseObject> settingsListAdapter;
-	protected List<ParseObject> parseSounds;
+	private static final int DEFAULT_CAPACITY = 10;
 	
-	protected ListView settingsView;
-		
-	// DEBUG
-	protected TextView text;
+	protected ListView mSettingsView;
+	protected ArrayAdapter<ParseObject> mSettingsListAdapter;
+	protected List<ParseObject> mParseSounds;
+	protected final FragmentManager mFragmentManager = getFragmentManager();
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_settings);
 		
-		parseSounds = getSounds(MAX_REFRESH);
-		setupSettingsListView();
-		initializeLoudUnknownToggle();
+		init();
+		
+		//refreshSounds();
+		
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		refresh();
+		refreshSounds();
 	}
 	
-	public void initializeLoudUnknownToggle() {
+	protected void init() {
+		mParseSounds = new ArrayList<ParseObject>(DEFAULT_CAPACITY);
+		mSettingsView = (ListView) findViewById(R.id.settings_listview);
+		mSettingsListAdapter = new SettingsListAdapter(this, mParseSounds, mFragmentManager);
+		try {
+			mSettingsView.setAdapter(mSettingsListAdapter);
+		} catch (Exception e) {
+			Log.e(LOG_TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
+		}
+		
 		Switch toggle = (Switch) findViewById(R.id.loud_unknown_toggle);
 		toggle.setChecked(getLoudUnknownSubscriptionStatus());
 		toggle.setOnClickListener(new OnClickListener() {
@@ -76,59 +92,34 @@ public class SettingsActivity extends ActionBarActivity implements
 			}
 		});
 	}
+
+	protected void refreshSounds() {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
+		query.setLimit(MAX_REFRESH);
+		query.findInBackground(new FindCallback<ParseObject>() {
+			
+			@Override
+			public void done(List<ParseObject> objs, ParseException e) {
+				if (e == null) {
+					mParseSounds.clear();
+					mParseSounds.addAll(objs);
+					mSettingsListAdapter.notifyDataSetChanged();
+					Log.v(LOG_TAG, "success getting Sound objects");
+				} else {
+					// ParseException, do nothing, log error
+					Log.e(LOG_TAG, "failed tp fetch Sound objects");
+				}
+			}
+		});
+	}
+
+	
 	
 	public boolean getLoudUnknownSubscriptionStatus() {
 		//PushService.subscribe(this.getApplicationContext(), defaultChannel, NotificationActivity.class);
 		Set<String> setOfAllSubscriptions = PushService.getSubscriptions(getApplicationContext());
 		Log.v(LOG_TAG, "current channels subscribed to: " + setOfAllSubscriptions.toString());
 		return setOfAllSubscriptions.contains("loudUnknown");
-	}
-	
-	public List<ParseObject> getSounds(int numToFetch) {
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
-		query.setLimit(numToFetch);
-		List<ParseObject> sounds = null;
-		try {
-			sounds = query.find();
-			Log.v(LOG_TAG, "success getting Sound objects");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return sounds;
-	}
-	/**
-	 * pull MAX_REFRESH newest notifications from parse and display
-	 */
-	public void refresh() {
-		parseSounds.clear();
-		parseSounds.addAll(getSounds(MAX_REFRESH));
-		settingsListAdapter.notifyDataSetChanged();
-	}
-	
-	// pull list of all targets being tracked by registered devices
-	// display in the list, with toggle and play button and delete button
-	protected void setupSettingsListView() {
-		//text = (TextView) findViewById(R.id.settings_text_test);
-
-		settingsView = (ListView) findViewById(R.id.settings_listview);
-		
-		settingsListAdapter = new SettingsListAdapter(this, parseSounds, getFragmentManager());
-		settingsView.setAdapter(settingsListAdapter);
-		settingsListAdapter.setNotifyOnChange(true);
-		
-		// Add click handler here
-		/*
-		settingsView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int pos,
-					long id) {
-				text.setText(settingsList.get(pos));
-			}
-			
-		});
-		*/
 	}
 
 	@Override
@@ -158,7 +149,7 @@ public class SettingsActivity extends ActionBarActivity implements
 			// this can be done by comparing the new states to the old states
 			return true;
 		case R.id.settings_action_refresh:
-			refresh();
+			refreshSounds();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -166,11 +157,11 @@ public class SettingsActivity extends ActionBarActivity implements
 	}
 
 
-	protected AddAudioSampleDialog add_dlg = null;
+	protected static final AddAudioSampleDialog add_dlg = new AddAudioSampleDialog();
 	private static final String DLG_TAG = "AddAudioSampleDialog";
 	
 	public void addNewSample() {
-		add_dlg = new AddAudioSampleDialog();
+		//add_dlg = new AddAudioSampleDialog();
 		add_dlg.show(getFragmentManager(), "addaudiosampledialog");
 	}
 	
@@ -208,41 +199,46 @@ public class SettingsActivity extends ActionBarActivity implements
 		sound.put("name", name);
 		sound.put("enabled", true);
 		sound.put("useNextAsTarget", true);
-		try {
-			sound.save();
-		} catch (ParseException e) {
-			Log.e(LOG_TAG, "Parse error: " + e.getCode() + " " + e.getMessage());
-			// server is unavailable
-		}
-		sound.fetchInBackground(new GetCallback<ParseObject>() {
-			public void done(ParseObject object, ParseException e) {
-				if (e == null) {
-					// success, tell user to make sound
-					refresh();
+		sound.saveInBackground(new SaveCallback() {
+			
+			@Override
+			public void done(ParseException e) {
+				if (e != null) {
+					Log.e(LOG_TAG, "Parse error: " + e.getCode() + " " + e.getMessage());
 				} else {
-					// failure, tell user to try again
+					refreshSounds();
 				}
 			}
 		});
 	}
 	
-	private boolean doDelete(String toDelete) {
+	private boolean doDelete(String toDelete) {		
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
-		Log.v(LOG_TAG, "going to delete sample with name: "+toDelete);
 		query.whereEqualTo("name", toDelete);
-		try {
-			List<ParseObject> results = query.find();
-			if (results.size() != 1) {
-				Log.e(LOG_TAG, "attempted to delete the sound but found: " + results.size() 
-						+ " sounds with name: " + toDelete);
+		query.getFirstInBackground(new GetCallback<ParseObject>() {
+			
+			@Override
+			public void done(ParseObject obj, ParseException e) {
+				if (e == null) {
+					Log.v(LOG_TAG, "attempting to delete object");
+					obj.deleteInBackground(new DeleteCallback() {
+						
+						@Override
+						public void done(ParseException delE) {
+							if (delE == null) {
+								Log.v(LOG_TAG, "successfully deleted object");
+								refreshSounds();
+							} else {
+								Log.e(LOG_TAG, "error deleting object");
+							}
+						}
+					});
+				} else {
+					Log.v(LOG_TAG, "failed to find matching object to delete");
+				}
 			}
-			ParseObject sound = (ParseObject) results.get(0);
-			sound.delete();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} finally {
-			refresh();
-		}
+		});
+		
 		return true;
 	}
 
