@@ -40,6 +40,15 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		}
 	}
 
+	@Override
+	public void notifyDataSetChanged() {
+		super.notifyDataSetChanged();
+		states.clear();
+		for (int i = 0; i < values.size(); i++) {
+			states.add(i, values.get(i).getBoolean("enabled"));
+		}
+	}
+	
 	/**
 	 * Method for owners of instances of this Adapter to fetch the list of objects
 	 */
@@ -119,7 +128,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 			@Override
 			public void onClick(View v) {
 				// show the dialog
-				ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
+				DeviceSetupErrorDialog confirmDelete = new DeviceSetupErrorDialog();
 				Bundle b = new Bundle();
 				b.putString("name", text);
 				confirmDelete.setArguments(b);

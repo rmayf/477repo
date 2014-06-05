@@ -4,6 +4,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.cs.washington.cse477.DeviceSetupErrorDialog.DeviceSetupErrorDialogListener;
+
+import android.annotation.SuppressLint;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,121 +28,85 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
-public class DeviceSetupActivity extends ActionBarActivity {
+public class DeviceSetupActivity extends ActionBarActivity 
+implements	DeviceSetupErrorDialogListener 
+{
 
-	protected ConnectivityManager conManager = null;
-	protected WifiManager wifiManager = null;
-
-	protected List<WifiConfiguration> wifiConfigurations = null;
-	protected List<ScanResult> scanResults = null;
-	protected List<String> stringScanResults = null;
-	protected Spinner networksSpinner = null;
-	protected Spinner securitySpinner = null;
-	protected ArrayAdapter<String> networksAdapter = null;
-	protected ArrayAdapter<String> securityAdapter = null;
-
-	protected WifiConnectionEstablishedReceiver connectionEstablishedReceiver = null;
-	protected WifiScanResultsReceiver scanResultReceiver = null;
-
-	protected boolean connectedToFlyPort = false;
-	protected boolean postComplete = false;
-
-	protected int savedNetworkID = -1;
-	protected String SSID_user = "";
-	protected String pass_user = "";
-	protected String encr_user = "";
-	
-	private static final String TAG = "DeviceSetupActivity";
+	private static final String LOG_TAG = "DeviceSetupActivity";
 	private static final String WIFI_CON_EST_TAG = "WifiConnectionEstablishedReceiver";
 	private static final String WIFI_SCAN_TAG = "WifiScanResultsReceiver";
 	
+	protected ConnectivityManager mConManager = null;
+	protected WifiManager mWifiManager = null;
+
+	protected List<WifiConfiguration> mWifiConfigurations = null;
+	protected List<ScanResult> mScanResults = null;
+	protected List<String> mStringScanResults = null;
+	protected Spinner mNetworksSpinner = null;
+	protected Spinner mSecuritySpinner = null;
+	protected ArrayAdapter<String> mNetworksAdapter = null;
+	protected ArrayAdapter<String> mSecurityAdapter = null;
+	protected ImageView mRefreshImg = null;
+	protected EditText mPassEditText = null;
+	protected TextView mPassTextView = null;
+	
+	protected static WifiConnectionEstablishedReceiver mConnectionEstablishedReceiver = null;
+	protected static WifiScanResultsReceiver mScanResultReceiver = null;
+
+	protected boolean mConnectedToFlyPort = false;
+	protected boolean mPostComplete = false;
+
+	protected int mSavedNetworkID = -1;
+	protected String mSSID_user = "";
+	protected String mPass_user = "";
+	protected String mEncr_user = "";
+	protected static final String[] mSecurityArray = new String[] { "WPA2", "WPA", "Open" };
+	
+	protected final FragmentManager mFragmentManager = getFragmentManager();
+	protected static final DeviceSetupErrorDialog mError_dlg = new DeviceSetupErrorDialog();
+	
+	/**
+	 * called on activity creation
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_device_setup);
 
-		init();
-	}
-
-	/**
-	 * initialize resources for this activity
-	 */
-	protected void init() {
-		setupNetworkManagers();
-		registerReceivers();
-		initWifiScan(null);
+		/**
+		 * Init
+		 */
+		mConManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		
 		setupUI();
 	}
-	
-	/**
-	 * initialize network system service instances for wifi and connectivity
-	 */
-	protected void setupNetworkManagers() {
-		// grab handle to ConnectivityManager
-		if (conManager == null) {
-			conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		}
-		if (conManager == null) {
-			Log.e(TAG, "failed to acquire ConnectivityManager");
-		}
-		
-		// grab handle to system WifiManager
-		if (wifiManager == null) {
-			wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		}
-		if (wifiManager == null) {
-			Log.e(TAG, "failed to acquire WifiManager");
-		}
-	}
-	
-	/**
-	 * create and register custom broadcast receivers
-	 */
-	protected void registerReceivers() {
-		if (scanResultReceiver == null) {
-			scanResultReceiver = new WifiScanResultsReceiver();
-			registerReceiver(scanResultReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-			Log.v(TAG,"registered scanResultReceiver");
-		}
 
-		if (connectionEstablishedReceiver == null) {
-			connectionEstablishedReceiver = new WifiConnectionEstablishedReceiver();
-			registerReceiver(connectionEstablishedReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-			Log.v(TAG,"registered connectionEstablishedReceiver");
-		}
+	/**
+	 * called when activity pauses, attempt to unregister receivers
+	 */
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unregisterReceivers();
 	}
 	
 	/**
-	 * unregister custom broadcast receivers
+	 * called when activity resumes, register receivers
 	 */
-	protected void unregisterReceivers() {
-		try {
-			unregisterReceiver(scanResultReceiver);
-		} catch (IllegalArgumentException iae) {
-			// do nothing...we don't really care if the receiver was already unregistered or null
-			Log.v(TAG,"failed to unregister scanResultReceiver with: " + iae.getMessage());
-		}
-		try {
-			unregisterReceiver(connectionEstablishedReceiver);
-		} catch (IllegalArgumentException iae) {
-			// do nothing...we don't really care if the receiver was already unregistered or null
-			Log.v(TAG,"failed to unregister connectionEstablishedReceiver with: " + iae.getMessage());
-		}
-	}
-
-	
-	/**
-	 * initiate scan for available WiFi networks
-	 * 
-	 * called onClick of refresh button
-	 */
-	public void initWifiScan(View v) {
-		if (wifiManager != null) {
-			wifiManager.startScan();
-		}
+	@SuppressLint("NewApi")
+	@Override
+	// TODO: fix this
+	protected void onResume() {
+		super.onResume();
+		registerReceivers();
+		initWifiScan(null);
+		mRefreshImg.setImageAlpha(255);
 	}
 	
 	/**
@@ -145,30 +114,34 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 */
 	protected void setupUI() {
 		
+		mPassEditText = (EditText) findViewById(R.id.dev_setup_password);
+		mRefreshImg = (ImageView) findViewById(R.id.dev_setup_refresh_networks_b);
+		mPassTextView = (TextView) findViewById(R.id.dev_setup_password_prompt);
+		
 		// collect initial scan results and store
-		scanResults = wifiManager.getScanResults();
-		stringScanResults = new LinkedList<String>();
-		Iterator<ScanResult> iter = scanResults.iterator();
+		mScanResults = mWifiManager.getScanResults();
+		mStringScanResults = new LinkedList<String>();
+		Iterator<ScanResult> iter = mScanResults.iterator();
 		while (iter.hasNext()) {
 			ScanResult sr = iter.next();
-			stringScanResults.add(sr.SSID);
+			mStringScanResults.add(sr.SSID);
 		}
 
 		// grab handle to networks spinner
-		networksSpinner = (Spinner) findViewById(R.id.dev_setup_networks_spinner);
+		mNetworksSpinner = (Spinner) findViewById(R.id.dev_setup_networks_spinner);
 		// create and set adapter for network spinner
-		networksAdapter = new ArrayAdapter<String>(this,
+		mNetworksAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item,
-				android.R.id.text1, stringScanResults);
-		networksSpinner.setAdapter(networksAdapter);
-		networksSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				android.R.id.text1, mStringScanResults);
+		mNetworksSpinner.setAdapter(mNetworksAdapter);
+		mNetworksSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> adview, View view, int pos,
 					long id) {
 				// on item selected, update SSID_user to selected item
-				SSID_user = stringScanResults.get(pos);
-				Log.v(TAG,"SSID_user = " + SSID_user);
+				mSSID_user = mStringScanResults.get(pos);
+				Log.v(LOG_TAG,"SSID_user = " + mSSID_user);
 			}
 
 			@Override
@@ -178,21 +151,27 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		});
 
 		// create and set adapter for security spinner
-		final String[] secArray = new String[] { "Open", "WPA", "WPA2" };
-		securitySpinner = (Spinner) findViewById(R.id.dev_setup_security_spinner);
-		securityAdapter = new ArrayAdapter<String>(this,
+		mSecuritySpinner = (Spinner) findViewById(R.id.dev_setup_security_spinner);
+		mSecurityAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_dropdown_item,
-				android.R.id.text1, secArray);
-		securitySpinner.setAdapter(securityAdapter);
-		securitySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				android.R.id.text1, mSecurityArray);
+		mSecuritySpinner.setAdapter(mSecurityAdapter);
+		mSecuritySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> adview, View view, int pos,
 					long id) {
 				// on item selected, update encr_user to selected item
-				encr_user = secArray[pos];
-				Log.v(TAG,"encr_user = " + encr_user);
+				mEncr_user = mSecurityArray[pos];
+				Log.v(LOG_TAG,"encr_user = " + mEncr_user);
 				
+				if (mEncr_user.equalsIgnoreCase("open")) {
+					mPassEditText.setEnabled(false);
+					mPassTextView.setTextColor(getResources().getColor(R.color.gray));
+				} else {
+					mPassEditText.setEnabled(true);
+					mPassTextView.setTextColor(getResources().getColor(R.color.black));
+				}
 			}
 
 			@Override
@@ -202,22 +181,60 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		});
 	}
 	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		unregisterReceivers();
+	/**
+	 * create and register custom broadcast receivers
+	 */
+	protected void registerReceivers() {
+		if (mScanResultReceiver == null) {
+			mScanResultReceiver = new WifiScanResultsReceiver();
+			registerReceiver(mScanResultReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+			Log.v(LOG_TAG,"registered scanResultReceiver");
+		}
+
+		if (mConnectionEstablishedReceiver == null) {
+			mConnectionEstablishedReceiver = new WifiConnectionEstablishedReceiver();
+			registerReceiver(mConnectionEstablishedReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+			Log.v(LOG_TAG,"registered connectionEstablishedReceiver");
+		}
 	}
 	
+	/**
+	 * unregister custom broadcast receivers
+	 */
+	protected void unregisterReceivers() {
+		try {
+			unregisterReceiver(mScanResultReceiver);
+		} catch (IllegalArgumentException iae) {
+			// do nothing...we don't really care if the receiver was already unregistered or null
+			Log.v(LOG_TAG,"failed to unregister scanResultReceiver with: " + iae.getMessage());
+		}
+		try {
+			unregisterReceiver(mConnectionEstablishedReceiver);
+		} catch (IllegalArgumentException iae) {
+			// do nothing...we don't really care if the receiver was already unregistered or null
+			Log.v(LOG_TAG,"failed to unregister connectionEstablishedReceiver with: " + iae.getMessage());
+		}
+	}
+
 	@Override
-	protected void onStop() {
-		super.onStop();
-		unregisterReceivers();	
+	public void onErrorDialogPositiveClick(DialogFragment dialog) {
+		dialog.getDialog().cancel();
+		
 	}
 	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		init();
+	/**
+	 * initiate scan for available WiFi networks
+	 * 
+	 * called onClick of refresh button
+	 */
+	// TODO: fix this
+	@SuppressLint("NewApi")
+	public void initWifiScan(View v) {
+		Log.v(LOG_TAG,"initWifiScan() called");
+		if (mWifiManager != null) {
+			mWifiManager.startScan();
+		}
+		mRefreshImg.setImageAlpha(128);
 	}
 
 	class EchoSetupConnector extends AsyncTask<Void, Void, Void> {
@@ -227,9 +244,9 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			// if EchoSetup is in range, begin connection process
 			if (checkEchoSetupInRange()) {
 				// save current network id if present
-				WifiInfo currentWifi = wifiManager.getConnectionInfo();
+				WifiInfo currentWifi = mWifiManager.getConnectionInfo();
 				if (currentWifi != null) {
-					savedNetworkID = currentWifi.getNetworkId();
+					mSavedNetworkID = currentWifi.getNetworkId();
 				}
 
 				// configure a new WifiConfiguration for EchoSetup
@@ -240,26 +257,26 @@ public class DeviceSetupActivity extends ActionBarActivity {
 
 				// fetch list of all configured networks on this phone and remove
 				// any that match on SSID with EchoSetup
-				wifiConfigurations = wifiManager.getConfiguredNetworks();
-				for (WifiConfiguration i : wifiConfigurations) {
+				mWifiConfigurations = mWifiManager.getConfiguredNetworks();
+				for (WifiConfiguration i : mWifiConfigurations) {
 					if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
-						wifiManager.removeNetwork(i.networkId);
+						mWifiManager.removeNetwork(i.networkId);
 					}
 				}
 				// add new configuration to WiFi manager, disconnect,
 				// and initiate connection to EchoSetup
-				int newNetwork = wifiManager.addNetwork(wificonf);
-				wifiManager.disconnect();
-				wifiManager.enableNetwork(newNetwork, true);
+				int newNetwork = mWifiManager.addNetwork(wificonf);
+				mWifiManager.disconnect();
+				mWifiManager.enableNetwork(newNetwork, true);
 
 				// reenable all configured networks 
 				//enableAllConfiguredNetworks();
 				
-				Log.v(TAG, "connecting...");
+				Log.v(LOG_TAG, "connecting...");
 			} else {
-				initWifiScan(null);
 				// notify user that EchoSetup not in range, press refresh
-				Log.v(TAG, "could not detect EchoSetup...did not attempt to connect");
+				Log.v(LOG_TAG, "could not detect EchoSetup...did not attempt to connect");
+				mError_dlg.show(getFragmentManager(), "devicesetuperrordialog");
 			}
 			return null;
 		}		
@@ -267,7 +284,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	
 	private boolean checkEchoSetupInRange() {
 		boolean inRange = false;
-		for (ScanResult s : scanResults) {
+		for (ScanResult s : mScanResults) {
 			if (s.SSID.equals("EchoSetup")) inRange = true;
 		}
 		return inRange;
@@ -277,13 +294,13 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 * re-enable all wifi networks
 	 */
 	public void reenableSavedWifiNetwork() {
-		Log.v(TAG,"re-enabling saved wifi network");
+		Log.v(LOG_TAG,"re-enabling saved wifi network");
 		(new wifiConnectionRestorer()).execute();
 	}
 	
 	protected void enableAllConfiguredNetworks() {
-		for (WifiConfiguration w : wifiManager.getConfiguredNetworks()) {
-			wifiManager.enableNetwork(w.networkId, false);
+		for (WifiConfiguration w : mWifiManager.getConfiguredNetworks()) {
+			mWifiManager.enableNetwork(w.networkId, false);
 		}
 	}
 	
@@ -292,9 +309,9 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		@Override
 		protected Void doInBackground(Void... params) {
 			// reconnect to old network
-			if (savedNetworkID != -1) {
+			if (mSavedNetworkID != -1) {
 				Log.v(WIFI_CON_EST_TAG, "reconnecting to saved wifi network");
-				wifiManager.enableNetwork(savedNetworkID, true);	
+				mWifiManager.enableNetwork(mSavedNetworkID, true);	
 			}
 			enableAllConfiguredNetworks();
 			return null;
@@ -308,9 +325,9 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 */
 	public void configureFlyport(View view) {
 		// set network password from user input
-		pass_user = ((EditText) findViewById(R.id.dev_setup_password)).getText().toString();
+		mPass_user = ((EditText) findViewById(R.id.dev_setup_password)).getText().toString();
 		
-		Log.v(TAG, "Attempting to connect with:\nSSID: " + SSID_user + "\nEncryption: " + encr_user + "\nPassword: " + pass_user);
+		Log.v(LOG_TAG, "Attempting to connect with:\nSSID: " + mSSID_user + "\nEncryption: " + mEncr_user + "\nPassword: " + mPass_user);
 		
 		// connect to EchoSetup
 		AsyncTask<Void, Void, Void> task = new EchoSetupConnector();
@@ -327,14 +344,14 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	public boolean sendConfigurationPOST(String SSID_user, String pass_user, String encr_user) {
 		
 		String stat = "SSID: " + SSID_user + "\nEncryption: " + encr_user + "\nPassword: " + pass_user;
-		Log.v(TAG,"sendConfigurationPOST():\n" + stat);
+		Log.v(LOG_TAG,"sendConfigurationPOST():\n" + stat);
 		
 		final String[] params = {SSID_user, pass_user, encr_user};
 		boolean res = false;
 		try {
 			res =((new HttpPOSTAsyncTask()).execute(params)).get().booleanValue();
 		} catch (Exception e) {
-			Log.e(TAG,"Exception executing AsyncTask: " + e.getMessage());
+			Log.e(LOG_TAG,"Exception executing AsyncTask: " + e.getMessage());
 			return false;
 		}
 		return res;
@@ -351,15 +368,18 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	 * Broadcast Receiver for WiFi Scan Result Event
 	 */
 	class WifiScanResultsReceiver extends BroadcastReceiver {
+		@SuppressLint("NewApi")
+		// TODO: fix this
 		public void onReceive(Context c, Intent intent) {
 			Log.v(WIFI_SCAN_TAG,"updating scan results spinner");
-			scanResults = wifiManager.getScanResults();
-			stringScanResults.clear();
-			Iterator<ScanResult> iter = scanResults.iterator();
+			mScanResults = mWifiManager.getScanResults();
+			mStringScanResults.clear();
+			Iterator<ScanResult> iter = mScanResults.iterator();
 			while (iter.hasNext()) {
-				stringScanResults.add(iter.next().SSID);
+				mStringScanResults.add(iter.next().SSID);
 			}
-			networksAdapter.notifyDataSetChanged();
+			mNetworksAdapter.notifyDataSetChanged();
+			mRefreshImg.setImageAlpha(255);
 		}
 	}
 
@@ -371,21 +391,21 @@ public class DeviceSetupActivity extends ActionBarActivity {
 		public void onReceive(Context c, Intent intent) {
 			Log.v(WIFI_CON_EST_TAG, "onReceive() called");
 
-			NetworkInfo activeNetwork = conManager.getActiveNetworkInfo();
-			if (activeNetwork != null && !connectedToFlyPort) {
+			NetworkInfo activeNetwork = mConManager.getActiveNetworkInfo();
+			if (activeNetwork != null && !mConnectedToFlyPort) {
 				boolean isWiFi = (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
 				boolean isConnected = (activeNetwork.isConnected() && activeNetwork.getState() == NetworkInfo.State.CONNECTED);
 				if (isWiFi && isConnected) {
-					WifiInfo wifi = wifiManager.getConnectionInfo();
+					WifiInfo wifi = mWifiManager.getConnectionInfo();
 					if (wifi.getSSID().equals("\"EchoSetup\"")) {
 						Log.v(WIFI_CON_EST_TAG, "Connected to EchoSetup!");
 						
 
-						connectedToFlyPort = true;
+						mConnectedToFlyPort = true;
 
 						// send post message to FlyPort device
-						postComplete = sendConfigurationPOST(SSID_user,pass_user,encr_user);
-						if (postComplete) {
+						mPostComplete = sendConfigurationPOST(mSSID_user,mPass_user,mEncr_user);
+						if (mPostComplete) {
 							Log.v(WIFI_CON_EST_TAG,"configuration POST sent successfully");
 						} else {
 							Log.w(WIFI_CON_EST_TAG,"configuration POST failed to send successfully");
@@ -396,39 +416,24 @@ public class DeviceSetupActivity extends ActionBarActivity {
 				    	startActivity(new Intent(c, NotificationActivity.class));
 						
 					} else {
-						connectedToFlyPort = false;
+						mConnectedToFlyPort = false;
 						Log.v(WIFI_CON_EST_TAG, "Incorrect SSID, connected to " + wifi.getSSID());
 					}
 				} else if (isWiFi && !isConnected) {
+					mConnectedToFlyPort = false;
 					Log.v(WIFI_CON_EST_TAG, "ActiveNetwork is WiFi, but state is: "
-							+ activeNetwork.getDetailedState().toString() + " connected to FlyPort: " + connectedToFlyPort);
+							+ activeNetwork.getDetailedState().toString() + " connected to FlyPort: " + mConnectedToFlyPort);
 				} else if (!isWiFi) {
+					mConnectedToFlyPort = false;
 					Log.v(WIFI_CON_EST_TAG, "ActiveNetwork is not WiFi");
 				} else {
+					mConnectedToFlyPort = false;
 					Log.v(WIFI_CON_EST_TAG, "ActiveNetwork is not WiFi or is not Connected");
 				}
 			} else {
+				mConnectedToFlyPort = false;
 				Log.v(WIFI_CON_EST_TAG, "ActiveNetworkInfo == null");
 			}
 		}
 	}
-	
-	
 }
-
-///*
-//* WiFi configuration to connect to mark's home network (WPA2)
-//*/
-//final String SSID = "RobotChicken";
-//final String password = "X3bc57pl98";		
-//wificonf.SSID = "\"" + SSID + "\"";
-//wificonf.preSharedKey = "\"" + password + "\"";
-//wificonf.status = WifiConfiguration.Status.ENABLED;
-//wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-//wificonf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-//wificonf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-//wificonf.allowedPairwiseCiphers
-//		.set(WifiConfiguration.PairwiseCipher.TKIP);
-//wificonf.allowedPairwiseCiphers
-//		.set(WifiConfiguration.PairwiseCipher.CCMP);
-//wificonf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
