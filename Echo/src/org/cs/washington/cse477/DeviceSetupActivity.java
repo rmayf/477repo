@@ -253,7 +253,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 				wifiManager.enableNetwork(newNetwork, true);
 
 				// reenable all configured networks 
-				enableAllConfiguredNetworks();
+				//enableAllConfiguredNetworks();
 				
 				Log.v(TAG, "connecting...");
 			} else {
@@ -392,7 +392,6 @@ public class DeviceSetupActivity extends ActionBarActivity {
 						}
 						
 						reenableSavedWifiNetwork();
-						
 						// start NotificationActivity after iniating reconnect
 				    	startActivity(new Intent(c, NotificationActivity.class));
 						

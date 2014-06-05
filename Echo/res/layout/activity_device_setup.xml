@@ -6,15 +6,6 @@
     tools:context="org.cs.washington.cse477.DeviceSetupActivity"
     tools:ignore="MergeRootFrame" >
 
-    <TextView
-        android:id="@+id/dev_setup_select"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-        android:text="@string/dev_setup_net_sel" />
-
     <Spinner
         android:id="@+id/dev_setup_networks_spinner"
         android:layout_width="wrap_content"
@@ -44,15 +35,6 @@
         android:focusableInTouchMode="false"
         android:text="@string/dev_setup_b" />
 <!--  -->
-
-    <TextView
-        android:id="@+id/dev_setup_security_select"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/dev_setup_security_spinner"
-        android:text="@string/dev_setup_sec_sel" />
     
     <EditText
         android:id="@+id/dev_setup_password"
@@ -83,5 +65,22 @@
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
         android:text="@string/dev_setup_encr_sel" />
+
+    <TextView
+        android:id="@+id/dev_setup_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/dev_setup_security"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="57dp"
+        android:text="@string/dev_setup_net_sel" />
+
+    <TextView
+        android:id="@+id/dev_setup_security_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/dev_setup_security"
+        android:layout_below="@+id/dev_setup_security_spinner"
+        android:text="@string/dev_setup_sec_sel" />
     
 </RelativeLayout>

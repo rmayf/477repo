@@ -22,10 +22,10 @@
     
     <!-- Device Setup -->
     <string name="dev_setup_b">Configure Device!</string>
-    <string name="dev_setup_net_sel">Select your Wireless Network</string>
-    <string name="dev_setup_encr_sel">Select your network\'s security setting:</string>
+    <string name="dev_setup_net_sel">1. Select your Wireless Network</string>
+    <string name="dev_setup_encr_sel">2. Select your network\'s security setting:</string>
     <string name="dev_setup_refresh">Refresh Networks</string>
-    <string name="dev_setup_sec_sel">Enter your network\'s password:</string>
+    <string name="dev_setup_sec_sel">3. Enter your network\'s password:</string>
     
     <!-- Notification Screen -->
     <string name="notification_play_desc">Play</string>
@@ -39,8 +39,7 @@
     
     <!-- Add Audio Dialog Fragment -->
     <string name="audio_dlg_hint">Name the sample</string>
-    <string name="audio_dlg_prompt">Enter a descriptive name for the noise you want Echo to listen for in the text field below.\n\nWhen you are ready to generate the noise, tap Ready. Echo will use the next loud noise it hears as the sound to listen for.\n\nBe
-    sure to verify that the sound Echo picked up is indeed the noise of interest by tapping the play button to hear it.</string>
+    <string name="audio_dlg_prompt">Enter a descriptive name for the noise you want Echo to listen for, then press Ready!\n\nAfter pressing Ready, the next sound Echo hears will be associated with this name.</string>
     <string name="audio_dlg_prompt2"></string>
     <string name="audio_dlg_cancel">Cancel</string>
     <string name="audio_dlg_ready">Ready</string>        
