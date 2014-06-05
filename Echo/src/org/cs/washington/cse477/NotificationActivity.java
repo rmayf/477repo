@@ -3,7 +3,6 @@ package org.cs.washington.cse477;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -104,16 +103,7 @@ public class NotificationActivity extends ActionBarActivity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		Intent intent;
 		switch(item.getItemId()) {
-		case R.id.notification_action_setup_device:
-			intent = new Intent(this, DeviceSetupActivity.class);
-	    	startActivity(intent);
-			return true;
-		case R.id.notification_action_settings:
-			intent = new Intent(this, SettingsActivity.class);
-	    	startActivity(intent);
-			return true;
 		case R.id.notification_action_refresh:
 			refreshNotifications();
 			return true;

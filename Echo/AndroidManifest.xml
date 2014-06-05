@@ -31,7 +31,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="16"
         android:targetSdkVersion="19" />
 
     <!-- APPLICATION -->
@@ -43,11 +43,11 @@
         android:theme="@style/AppTheme" >
         
         
-        <!-- Notifications Activity -->
-        <activity
-            android:name="org.cs.washington.cse477.NotificationActivity"
-            android:label="@string/title_activity_notification"
+        <!-- Activities -->
+         <activity
+            android:name="org.cs.washington.cse477.SettingsActivity"
             android:screenOrientation="portrait"
+            android:label="@string/title_activity_settings"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,21 +55,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.cs.washington.cse477.DeviceSetupActivity"
+            android:name="org.cs.washington.cse477.NotificationActivity"
+            android:label="@string/title_activity_notification"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_device_setup" >
+            android:launchMode="singleTop" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.cs.washington.cse477.NotificationActivity" />
+                android:value="org.cs.washington.cse477.SettingsActivity" />
         </activity>
         <activity
-            android:name="org.cs.washington.cse477.SettingsActivity"
+            android:name="org.cs.washington.cse477.DeviceSetupActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_device_setup"
+            android:launchMode="singleTop" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.cs.washington.cse477.NotificationActivity" />
+                android:value="org.cs.washington.cse477.SettingsActivity" />
         </activity>
+        <activity
+            android:name="org.cs.washington.cse477.DeviceSetupProgressActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_device_setup_progress"
+            android:launchMode="singleTop" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.cs.washington.cse477.DeviceSetupActivity" />
+        </activity>
+       
          
          <!-- PARSE PUSH NOTIFICATION STUFF -->
         <service android:name="com.parse.PushService" />
