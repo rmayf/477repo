@@ -131,27 +131,23 @@ public class SettingsActivity extends ActionBarActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		switch(item.getItemId()) {		
-		case R.id.notification_action_add_sample:
+		int itemId = item.getItemId();
+		if (itemId == R.id.notification_action_add_sample) {
 			// pop-up dialog with instructions
 			addNewSample();
-			
 			// when push received for new audio sample, goto audio upload activity
 			//intent = new Intent(this, AudioUploadActivity.class);
 			// put data to intent that we can pull out from within AudioUploadActivity
 			//startActivity(intent);
 			return true;
-		case R.id.notification_action_push_settings:
+		} else if (itemId == R.id.notification_action_push_settings) {
 			// push settings to cloud if any have changed
 			// this can be done by comparing the new states to the old states
 			return true;
-		case R.id.settings_action_refresh:
+		} else if (itemId == R.id.settings_action_refresh) {
 			refreshSounds();
 			return true;
-		default:
+		} else {
 			return super.onOptionsItemSelected(item);
 		}
 	}

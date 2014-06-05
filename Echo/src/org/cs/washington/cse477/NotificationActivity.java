@@ -111,19 +111,19 @@ public class NotificationActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		Intent intent;
-		switch(item.getItemId()) {
-		case R.id.notification_action_setup_device:
+		int itemId = item.getItemId();
+		if (itemId == R.id.notification_action_setup_device) {
 			intent = new Intent(this, DeviceSetupActivity.class);
-	    	startActivity(intent);
+			startActivity(intent);
 			return true;
-		case R.id.notification_action_settings:
+		} else if (itemId == R.id.notification_action_settings) {
 			intent = new Intent(this, SettingsActivity.class);
-	    	startActivity(intent);
+			startActivity(intent);
 			return true;
-		case R.id.notification_action_refresh:
+		} else if (itemId == R.id.notification_action_refresh) {
 			refreshNotifications();
 			return true;
-		default:
+		} else {
 			return super.onOptionsItemSelected(item);
 		}
 	}
