@@ -29,7 +29,7 @@ public class NotificationActivity extends ActionBarActivity {
 	protected static List<ParseObject> mParseNotifications;
 	
 	/**
-	 * onCreate(): initialize and fetch notifications
+	 * initialize and fetch notifications
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +37,17 @@ public class NotificationActivity extends ActionBarActivity {
 		
 		setContentView(R.layout.activity_notification);
 		
-		init();
-		
-		//refreshNotifications();
+		/**
+		 * Init
+		 */
+		mParseNotifications = new ArrayList<ParseObject>(MAX_REFRESH);
+		mNotifyView = (ListView) findViewById(R.id.notification_listview);
+		mNotifyAdapter = new NotificationListAdapter(this, mParseNotifications);
+		try {
+			mNotifyView.setAdapter(mNotifyAdapter);
+		} catch (Exception e) {
+			Log.e(LOG_TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
+		}
 		
 	}
 	
@@ -51,20 +59,6 @@ public class NotificationActivity extends ActionBarActivity {
 	protected void onResume() {
 		super.onResume();
 		refreshNotifications();
-	}
-	
-	/**
-	 * initialize activity member data and set view adapter 
-	 */
-	protected void init() {
-		mParseNotifications = new ArrayList<ParseObject>(MAX_REFRESH);
-		mNotifyView = (ListView) findViewById(R.id.notification_listview);
-		mNotifyAdapter = new NotificationListAdapter(this, mParseNotifications);
-		try {
-			mNotifyView.setAdapter(mNotifyAdapter);
-		} catch (Exception e) {
-			Log.e(LOG_TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
-		}
 	}
 
 	/**
@@ -111,19 +105,19 @@ public class NotificationActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		Intent intent;
-		int itemId = item.getItemId();
-		if (itemId == R.id.notification_action_setup_device) {
+		switch(item.getItemId()) {
+		case R.id.notification_action_setup_device:
 			intent = new Intent(this, DeviceSetupActivity.class);
-			startActivity(intent);
+	    	startActivity(intent);
 			return true;
-		} else if (itemId == R.id.notification_action_settings) {
+		case R.id.notification_action_settings:
 			intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
+	    	startActivity(intent);
 			return true;
-		} else if (itemId == R.id.notification_action_refresh) {
+		case R.id.notification_action_refresh:
 			refreshNotifications();
 			return true;
-		} else {
+		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}

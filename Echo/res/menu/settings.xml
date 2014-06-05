@@ -18,10 +18,4 @@
         android:title="@string/menu_audio_upload"
         echo:showAsAction="always"/>
     
-    <item
-        android:id="@+id/notification_action_push_settings"
-        android:orderInCategory="1000"
-        android:showAsAction="never"
-        android:title="@string/menu_notification_push" />
-
 </menu>
