@@ -1,6 +1,6 @@
 // Reid Mayfield, 5/21/2014 6:47pm
 //
-// Echo, Audio Detection Device v2.3
+// Echo, Audio Detection Device v2.4
 
 //#define _AUTOMATIC_SETUP 
 #define _DEBUG_PRINTING 
