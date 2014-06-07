@@ -5,6 +5,7 @@
 //#define _AUTOMATIC_SETUP 
 #define _DEBUG_PRINTING 
 #define _INTERNET
+#define _ENV_WORK
 
 #ifdef _DEBUG_PRINTING
 #  define _dbprint(x) UARTWrite(1, x)
@@ -32,10 +33,11 @@
 #define BIT_DEPTH 8
 #define OPT_SETUP 2
 #define OPT_UPLOAD 1
-#define ENVELOPE_HISTORY_SIZE 1024
+#define ENVELOPE_HISTORY_SIZE 1028
 
 
 #define ENVELOPE_FIXED_THRES 120
+#define PEAK_FINDER_SIZE 23
 #define MEM_SEQUENTIAL_READ 0x3
 #define MEM_SEQUENTIAL_WRITE 0x2
 #define SPI_CLK_PIN p18
@@ -47,6 +49,7 @@
  */
 BYTE txbuf[TXBUF_SIZE];
 unsigned int env_hist[ENVELOPE_HISTORY_SIZE];
+unsigned int peak_finder[PEAK_FINDER_SIZE];
 BOOL ParamSet = FALSE;
 unsigned long long counter = 0;
 const unsigned long long num_samps = 32768;
@@ -73,6 +76,25 @@ void __attribute__((__interrupt__, auto_psv)) _T4Interrupt( void )
   TMR4 = 0;// interrupt counter reinitialized
   TIMER = TRUE;
   IFS1bits.T4IF = 0;//clear interrupt flag
+}
+
+BOOL is_peak(unsigned int *peak) {
+  int i;
+  int test_peak_idx = PEAK_FINDER_SIZE/2;
+  *peak = peak_finder[test_peak_idx];
+  BOOL pass = TRUE;
+  for (i = 0; i < PEAK_FINDER_SIZE; i++) {
+    if (pass && (i != test_peak_idx)) {
+	  if (peak_finder[i] > *peak) {
+	    pass = FALSE;
+	  }
+	}
+	if (i > 0) {
+	  peak_finder[i-1] = peak_finder[i];
+	}
+  }
+  peak_finder[PEAK_FINDER_SIZE - 1] = ADCVal(1);
+  return pass;
 }
 
 void FlyportTask() {
@@ -116,7 +138,7 @@ void FlyportTask() {
     WFConnect(WF_CUSTOM);
     while (WFStatus != CONNECTED);
 	  // Allow time for DHCP to connect
-  while(!DHCPAssigned);
+	while(!DHCPAssigned);
   }
   else {
     _dbprint("Loading Default WIFI\r\n");
@@ -155,22 +177,22 @@ void FlyportTask() {
   cSPIInit(p8, p12, p10, p7);
 
   // Initialize the environment to use for inside the main while loop
-  unsigned int env_idx, prev, curr, next, amount_read;
+  unsigned int env_idx, peak, amount_read;
   UINT64 sum;
-  env_idx = 0;
   sum = 0;
-  prev = curr = next = ADCVal(1);
+  peak = ADCVal(1);
+  for (env_idx = 0; env_idx < PEAK_FINDER_SIZE; env_idx++) {
+	  peak_finder[env_idx] = peak;
+  }
   
   // Fill the buffer with starting values
+  env_idx = 0;
   while( env_idx < ENVELOPE_HISTORY_SIZE)
   {
-	next = ADCVal(1);
-	if ((curr > next) && (curr > prev)) {
-	  env_hist[env_idx++] = curr;
-	  sum += curr;
+	if (is_peak(&peak)) {
+	  env_hist[env_idx++] = peak;
+	  sum += peak;
 	}
-	prev = curr;
-	curr = next;
   }
   
   // Amplitude envelope detection loop. This samples the ADC and uses a running average plus a
@@ -178,15 +200,14 @@ void FlyportTask() {
   env_idx = 0;
   _dbprint("Echo is Listening...\r\n");
   while(1) {
-    next = ADCVal(1);
-    if ((curr > next) && (curr > prev)) {
-      if (curr > ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_FIXED_THRES)) {
+    if (is_peak(&peak)) {
+      if (peak > ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_FIXED_THRES)) {
 
 			// Threshold was surpassed.  Sample at a fixed rate and write to sram
 			_dbprint("Envelope Surpassed\r\n");
 			IOPut(o4, on);
 			
-			
+			#ifndef _ENV_WORK
 			// weird type shit was going on with the sampling loop
 			// how many bits is int, unsigned, unsigned long, long??
 			// using unsigned long long appears to fix the problem and the ADC samples correct number of times
@@ -259,18 +280,17 @@ void FlyportTask() {
 			// Reset and do it all over again
 			TCPClientClose(server);
 			server = INVALID_SOCKET;
+			#endif
 			_dbprint("Done Sending!\r\n");
 			IOPut(o4, off);
 		  }
-		  
+
 		  sum -= env_hist[env_idx];
-		  env_hist[env_idx] = curr;
+		  env_hist[env_idx] = peak;
 		  sum += env_hist[env_idx];
 		  if (++env_idx >= ENVELOPE_HISTORY_SIZE)
 		    env_idx = 0;
     }
-    prev = curr;
-    curr = next;
   }
   
   //cSPITerminate();
