@@ -2,9 +2,9 @@
 //
 // Echo, Audio Detection Device v2.3
 
-#define _AUTOMATIC_SETUP 
+//#define _AUTOMATIC_SETUP 
 #define _DEBUG_PRINTING 
-//#define _INTERNET
+#define _INTERNET
 
 #ifdef _DEBUG_PRINTING
 #  define _dbprint(x) UARTWrite(1, x)
@@ -22,7 +22,7 @@
 #ifdef _INTERNET
 #  define SERV_IP_ADDR "128.208.1.164"
 #else
-#  define SERV_IP_ADDR "192.168.8.102"
+#  define SERV_IP_ADDR "192.168.8.104"
 #endif
 
 #define UPLOAD_HEADER_LEN 11
@@ -104,6 +104,8 @@ void FlyportTask() {
   WFSetSecurity(WF_SECURITY_OPEN, "", 0, 0);
   WFConnect(WF_CUSTOM);
   while (WFStatus != CONNECTED);
+    // Allow time for DHCP to connect
+  while(!DHCPAssigned);
   //vTaskDelay(50);
   
   #else
@@ -113,6 +115,8 @@ void FlyportTask() {
     WFCustomLoad();
     WFConnect(WF_CUSTOM);
     while (WFStatus != CONNECTED);
+	  // Allow time for DHCP to connect
+  while(!DHCPAssigned);
   }
   else {
     _dbprint("Loading Default WIFI\r\n");
@@ -129,10 +133,14 @@ void FlyportTask() {
     
     // Send the setupSuccess message to the server 
 	while(!DHCPAssigned);
-	while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET)
+	while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
 	  vTaskDelay(25);
-	while (!TCPisConn(server))
+	  _dbprint("TCP Client Open\r\n");
+	}
+	while (!TCPisConn(server)) {
 	  vTaskDelay(25);
+	  _dbprint("TCP Client Connecting\r\n");
+	}
     memcpy(txbuf, &magic_num, 4);
     txbuf[4] = OPT_SETUP;
     TCPWrite(server, txbuf, 5);
@@ -141,8 +149,7 @@ void FlyportTask() {
     _dbprint("Sent Setup Complete message to the server\r\n");
   }
   #endif
-  // Allow time for DHCP to connect
-  while(!DHCPAssigned);
+
   
   // Initialize SPI
   cSPIInit(p8, p12, p10, p7);
@@ -168,7 +175,6 @@ void FlyportTask() {
   
   // Amplitude envelope detection loop. This samples the ADC and uses a running average plus a
   // fixed threshold to detect distinct sounds.
-  vTaskSuspendAll();
   env_idx = 0;
   _dbprint("Echo is Listening...\r\n");
   while(1) {
@@ -189,7 +195,7 @@ void FlyportTask() {
 			cSPIStartSeqWrite(0, num_samps);
 			
 			// Start Timer
-			//vTaskSuspendAll();
+			vTaskSuspendAll();
 			T4CONbits.TON = 1; // timer start
 			counter = 0;
 			while (counter < num_samps) {
@@ -213,11 +219,11 @@ void FlyportTask() {
 			// sample.
 			
 			while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
-			  vTaskDelay(25);
+			  vTaskDelay(5);
 			  _dbprint("TCP Client Open\r\n");
 			}
 			while (!TCPisConn(server)) {
-			  vTaskDelay(25);
+			  vTaskDelay(5);
 			  _dbprint("TCP connecting\r\n");
 			}
 			_dbprint("Connected to the server\r\n");
@@ -255,7 +261,6 @@ void FlyportTask() {
 			server = INVALID_SOCKET;
 			_dbprint("Done Sending!\r\n");
 			IOPut(o4, off);
-			vTaskSuspendAll();
 		  }
 		  
 		  sum -= env_hist[env_idx];
