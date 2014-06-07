@@ -42,11 +42,7 @@ public class NotificationActivity extends ActionBarActivity {
 		mParseNotifications = new ArrayList<ParseObject>(MAX_REFRESH);
 		mNotifyView = (ListView) findViewById(R.id.notification_listview);
 		mNotifyAdapter = new NotificationListAdapter(this, mParseNotifications);
-		try {
-			mNotifyView.setAdapter(mNotifyAdapter);
-		} catch (Exception e) {
-			Log.e(LOG_TAG,"failed to set notifications listview adapter with:\n" + e.getMessage());
-		}
+		mNotifyView.setAdapter(mNotifyAdapter);
 		
 	}
 	

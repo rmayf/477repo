@@ -5,5 +5,37 @@
     android:layout_height="match_parent"
     tools:context="org.cs.washington.cse477.DeviceSetupProgressActivity"
     tools:ignore="MergeRootFrame" >
+
+    <TextView
+        android:id="@+id/dev_setup_prog_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:textStyle="italic"
+        android:text="@string/dev_setup_prog_prompt"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ProgressBar
+        android:id="@+id/dev_setup_prog_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/dev_setup_prog_prompt"
+        android:layout_alignRight="@+id/dev_setup_prog_prompt"
+        android:layout_below="@+id/dev_setup_prog_prompt" />
+
+    <TextView
+        android:id="@+id/dev_setup_prog_debug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall" />
     
 </RelativeLayout>

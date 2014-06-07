@@ -4,20 +4,19 @@
     <string name="app_name">Echo</string>
     <string name="title_activity_device_setup">EchoBox WiFi Setup</string>
     <string name="title_activity_device_setup_progress">EchoBox WiFi Setup</string>
-    <string name="title_activity_notification">Echo</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_notification">Notifications</string>
+    <string name="title_activity_settings">Echo</string>
     
     
     <!-- Menu Items -->
     <string name="menu_setup_device">Setup New Device</string>
     <string name="menu_audio_upload">Upload Audio Sample</string>
     <string name="menu_refresh">Refresh</string>
-    <string name="menu_notification_push">Save Settings</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_notifications">Notifications</string>
     
     <!-- Device Setup -->
-    <string name="dev_setup_b">Save</string>
+    <string name="dev_setup_b">Setup EchoBox!</string>
     <string name="dev_setup_refresh_b_desc">Refresh</string>
     <string name="dev_setup_net_sel">1. Select your Wireless Network</string>
     <string name="dev_setup_encr_sel">2. Select your network\'s security setting:</string>
@@ -25,9 +24,15 @@
     <string name="dev_setup_sec_sel">3. Enter your network\'s password:</string>
     <string name="dev_setup_description">EchoBox\'s WiFi must be configured upon initial setup or anytime the WiFi network it connects to changes.</string>
     
+    <!-- Device Setup Progress -->
+    <string name="dev_setup_prog_prompt">Please wait while your EchoBox is configured...</string>
+    
     <!-- Device Setup Error Dialog -->
     <string name="dev_setup_error_dlg_prompt">Echo could not detect your EchoBox!\n\nEnsure your EchoBox is powered on or try resetting your EchoBox.</string>
     <string name="dev_setup_error_dlg_b_text">Try Again</string>
+    <!-- Device Setup Progress Error Dialog -->
+    <string name="dev_setup_prog_error_dlg_prompt">EchoBox setup failed. Please try again or attempt Alternate Setup</string>
+    <string name="dev_setup_prog_error_dlg_b_text">Continue</string>
     
     <!-- Notification Screen -->
     <string name="notification_play_desc">Play</string>

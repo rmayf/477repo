@@ -13,6 +13,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -24,7 +26,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class HttpPOSTAsyncTask extends AsyncTask<String, Void, Boolean> {
-	private static final String TAG = "HttpPOSTGen";
+	private static final String LOG_TAG = "HttpPOSTGen";
     private static final int MAX_ATTEMPTS = 3;
 	private String SSID = null;
 	private String password = null;
@@ -77,7 +79,7 @@ public class HttpPOSTAsyncTask extends AsyncTask<String, Void, Boolean> {
 			try {
 				post = new HttpPost(new URI("http://192.168.1.13/"));
 			} catch (Exception e) {
-				Log.e(TAG, "HttpPost creation failed with: " + e.getMessage());
+				Log.e(LOG_TAG, "HttpPost creation failed with: " + e.getMessage());
 				break;
 			}
 			
@@ -137,12 +139,19 @@ public class HttpPOSTAsyncTask extends AsyncTask<String, Void, Boolean> {
 				post.setEntity(new UrlEncodedFormEntity(nameValuePair));
 
 				// Execute HTTP Post Request
-				client.execute(post);
-				res = true;
+				HttpResponse resp = client.execute(post);
+
+				// TODO: correct response code?
+				if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+					res = true;
+				} else {
+					Log.v(LOG_TAG, "HttpResponse status code != 200");
+					res = false;
+				}
 			} catch (Exception e) {
 				res = false;
-				Log.e(TAG, "POST Execution Exception");
-				Log.e(TAG, e.getMessage());
+				Log.e(LOG_TAG, "POST Execution Exception");
+				Log.e(LOG_TAG, e.getMessage());
 				break;
 			}
 		}
