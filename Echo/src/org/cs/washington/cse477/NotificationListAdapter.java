@@ -67,7 +67,7 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 			public void onClick(View v) {
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.v(TAG,"clicked notifications play for file: " + getString());
-				ParseInit.asf.fetchThenPlayEventRecording(getString());
+				AppInit.asf.fetchThenPlayEventRecording(getString());
 			}
 		});
 

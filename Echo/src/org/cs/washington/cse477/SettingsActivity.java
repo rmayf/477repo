@@ -4,6 +4,9 @@ package org.cs.washington.cse477;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.cs.washington.cse477.AddAudioSampleDialog.AddAudioSampleDialogListener;
 import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
@@ -11,6 +14,7 @@ import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -76,9 +80,9 @@ public class SettingsActivity extends ActionBarActivity implements
 				boolean checked = Boolean.valueOf(((Switch) v).isChecked());
 				Log.v(LOG_TAG,"checked: " + checked);
 				if (checked) {
-					PushService.subscribe(getApplicationContext(), ParseInit.loudUnknownChannel, NotificationActivity.class);
+					PushService.subscribe(getApplicationContext(), AppInit.loudUnknownChannel, NotificationActivity.class);
 				} else {
-					PushService.unsubscribe(getApplicationContext(), ParseInit.loudUnknownChannel);
+					PushService.unsubscribe(getApplicationContext(), AppInit.loudUnknownChannel);
 				}
 			}
 		});
@@ -99,6 +103,8 @@ public class SettingsActivity extends ActionBarActivity implements
 	protected void refreshSounds() {
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
 		query.setLimit(MAX_REFRESH);
+		// order by descending so that the most recently created sound is at the top
+		query.orderByDescending("createdAt");
 		query.findInBackground(new FindCallback<ParseObject>() {
 			
 			@Override
@@ -192,11 +198,66 @@ public class SettingsActivity extends ActionBarActivity implements
 					if (e != null) {
 						Log.e(LOG_TAG, "Parse error: " + e.getCode() + " " + e.getMessage());
 					} else {
-						refreshSounds();
+						refreshSoundsThenSetNextAsTarget();
 					}
 				}
 			});
 		}
+    }
+    
+	protected void refreshSoundsThenSetNextAsTarget() {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Sound");
+		query.setLimit(MAX_REFRESH);
+		// order by descending so that the most recently created sound is at the top
+		query.orderByDescending("createdAt");
+		query.findInBackground(new FindCallback<ParseObject>() {
+			
+			@Override
+			public void done(List<ParseObject> objs, ParseException e) {
+				if (e == null) {
+					mParseSounds.clear();
+					mParseSounds.addAll(objs);
+					mSettingsListAdapter.notifyDataSetChanged();
+					Log.v(LOG_TAG, "success getting Sound objects");
+					ParseObject latestSound = mParseSounds.get(0);
+					String objectId = latestSound.getObjectId();
+					if (useNextNoiseAsTarget(objectId)) {
+						Log.v(LOG_TAG, "using next loud noise as match target");
+					} else {
+						Log.e(LOG_TAG, "could not tell node to use next");
+					}
+				} else {
+					// ParseException, do nothing, log error
+					Log.e(LOG_TAG, "failed tp fetch Sound objects");
+				}
+			}
+		});
+	}
+    
+    private boolean useNextNoiseAsTarget(String filename) {
+    	String urlAndPath = "http://" + AppInit.host + ":" + AppInit.port + "/setNextNoiseAsTarget?filename=";
+		urlAndPath += filename;
+		AsyncTask<String,Void,Integer> httpReq = new AsyncHttpRequestToMatchServer();
+		int statusCode = -1;
+		try {
+			statusCode = httpReq.execute(urlAndPath).get(10, TimeUnit.SECONDS).intValue();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (statusCode != -1) {
+			Log.v(LOG_TAG, "status code from http response: " + statusCode);
+			if (statusCode == 200 || statusCode == 201) {
+				return true;
+			} 
+		} 	
+		return false;
     }
     
     /**
@@ -207,10 +268,35 @@ public class SettingsActivity extends ActionBarActivity implements
 		Log.v(LOG_TAG,"positive click delete dialog");
 		Bundle args = dialog.getArguments();
 		if (args != null) {
-			deleteSound(args.getString("objectId")); 
+			String toDelete = args.getString("objectId");
+			deleteSound(toDelete); 
+			deleteSoundFromNode(toDelete);
 		}
 	}
 	
+	private void deleteSoundFromNode(String toDelete) {
+		String urlAndPath = "http://" + AppInit.host + ":" + AppInit.port + "/deleteTarget?filename=";
+		urlAndPath += toDelete;
+		urlAndPath += ".wav";
+		AsyncTask<String,Void,Integer> httpReq = new AsyncHttpRequestToMatchServer();
+		int statusCode = -1;
+		try {
+			statusCode = httpReq.execute(urlAndPath).get(10, TimeUnit.SECONDS).intValue();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (statusCode != -1) {
+			Log.v(LOG_TAG, "status code from http response: " + statusCode);
+		} 
+	}
+
 	/**
 	 * delete sound from Parse asynchronously, using objectId as key
 	 * 

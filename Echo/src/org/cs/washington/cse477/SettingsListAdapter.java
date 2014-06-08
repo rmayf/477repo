@@ -92,7 +92,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 			public void onClick(View v) {
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.v(LOG_TAG,"clicked settings play");
-				ParseInit.asf.fetchThenPlayTarget(objectId +".wav");
+				AppInit.asf.fetchThenPlayTarget(objectId +".wav");
 			}			
 		});
 		ImageView delete = (ImageView) rowView.findViewById(R.id.settings_delete);

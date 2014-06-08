@@ -6,10 +6,12 @@ import com.parse.Parse;
 import com.parse.ParseInstallation;
 import com.parse.PushService;
 
-public class ParseInit extends Application {
+public class AppInit extends Application {
 	public static AudioSampleFetcher asf;
 	public static final String defaultChannel = "default";
 	public static final String loudUnknownChannel = "loudUnknown";
+	public static final String host = "klement.cs.washington.edu";
+	public static final int port = 9876;
 
 	@Override
 	public void onCreate() {
