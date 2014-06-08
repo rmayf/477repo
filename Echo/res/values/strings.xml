@@ -47,7 +47,7 @@
     
     <!-- Add Audio Dialog Fragment -->
     <string name="audio_dlg_hint">Name the sample</string>
-    <string name="audio_dlg_prompt">Enter a descriptive name for the noise you want Echo to listen for, then press Ready!\n\nAfter pressing Ready, the next sound Echo hears will be associated with this name.</string>
+    <string name="audio_dlg_prompt">Enter a descriptive name for the noise you want Echo to listen for, then press Ready!\n\nAfter pressing Ready, wait 6 seconds then make a loud noise to train Echo</string>
     <string name="audio_dlg_prompt2"></string>
     <string name="audio_dlg_cancel">Cancel</string>
     <string name="audio_dlg_ready">Ready</string>        

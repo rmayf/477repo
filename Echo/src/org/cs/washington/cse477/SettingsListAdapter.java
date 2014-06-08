@@ -84,14 +84,12 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		
 		final ImageView img = (ImageView) rowView.findViewById(R.id.settings_play);
 		img.setClickable(true);
-		img.setImageResource(R.drawable.ic_action_play);
 		img.setOnClickListener(new OnClickListener() {
 		
 			@Override
 			public void onClick(View v) {
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.v(LOG_TAG,"clicked settings play");
-				img.setImageResource(R.drawable.ic_action_stop);
 				AppInit.asf.fetchThenPlayTarget(objectId +".wav");
 			}			
 		});

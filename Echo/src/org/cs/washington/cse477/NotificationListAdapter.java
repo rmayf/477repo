@@ -64,7 +64,6 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 		// set the click listener for the play 
 		final ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
 		img.setClickable(true);
-		img.setImageResource(R.drawable.ic_action_play);
 		img.setOnClickListener(new OnClickListenerWithArgs(filename) {
 			
 			@Override
