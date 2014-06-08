@@ -1,12 +1,14 @@
 package org.cs.washington.cse477;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
+import android.app.FragmentManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +24,14 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 	
 	private final Context context;
 	private final List<ParseObject> values;
+	
+	private FragmentManager fm;
 	  
-	public NotificationListAdapter(Context context, List<ParseObject> values) {
+	public NotificationListAdapter(Context context, List<ParseObject> values, FragmentManager fm) {
 		super(context, R.layout.notification_listview_item, values);
 		this.context = context;
 		this.values = values;
+		this.fm = fm;
 	}
 
 	@Override
@@ -56,7 +61,7 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 		
 		textview.setText(text);
 		dateview.setText(dateText);
-		
+		// set the click listener for the play 
 		final ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
 		img.setClickable(true);
 		img.setImageResource(R.drawable.ic_action_play);
@@ -68,6 +73,21 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 				Log.v(TAG,"clicked notifications play for file: " + getString());
 				AppInit.asf.fetchThenPlayEventRecording(getString());
 			}
+		});
+		ImageView deleteButtonImg = (ImageView) rowView.findViewById(R.id.notification_delete);
+		deleteButtonImg.setClickable(true);
+		deleteButtonImg.setOnClickListener(new OnClickListenerWithArgs(filename, obj.getObjectId()) {
+
+			@Override
+			public void onClick(View v) {
+				ConfirmDeleteDialog confirmDelete = new ConfirmDeleteDialog();
+				Bundle b = new Bundle();
+				b.putString("filename", getString());
+				b.putString("objectId", getObjectIdString());
+				confirmDelete.setArguments(b);
+				confirmDelete.show(fm, "confirm_delete");
+			}
+			
 		});
 
 		return rowView;

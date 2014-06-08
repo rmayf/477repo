@@ -270,11 +270,11 @@ public class SettingsActivity extends ActionBarActivity implements
 		if (args != null) {
 			String toDelete = args.getString("objectId");
 			deleteSound(toDelete); 
-			deleteSoundFromNode(toDelete);
+			deleteMatchTargetFromNode(toDelete);
 		}
 	}
 	
-	private void deleteSoundFromNode(String toDelete) {
+	private void deleteMatchTargetFromNode(String toDelete) {
 		String urlAndPath = "http://" + AppInit.host + ":" + AppInit.port + "/deleteTarget?filename=";
 		urlAndPath += toDelete;
 		urlAndPath += ".wav";

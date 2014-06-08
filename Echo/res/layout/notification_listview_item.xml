@@ -42,7 +42,6 @@
         android:id="@+id/notification_delete"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        
         android:layout_alignParentRight="true"
         android:contentDescription="@string/notification_delete"
         android:src="@drawable/ic_action_remove" />
