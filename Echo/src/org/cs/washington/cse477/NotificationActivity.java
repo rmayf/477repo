@@ -68,11 +68,14 @@ public class NotificationActivity extends ActionBarActivity {
 			
 			@Override
 			public void done(List<ParseObject> objs, ParseException e) {
-				if (e == null) {
+				if (e == null && mParseNotifications != null && mNotifyAdapter != null) {
+					// TODO: crashes if mParseNotifications is null, i.e. this activity has never been opened but a notification arrives
 					mParseNotifications.clear();
 					mParseNotifications.addAll(objs);
 					mNotifyAdapter.notifyDataSetChanged();
 					Log.v(LOG_TAG, "success getting: " + mParseNotifications.size() + " event objects");
+				} else if (e == null) {
+					Log.w(LOG_TAG,"Notification received, but did not attempt to update Notifications");
 				} else {
 					// ParseException, do nothing, log error
 					Log.e(LOG_TAG,"failed to fetch notifications from Parse\n" + e.getMessage());
