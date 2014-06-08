@@ -45,6 +45,6 @@
           android:layout_alignTop="@+id/settings_text"
           android:layout_toLeftOf="@+id/settings_toggle"
           android:contentDescription="@string/settings_play_desc"
-          android:src="@drawable/ic_action_play" />
-
+           />
+<!-- android:src="@drawable/ic_action_play" -->
 </RelativeLayout>

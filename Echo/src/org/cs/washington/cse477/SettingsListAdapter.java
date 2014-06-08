@@ -41,11 +41,9 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = convertView;
-        if (rowView == null) {
-        	rowView = inflater.inflate(R.layout.settings_listview_item, parent, false);
-        }
-		
-        // fetch current row's corresponding ParseObject
+		rowView = inflater.inflate(R.layout.settings_listview_item, parent, false);
+        
+		// fetch current row's corresponding ParseObject
 		ParseObject obj = values.get(position);
 		final String objectId = obj.getObjectId();
 		
@@ -84,14 +82,23 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 			}
 		});		
 		
-		ImageView img = (ImageView) rowView.findViewById(R.id.settings_play);
+		final ImageView img = (ImageView) rowView.findViewById(R.id.settings_play);
 		img.setClickable(true);
+		String fileName = objectId + ".wav";
+		if (!AppInit.asf.playingSound) {
+			img.setImageResource(R.drawable.ic_action_play);
+		} else if (AppInit.asf.playingSound && fileName.equals(AppInit.asf.filePlaying)) {
+			img.setImageResource(R.drawable.ic_action_stop);
+		} else {
+			img.setImageResource(R.drawable.ic_action_play);
+		}
 		img.setOnClickListener(new OnClickListener() {
 		
 			@Override
 			public void onClick(View v) {
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.v(LOG_TAG,"clicked settings play");
+				img.setImageResource(R.drawable.ic_action_stop);
 				AppInit.asf.fetchThenPlayTarget(objectId +".wav");
 			}			
 		});

@@ -36,6 +36,7 @@
     
     <!-- Notification Screen -->
     <string name="notification_play_desc">Play</string>
+    <string name="notification_delete">Delete</string>
     
     <!-- Settings -->
     <string name="settings_play_desc">Play</string>
