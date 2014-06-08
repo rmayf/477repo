@@ -170,32 +170,4 @@ public class AudioSampleFetcher {
 		File toDelete = new File(path);
 		return toDelete.delete();
 	}
-	
-	/*
-	public void saveSoundNameToParse(View view) {
-		EditText soundNameText = (EditText) findViewById(R.id.soundNameText);
-		String soundName = soundNameText.getText().toString();
-		ParseObject sound = new ParseObject("Sound");
-		sound.put("name", soundName);
-		try {
-			sound.save();
-		} catch (ParseException e) {
-			Log.e(LOG_TAG, "Parse Server not available");
-			// server is unavailable
-		}
-		sound.fetchInBackground(new GetCallback<ParseObject>() {
-			public void done(ParseObject object, ParseException e) {
-				if (e == null) {
-					// success, tell user to make sound then subscribe
-					findViewById(R.id.makeSoundInstructions).setVisibility(View.VISIBLE);
-					PushService.subscribe(getApplicationContext(), object.getObjectId(), NotificationActivity.class);
-					Log.v(LOG_TAG, "Subscribing to channel: " + object.getObjectId());
-				} else {
-					// failure, tell user to try again
-				}
-			}
-		});
-	}
-	*/
-
 }
