@@ -10,26 +10,30 @@ public class AudioSampleFetcher {
 	private static final String LOG_TAG = "AudioSampleFetcher";
 	private Context context;
 	
-	public boolean playingSound;
-	public String filePlaying;
-	
 	public AudioSampleFetcher(Context context) {
 		this.context = context;
-		playingSound = false;
-		filePlaying = null;
 	}
 
-	public void fetchThenPlayTarget(String filename)  {
-		playingSound = true;
-		filePlaying = filename;
-		new FetchInBackgroundThenPlaySound().execute("getMatchAgainst", filename);
+	public boolean fetchThenPlayTarget(String filename)  {
+		try {
+			new FetchInBackgroundThenPlaySound().execute("getMatchAgainst", filename);
+			return true;
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "error running FetchInBackgroundThenPlaySound()");
+			return false;
+		}
 	}
+
 	// eventually we will implement this because we are either fetching target sounds or
 	// recordings of events.
-	public void fetchThenPlayEventRecording(String filename) {
-		playingSound = true;
-		filePlaying = filename;
-		new FetchInBackgroundThenPlaySound().execute("getEventRecording", filename);
+	public boolean fetchThenPlayEventRecording(String filename) {
+		try {
+			new FetchInBackgroundThenPlaySound().execute("getEventRecording", filename);
+			return true;
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "error running FetchInBackgroundThenPlaySound()");
+			return false;
+		}
 	}
 	
 	public abstract class MPOnCompleteListener implements MediaPlayer.OnCompletionListener {}
@@ -48,18 +52,19 @@ public class AudioSampleFetcher {
 			String filename = args[1];
 			
 			String url = "http://" + AppInit.host + ":" + AppInit.port + "/" + method + "?filename=" + filename;
-			
-			MediaPlayer mediaPlayer = new MediaPlayer();
-			
+
 			try {
+				MediaPlayer mediaPlayer = new MediaPlayer();
 				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 				mediaPlayer.setOnCompletionListener(new MPOnCompleteListener() {
 					
 					@Override
 					public void onCompletion(MediaPlayer mp) {
-						playingSound = false;
-						filePlaying = null;
+						
+						mp.reset();
 						mp.release();
+						mp = null;
+						
 					}
 				});
 				mediaPlayer.setDataSource(url);
@@ -67,8 +72,6 @@ public class AudioSampleFetcher {
 				mediaPlayer.start();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, "MediaPlayer encountered an error");
-				playingSound = false;
-				filePlaying = null;
 			}
 			return null;
 		}

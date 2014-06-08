@@ -16,7 +16,6 @@
 <!-- android:src="@drawable/ic_action_play" -->
 
     <LinearLayout
-        android:id="@+id/notification_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginLeft="6dip"

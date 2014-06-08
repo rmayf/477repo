@@ -59,20 +59,13 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 		
 		final ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
 		img.setClickable(true);
-		if (!AppInit.asf.playingSound) {
-			img.setImageResource(R.drawable.ic_action_play);
-		} else if (AppInit.asf.playingSound && filename.equals(AppInit.asf.filePlaying)) {
-			img.setImageResource(R.drawable.ic_action_stop);
-		} else {
-			img.setImageResource(R.drawable.ic_action_play);
-		}
+		img.setImageResource(R.drawable.ic_action_play);
 		img.setOnClickListener(new OnClickListenerWithArgs(filename) {
 			
 			@Override
 			public void onClick(View v) {
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.v(TAG,"clicked notifications play for file: " + getString());
-				img.setImageResource(R.drawable.ic_action_stop);
 				AppInit.asf.fetchThenPlayEventRecording(getString());
 			}
 		});

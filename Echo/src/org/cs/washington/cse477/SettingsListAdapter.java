@@ -84,14 +84,7 @@ public class SettingsListAdapter extends ArrayAdapter<ParseObject> {
 		
 		final ImageView img = (ImageView) rowView.findViewById(R.id.settings_play);
 		img.setClickable(true);
-		String fileName = objectId + ".wav";
-		if (!AppInit.asf.playingSound) {
-			img.setImageResource(R.drawable.ic_action_play);
-		} else if (AppInit.asf.playingSound && fileName.equals(AppInit.asf.filePlaying)) {
-			img.setImageResource(R.drawable.ic_action_stop);
-		} else {
-			img.setImageResource(R.drawable.ic_action_play);
-		}
+		img.setImageResource(R.drawable.ic_action_play);
 		img.setOnClickListener(new OnClickListener() {
 		
 			@Override
