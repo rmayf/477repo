@@ -145,16 +145,14 @@ public class NotificationActivity extends ActionBarActivity
 		try {
 			// TODO: blocking?
 			statusCode = httpReq.execute(urlAndPath).get(10, TimeUnit.SECONDS).intValue();
-			httpReq.execute(urlAndPath);
 		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage());
 			Log.e(LOG_TAG, "Error deleting Notification");
 		}
 		if (statusCode != -1) {
 			Log.v(LOG_TAG, "status code from http response: " + statusCode);
 		} 
 	}
-
-	
 
 	/**
 	 * add menu to view
