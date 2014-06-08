@@ -33,9 +33,7 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = convertView;
-        if (rowView == null) {
-        	rowView = inflater.inflate(R.layout.notification_listview_item, parent, false);
-        }
+    	rowView = inflater.inflate(R.layout.notification_listview_item, parent, false);
         ParseObject obj = values.get(position);
         String filename = (String) obj.get("eventFilename");
         
@@ -59,14 +57,22 @@ public class NotificationListAdapter extends ArrayAdapter<ParseObject> {
 		textview.setText(text);
 		dateview.setText(dateText);
 		
-		ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
+		final ImageView img = (ImageView) rowView.findViewById(R.id.notification_play);
 		img.setClickable(true);
+		if (!AppInit.asf.playingSound) {
+			img.setImageResource(R.drawable.ic_action_play);
+		} else if (AppInit.asf.playingSound && filename.equals(AppInit.asf.filePlaying)) {
+			img.setImageResource(R.drawable.ic_action_stop);
+		} else {
+			img.setImageResource(R.drawable.ic_action_play);
+		}
 		img.setOnClickListener(new OnClickListenerWithArgs(filename) {
 			
 			@Override
 			public void onClick(View v) {
 				// on click of the play button (image), initiate fetch of sound and playback
 				Log.v(TAG,"clicked notifications play for file: " + getString());
+				img.setImageResource(R.drawable.ic_action_stop);
 				AppInit.asf.fetchThenPlayEventRecording(getString());
 			}
 		});

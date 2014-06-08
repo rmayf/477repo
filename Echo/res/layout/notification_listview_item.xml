@@ -12,15 +12,18 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="6dip"
         android:contentDescription="@string/notification_play_desc"
-        android:src="@drawable/ic_action_play" />
+         />
+<!-- android:src="@drawable/ic_action_play" -->
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/notification_text_layout"
         android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:layout_toRightOf="@+id/notification_play"
-	    android:layout_marginLeft="6dip"
-	    android:layout_alignWithParentIfMissing="true" >
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="6dip"
+        android:layout_toRightOf="@+id/notification_play"
+        android:layout_toLeftOf="@+id/notification_delete"
+        android:orientation="vertical" >
+
         <TextView
 	        android:id="@+id/notification_text"
 	        android:layout_width="fill_parent"
@@ -35,6 +38,15 @@
 	        android:gravity="center_vertical"
 	        android:textSize="12sp" />
     </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/notification_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/notification_delete"
+        android:src="@drawable/ic_action_remove" />
     
 
 </RelativeLayout>

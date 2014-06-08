@@ -1,21 +1,7 @@
 package org.cs.washington.cse477;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -23,151 +9,68 @@ import android.util.Log;
 public class AudioSampleFetcher {	
 	private static final String LOG_TAG = "AudioSampleFetcher";
 	private Context context;
-	//private String host = "128.208.7.228";
 	
+	public boolean playingSound;
+	public String filePlaying;
 	
 	public AudioSampleFetcher(Context context) {
 		this.context = context;
+		playingSound = false;
+		filePlaying = null;
 	}
 
 	public void fetchThenPlayTarget(String filename)  {
-		AsyncTask<String, Void, String> task = new FetchInBackgroundThenPlaySound();
-		task.execute("getMatchAgainst", filename);
+		playingSound = true;
+		filePlaying = filename;
+		new FetchInBackgroundThenPlaySound().execute("getMatchAgainst", filename);
 	}
 	// eventually we will implement this because we are either fetching target sounds or
 	// recordings of events.
 	public void fetchThenPlayEventRecording(String filename) {
+		playingSound = true;
+		filePlaying = filename;
 		new FetchInBackgroundThenPlaySound().execute("getEventRecording", filename);
 	}
+	
+	public abstract class MPOnCompleteListener implements MediaPlayer.OnCompletionListener {}
 	
 	/**
 	 * Fetches the file from the nodejs server in a background thread then plays the file
 	 * in the UI thread. Deletes the file from local storage when playback is done.
 	 * 
 	 */
-	private class FetchInBackgroundThenPlaySound extends AsyncTask<String, Void, String> {
+	private class FetchInBackgroundThenPlaySound extends AsyncTask<String, Void, Void> {
 		//args[0] is the method you're calling on the server, either the string "getMatchAgainst"
 		// or the String "getEventRecording"
 		// args[1] is the file you want 
-		protected String doInBackground(String... args) {
-			URI uri = null;
+		protected Void doInBackground(String... args) {
 			String method = args[0];
 			String filename = args[1];
-			try {
-				uri = new URI("http://" + AppInit.host + ":" + AppInit.port + "/" + method + "?filename=" + filename);
-			} catch (URISyntaxException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			};
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet(uri);
-			HttpResponse res = null;
-			try {
-				res = httpClient.execute(httpGet);
-			} catch (ClientProtocolException e) {
-				Log.e(LOG_TAG, "Protocol error: " + e.getMessage());
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				Log.e(LOG_TAG, "IOException error: " + e.getMessage());
-				e.printStackTrace();
-			}
-			if (res == null) {
-				//TODO alert user that the server is down
-				Log.e(LOG_TAG, "Server is down, cannot fetch audio file");
-				httpGet.abort();
-				// null is passed to onPostExecute() and it knows what to do with null input
-				return null;
-			}
 			
-			HttpEntity entity = res.getEntity();
-			byte[] temp = new byte[1024];
-			int bytesRead = 0;
-			InputStream in = null;
-			FileOutputStream outputStream = null;
+			String url = "http://" + AppInit.host + ":" + AppInit.port + "/" + method + "?filename=" + filename;
+			
+			MediaPlayer mediaPlayer = new MediaPlayer();
+			
 			try {
-
-				outputStream = context.openFileOutput(filename, Context.MODE_WORLD_READABLE); // I don't know of any alternatives
-				in = new BufferedInputStream(entity.getContent());
-				while ((bytesRead = in.read(temp)) > 0) {
-					outputStream.write(temp, 0, bytesRead);
-				}
-				in.close();
-				outputStream.close();
-				in.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			String path = context.getApplicationContext().getFilesDir().getAbsolutePath();
-			path += "/";
-			path += filename;
-			Log.v(LOG_TAG, "opening file at location: " + path);	
-			return path;
-		}
-		
-		protected void onPostExecute(String path) {
-			if (path == null) {
-				//TODO alert user that the server is down
-				return;
-			}
-			MediaPlayer mp = new MediaPlayer();
-			mp.setOnCompletionListener(new DeleteAfterPlay(path) {
-				public void onCompletion(MediaPlayer mp) {
-					mp.release();
-					if (deleteFromAppStorage(getPath())) {
-						Log.v(LOG_TAG, "successfully deleted file: " + getPath());
-					} else {
-						Log.e(LOG_TAG, "error deleting file: " + getPath());
+				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+				mediaPlayer.setOnCompletionListener(new MPOnCompleteListener() {
+					
+					@Override
+					public void onCompletion(MediaPlayer mp) {
+						playingSound = false;
+						filePlaying = null;
+						mp.release();
 					}
-				}
-			});
-			try {
-				mp.setDataSource(path);
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				});
+				mediaPlayer.setDataSource(url);
+				mediaPlayer.prepare(); // might take long! (for buffering, etc)
+				mediaPlayer.start();
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "MediaPlayer encountered an error");
+				playingSound = false;
+				filePlaying = null;
 			}
-			try {
-				mp.prepare();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			mp.start();	
+			return null;
 		}
-	}
-	
-	/**
-	 * Partial implementation of the class that is called when media playback completes.
-	 * The unimplemented method onCompletion() is implemented in the callback.
-	 */
-	public abstract class DeleteAfterPlay implements MediaPlayer.OnCompletionListener {
-		private String path;
-		public DeleteAfterPlay(String path) {
-			this.path = path;
-		}
-		public String getPath() {
-			return path;
-		}
-	}
-	
-	// deletes a file from local storage
-	public boolean deleteFromAppStorage(String path) {
-		File toDelete = new File(path);
-		return toDelete.delete();
 	}
 }
