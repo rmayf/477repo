@@ -3,9 +3,9 @@
 // Echo, Audio Detection Device v2.4
 
 //#define _AUTOMATIC_SETUP 
-#define _DEBUG_PRINTING 
+//#define _DEBUG_PRINTING 
 #define _INTERNET
-#define _ENV_WORK
+//#define _ENV_WORK
 
 #ifdef _DEBUG_PRINTING
 #  define _dbprint(x) UARTWrite(1, x)
@@ -27,17 +27,23 @@
 #endif
 
 #define UPLOAD_HEADER_LEN 11
-#define TXBUF_SIZE 4096
+#define TXBUF_SIZE 4086
 #define MAGIC_NUM 0xdeadbabe
 #define SAMPLE_FREQ 0x2B11 // 11025 Hz
 #define BIT_DEPTH 8
 #define OPT_SETUP 2
 #define OPT_UPLOAD 1
-#define ENVELOPE_HISTORY_SIZE 1028
+#define ENVELOPE_HISTORY_SIZE 1024
 
+#define DHCP_TIMEOUT 250
+#define TCP_CLIENT_TIMEOUT 150
+#define TCP_CLIENT_LONG_TIMEOUT 1000
 
-#define ENVELOPE_FIXED_THRES 120
-#define PEAK_FINDER_SIZE 23
+#define ENVELOPE_LOW_THRES 60
+#define ENVELOPE_HIGH_THRES 135
+#define PEAK_FINDER_SIZE 11
+#define FREQ_THRES 8000
+
 #define MEM_SEQUENTIAL_READ 0x3
 #define MEM_SEQUENTIAL_WRITE 0x2
 #define SPI_CLK_PIN p18
@@ -57,11 +63,11 @@ TCP_SOCKET server = INVALID_SOCKET;
 BOOL TIMER = TRUE;
 const UINT32 magic_num = MAGIC_NUM;
 const UINT32 freq = SAMPLE_FREQ;
-
 //int testI = 0;
 //const UINT16 half_max = 0xFFC0 / 2;
 
-
+void tcpClientConnect(void);
+void dhcpConnect(void);
 
 
 void reset() {
@@ -95,6 +101,30 @@ BOOL is_peak(unsigned int *peak) {
   }
   peak_finder[PEAK_FINDER_SIZE - 1] = ADCVal(1);
   return pass;
+}
+
+BOOL is_high_freq() {
+  vTaskSuspendAll();
+  unsigned long long time = 0;
+  unsigned int i = 0;
+  unsigned int dumb;
+  T4CONbits.TON = 1; // timer start
+  while (i < ENVELOPE_HISTORY_SIZE) {
+    if (TIMER) {
+  	  if (is_peak(&dumb)) {
+	    i++;
+	  }
+	  time++;
+    }
+    TIMER = FALSE;
+  } 
+  T4CONbits.TON = 0; // timer stop
+  char msg[40];
+  sprintf(msg, "time was: %llu\r\n", time);
+  UARTWrite(1, msg);
+  xTaskResumeAll();
+
+  return time < FREQ_THRES;
 }
 
 void FlyportTask() {
@@ -135,10 +165,7 @@ void FlyportTask() {
   if (WFCustomExist()) {
     _dbprint("Loading Custom WIFI\r\n");
     WFCustomLoad();
-    WFConnect(WF_CUSTOM);
-    while (WFStatus != CONNECTED);
-	  // Allow time for DHCP to connect
-	while(!DHCPAssigned);
+	dhcpConnect();
   }
   else {
     _dbprint("Loading Default WIFI\r\n");
@@ -149,20 +176,9 @@ void FlyportTask() {
     WFDisconnect();
     while (WFStatus != NOT_CONNECTED);
     WFCustomSave();
-    WFConnect(WF_CUSTOM);
-    while (WFStatus != CONNECTED);
-    _dbprint("Saved Custom Profile\r\n");
-    
-    // Send the setupSuccess message to the server 
-	while(!DHCPAssigned);
-	while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
-	  vTaskDelay(25);
-	  _dbprint("TCP Client Open\r\n");
-	}
-	while (!TCPisConn(server)) {
-	  vTaskDelay(25);
-	  _dbprint("TCP Client Connecting\r\n");
-	}
+	_dbprint("Saved Custom Profile\r\n");
+	dhcpConnect();
+	tcpClientConnect();
     memcpy(txbuf, &magic_num, 4);
     txbuf[4] = OPT_SETUP;
     TCPWrite(server, txbuf, 5);
@@ -201,7 +217,14 @@ void FlyportTask() {
   _dbprint("Echo is Listening...\r\n");
   while(1) {
     if (is_peak(&peak)) {
-      if (peak > ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_FIXED_THRES)) {
+      if (peak > ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_LOW_THRES)) {
+		    
+		    if (peak < ((sum / ENVELOPE_HISTORY_SIZE) + ENVELOPE_HIGH_THRES)) {
+			  if (!is_high_freq()) {
+			    continue;
+			  }
+			}
+			TIMER = FALSE;
 
 			// Threshold was surpassed.  Sample at a fixed rate and write to sram
 			_dbprint("Envelope Surpassed\r\n");
@@ -238,15 +261,7 @@ void FlyportTask() {
 			// A 3 sec clip of 16 bit samples should now be stored in the sram.  These data are 
 			// read back in from memory and sent to the server along with metadata about the 
 			// sample.
-			
-			while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
-			  vTaskDelay(5);
-			  _dbprint("TCP Client Open\r\n");
-			}
-			while (!TCPisConn(server)) {
-			  vTaskDelay(5);
-			  _dbprint("TCP connecting\r\n");
-			}
+			tcpClientConnect();
 			_dbprint("Connected to the server\r\n");
 			// Send the header
 			memcpy(txbuf, &magic_num, 4);
@@ -283,16 +298,92 @@ void FlyportTask() {
 			#endif
 			_dbprint("Done Sending!\r\n");
 			IOPut(o4, off);
+			// Fill the buffer with starting values
+		    env_idx = 0;
+			sum = 0;
+		    while( env_idx < ENVELOPE_HISTORY_SIZE)
+		    {
+			  if (is_peak(&peak)) {
+			    env_hist[env_idx++] = peak;
+			    sum += peak;
+			  }
+		    }
+			_dbprint("Re-calibrate the audio envelope\r\n");
 		  }
 
 		  sum -= env_hist[env_idx];
 		  env_hist[env_idx] = peak;
 		  sum += env_hist[env_idx];
-		  if (++env_idx >= ENVELOPE_HISTORY_SIZE)
+		  if (++env_idx >= ENVELOPE_HISTORY_SIZE) {
 		    env_idx = 0;
+		  }
     }
   }
   
   //cSPITerminate();
   // I YAM IMMORTAL!!!!  
+}
+void tcpClientConnect(void)
+{
+  int ttl = TCP_CLIENT_TIMEOUT;
+  long long lttl = TCP_CLIENT_LONG_TIMEOUT;
+  while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
+    vTaskDelay(5);
+    _dbprint("TCP Client Open\r\n");
+  }
+  
+  while (!TCPisConn(server)) {
+    if ( ttl > 0 )
+    {
+  	  vTaskDelay(5);
+  	  _dbprint("TCP connecting\r\n");
+  	  ttl--;
+	  lttl--;
+    }
+    else
+    {
+	  if ( lttl <= 0 )
+	  {
+		dhcpConnect();
+		lttl = TCP_CLIENT_LONG_TIMEOUT;
+	  }
+  	  _dbprint("Reset TCP Client\r\n");
+  	  TCPClientClose(server);
+  	  while((server = TCPClientOpen(SERV_IP_ADDR, SERV_PORT)) == INVALID_SOCKET) {
+		vTaskDelay(5);
+	    _dbprint("TCP Client Open\r\n");
+	  }
+	  ttl = TCP_CLIENT_TIMEOUT;
+    }
+	char msg[10];
+	sprintf(msg, "lttl: %ll\r\n",lttl);
+	_dbprint(msg);
+  }
+
+}
+
+void dhcpConnect(void)
+{
+  int ttl = DHCP_TIMEOUT;
+  WFConnect(WF_CUSTOM);
+  while (WFStatus != CONNECTED);
+  
+  // Send the setupSuccess message to the server 
+  while(!DHCPAssigned)
+  {
+	if ( ttl > 0 )
+	{
+	  vTaskDelay(5);
+  	  _dbprint("DHCP connecting\r\n");
+  	  ttl--;
+	}
+	else
+	{
+	  _dbprint("Reset WiFi\r\n");
+  	  WFDisconnect();
+	  WFConnect(WF_CUSTOM);
+	  while (WFStatus != CONNECTED);
+	  ttl = DHCP_TIMEOUT;
+	}
+  }
 }
