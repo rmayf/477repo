@@ -225,6 +225,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 			startActivity(progressIntent);
 		} else {
 			Log.v(LOG_TAG, "could not detect EchoSetup...did not attempt to connect");
+			initWifiScan(null);
 			mError_dlg.show(getFragmentManager(), "devicesetuperrordialog");
 		}
 	}

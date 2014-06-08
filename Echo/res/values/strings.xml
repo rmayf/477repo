@@ -28,7 +28,7 @@
     <string name="dev_setup_prog_prompt">Please wait while your EchoBox is configured...</string>
     
     <!-- Device Setup Error Dialog -->
-    <string name="dev_setup_error_dlg_prompt">Echo could not detect your EchoBox!\n\nEnsure your EchoBox is powered on or try resetting your EchoBox.</string>
+    <string name="dev_setup_error_dlg_prompt">Echo could not detect your EchoBox!\n\nPlease wait a few seconds for your phone to scan for EchoBox\'s WiFi network.</string>
     <string name="dev_setup_error_dlg_b_text">Try Again</string>
     <!-- Device Setup Progress Error Dialog -->
     <string name="dev_setup_prog_error_dlg_prompt">EchoBox setup failed. Please try again or attempt Alternate Setup</string>
