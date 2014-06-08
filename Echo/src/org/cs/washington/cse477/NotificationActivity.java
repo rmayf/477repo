@@ -2,9 +2,7 @@ package org.cs.washington.cse477;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
 
@@ -81,7 +79,6 @@ public class NotificationActivity extends ActionBarActivity
 			@Override
 			public void done(List<ParseObject> objs, ParseException e) {
 				if (e == null && mParseNotifications != null && mNotifyAdapter != null) {
-					// TODO: crashes if mParseNotifications is null, i.e. this activity has never been opened but a notification arrives
 					mParseNotifications.clear();
 					mParseNotifications.addAll(objs);
 					mNotifyAdapter.notifyDataSetChanged();
@@ -146,16 +143,11 @@ public class NotificationActivity extends ActionBarActivity
 		AsyncTask<String,Void,Integer> httpReq = new AsyncHttpRequestToMatchServer();
 		int statusCode = -1;
 		try {
+			// TODO: blocking?
 			statusCode = httpReq.execute(urlAndPath).get(10, TimeUnit.SECONDS).intValue();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			httpReq.execute(urlAndPath);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Error deleting Notification");
 		}
 		if (statusCode != -1) {
 			Log.v(LOG_TAG, "status code from http response: " + statusCode);

@@ -4,9 +4,7 @@ package org.cs.washington.cse477;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.cs.washington.cse477.AddAudioSampleDialog.AddAudioSampleDialogListener;
 import org.cs.washington.cse477.ConfirmDeleteDialog.ConfirmDeleteListener;
@@ -240,16 +238,10 @@ public class SettingsActivity extends ActionBarActivity implements
 		AsyncTask<String,Void,Integer> httpReq = new AsyncHttpRequestToMatchServer();
 		int statusCode = -1;
 		try {
+			// TODO: blocking?
 			statusCode = httpReq.execute(urlAndPath).get(10, TimeUnit.SECONDS).intValue();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Error setting next sound as target");
 		}
 		if (statusCode != -1) {
 			Log.v(LOG_TAG, "status code from http response: " + statusCode);
@@ -282,15 +274,8 @@ public class SettingsActivity extends ActionBarActivity implements
 		int statusCode = -1;
 		try {
 			statusCode = httpReq.execute(urlAndPath).get(10, TimeUnit.SECONDS).intValue();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Error deleting Sound");
 		}
 		if (statusCode != -1) {
 			Log.v(LOG_TAG, "status code from http response: " + statusCode);
