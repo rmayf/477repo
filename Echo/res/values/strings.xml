@@ -32,7 +32,7 @@
     <string name="dev_setup_error_dlg_prompt">Echo could not detect your EchoBox!\n\nPlease wait a few seconds for your phone to scan for EchoBox\'s WiFi network.</string>
     <string name="dev_setup_error_dlg_b_text">Try Again</string>
     <!-- Device Setup Progress Error Dialog -->
-    <string name="dev_setup_prog_error_dlg_prompt">EchoBox setup encountered an error. Please try again or attempt Alternate Setup</string>
+    <string name="dev_setup_prog_error_dlg_prompt">EchoBox setup encountered an error, please try again.</string>
     <string name="dev_setup_prog_error_dlg_b_text">Continue</string>
     
     
@@ -49,7 +49,7 @@
     
     <!-- Add Audio Dialog Fragment -->
     <string name="audio_dlg_hint">Name the sound</string>
-    <string name="audio_dlg_prompt">Enter a name for your sound.\n\nAfter pressing Ready, wait 6 seconds then make the sound within range of your EchoBox.\n</string>
+    <string name="audio_dlg_prompt">Enter a name for your sound.\n\nAfter pressing Ready, wait a few seconds then make the sound within range of your EchoBox.\n\nThe first loud sound your EchoBox hears will be recorded with this name.</string>
     <string name="audio_dlg_prompt2"></string>
     <string name="audio_dlg_cancel">Cancel</string>
     <string name="audio_dlg_ready">Ready</string>        

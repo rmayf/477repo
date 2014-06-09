@@ -56,7 +56,7 @@ public class DeviceSetupActivity extends ActionBarActivity {
 	protected String mSSID_user = "";
 	protected String mPass_user = "";
 	protected String mEncr_user = "";
-	protected static final String[] mSecurityArray = new String[] { "WPA2", "WPA", "Open" };
+	protected static final String[] mSecurityArray = new String[] { "WPA2-PSK", "WPA-PSK", "Open" };
 	
 	protected final FragmentManager mFragmentManager = getFragmentManager();
 	protected static final DeviceSetupErrorDialog mError_dlg = new DeviceSetupErrorDialog();
