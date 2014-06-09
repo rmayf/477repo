@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class NotificationPushReceiver extends BroadcastReceiver {
 
-	private static final String TAG = "NotificationPushReceiver";
+	private static final String TAG = "NotificationPushReceiver";	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		try {

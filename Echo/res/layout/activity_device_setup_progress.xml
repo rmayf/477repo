@@ -37,5 +37,19 @@
         android:layout_alignParentRight="true"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/dev_setup_prog_error_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/dev_setup_prog_bar"
+        android:layout_alignRight="@+id/dev_setup_prog_bar"
+        android:layout_below="@+id/dev_setup_prog_bar"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:textStyle="italic"
+        android:text="@string/dev_setup_prog_error_hint" />
     
 </RelativeLayout>

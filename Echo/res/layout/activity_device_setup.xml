@@ -115,7 +115,7 @@
         android:layout_alignLeft="@+id/dev_setup_networks_spinner"
         android:layout_alignRight="@+id/dev_setup_networks_spinner"
         android:layout_marginBottom="28dp"
-        android:inputType="textPassword" >
+        android:inputType="textNoSuggestions" >
     </EditText>
 
     

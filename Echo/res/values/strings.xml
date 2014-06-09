@@ -26,13 +26,15 @@
     
     <!-- Device Setup Progress -->
     <string name="dev_setup_prog_prompt">Please wait while your EchoBox is configured...</string>
+    <string name="dev_setup_prog_error_hint">If setup hangs on this screen for more than 30 seconds reset your EchoBox and retry setup.</string>
     
     <!-- Device Setup Error Dialog -->
     <string name="dev_setup_error_dlg_prompt">Echo could not detect your EchoBox!\n\nPlease wait a few seconds for your phone to scan for EchoBox\'s WiFi network.</string>
     <string name="dev_setup_error_dlg_b_text">Try Again</string>
     <!-- Device Setup Progress Error Dialog -->
-    <string name="dev_setup_prog_error_dlg_prompt">EchoBox setup failed. Please try again or attempt Alternate Setup</string>
+    <string name="dev_setup_prog_error_dlg_prompt">EchoBox setup encountered an error. Please try again or attempt Alternate Setup</string>
     <string name="dev_setup_prog_error_dlg_b_text">Continue</string>
+    
     
     <!-- Notification Screen -->
     <string name="notification_play_desc">Play</string>
@@ -46,8 +48,8 @@
 
     
     <!-- Add Audio Dialog Fragment -->
-    <string name="audio_dlg_hint">Name the sample</string>
-    <string name="audio_dlg_prompt">Enter a descriptive name for the noise you want Echo to listen for, then press Ready!\n\nAfter pressing Ready, wait 6 seconds then make a loud noise to train Echo</string>
+    <string name="audio_dlg_hint">Name the sound</string>
+    <string name="audio_dlg_prompt">Enter a name for your sound.\n\nAfter pressing Ready, wait 6 seconds then make the sound within range of your EchoBox.\n</string>
     <string name="audio_dlg_prompt2"></string>
     <string name="audio_dlg_cancel">Cancel</string>
     <string name="audio_dlg_ready">Ready</string>        
